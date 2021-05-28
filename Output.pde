@@ -67,10 +67,6 @@ class Displayer extends Module{
     initDisplay();
   }
   
-  void updateSavePath(){
-    savePath = cp5.get(Textfield.class, "savePath"+str(id)).getText();
-  }
-  
   void initDisplay(){ 
     img = createImage(globalWidth, globalHeight, RGB);
     img.loadPixels();

@@ -46,6 +46,7 @@ public abstract class Module{
   PVector size;
   color c;
   
+  
   //made false when a module is deleted
   boolean active = true;
   
@@ -85,9 +86,6 @@ public abstract class Module{
   }
   
   void display(){      
-    fill(0);
-    text(name, pos.x+10, pos.y-3);
-    
     stroke(0);
     fill(c);
     if (selected){
@@ -112,7 +110,17 @@ public abstract class Module{
     }
     for (ModOutput n : modOuts){
       n.display();
-    }    
+    }
+    
+    fill(0);
+    
+    if (name.length() < 5){
+      textAlign(CENTER);
+      text(name, pos.x+size.x/2, pos.y+20);
+    } else {    
+      textAlign(LEFT);
+      text(name, pos.x+10, pos.y-3);
+    }
   }
   
   //If InputNode.lookUp, there is a module above it that needs to operate before
@@ -149,7 +157,7 @@ public abstract class Module{
   //Should we put a check to see if the module is already looking up? Cause if so, it has
   //already told everybody down below to look up as well. There's a lot of double counting.
   void headsUp(){
-    //println(name+" headsUp" + frameCount);
+    //println(name);
     for (OutputNode n : outs){
       for (PVector p : n.receivers){
         modules.get((int)p.x).ins[(int)p.y].lookUp = true;
@@ -297,7 +305,7 @@ public abstract class Module{
     case "math" :
       modules.add(new Math(newPos));
       break; 
-    case "absolute value" :
+    case "| |" :
       modules.add(new AbsoluteValue(newPos));
       break; 
     case "sampler" :
@@ -309,22 +317,22 @@ public abstract class Module{
     case "or" :
       modules.add(new Or(newPos));
       break;
-    case "exclusive or" :
+    case "xor" :
       modules.add(new XOr(newPos));
       break; 
     case "not" :
       modules.add(new Not(newPos));
       break;   
-    case "add" :
+    case "+" :
       modules.add(new Add(newPos));
       break;
-    case "subtract" :
+    case "-" :
       modules.add(new Subtract(newPos));
       break; 
-    case "multiply" :
+    case "x" :
       modules.add(new Multiply(newPos));
       break; 
-    case "divide" :
+    case "/" :
       modules.add(new Divide(newPos));
       break;
     case "feedback" :
@@ -333,15 +341,15 @@ public abstract class Module{
     case "rotate" :
       modules.add(new Rotate(newPos));
       break; 
+    case "reflect" :
+      modules.add(new Reflect(newPos));
+      break;  
     case "random" :
       modules.add(new Random(newPos));
       break;
-    case "heightmap" :
+    case "height map" :
       modules.add(new HeightMap(newPos));
-      break;
-    case "spheroid" :
-      modules.add(new Spheroid(newPos));
-      break;   
+      break;  
     case "scale" :
       modules.add(new Scale(newPos));
       break;
@@ -353,15 +361,9 @@ public abstract class Module{
       break;
     case "translate" :
       modules.add(new Translate(newPos));
-      break;   
-    case "spindle" :
-      modules.add(new Spindle(newPos));
-      break;
+      break;      
     case "iterator" :
       modules.add(new Iterator(newPos));
-      break;
-    case "saturate" :
-      modules.add(new Saturate(newPos));
       break;  
     case "kernel" :
       modules.add(new Kernel(newPos));
@@ -377,7 +379,16 @@ public abstract class Module{
       break;
     case "celato" :
       modules.add(new Celato(newPos));
+      break; 
+    case "spheroid" :
+      modules.add(new Spheroid(newPos));
+      break;   
+    case "spindle" :
+      modules.add(new Spindle(newPos));
       break;
+    case "mean" :
+      modules.add(new MedianFilter(newPos));
+      break;  
     case "median" :
       modules.add(new MedianFilter(newPos));
       break;
@@ -389,7 +400,7 @@ public abstract class Module{
       break;
     case "distance" :
       modules.add(new DistanceTransform(newPos));
-      break;
+      break; 
     case "histograb" :
       modules.add(new Histograb(newPos));
       break;
@@ -419,6 +430,9 @@ public abstract class Module{
       break;   
     case "global max" :
       modules.add(new GlobalMax(newPos));
+      break;
+    case "center" :
+      modules.add(new CenterOfMass(newPos));
       break;   
     case "gray dilate" :
       modules.add(new GrayDilate(newPos));
@@ -426,6 +440,15 @@ public abstract class Module{
     case "gray erode" :
       modules.add(new GrayErode(newPos));
       break; 
+    case "blob" :
+      modules.add(new Blob(newPos));
+      break;  
+    case "DFT" :
+      modules.add(new DFTModule(newPos));
+      break; 
+    case "IDFT" :
+      modules.add(new IDFTModule(newPos));
+      break;    
     case "<" :
       modules.add(new LessThan(newPos));
       break;  

@@ -134,7 +134,7 @@ class TextGen extends Module{
     super(pos_);
     size = new PVector(110, 50);
     c = color(125, 100, 175);
-    name = "text";
+    name = "text ";
     helper = new HelpBox(textHelp);
     
     cp5.addSlider("size"+str(id))
@@ -219,94 +219,11 @@ class TextGen extends Module{
   
 }
 
-class Worley extends Module{
-  
-  ArrayList<PVector> seedPoints = new ArrayList<PVector>();
-  
-  Worley(PVector pos_){
-    super(pos_);
-    size = new PVector(99, 24);
-    c = color(125, 100, 175);
-    name = "worley";
- 
-    cp5.addSlider("whichPoint"+str(id))
-      .setLabel("")
-      .setPosition(6, 8)
-      .setWidth(80)
-      .setHeight(10)
-      .setRange(1, 3)
-      .setValue(1)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))
-      ;    
-
-
-    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
-    
-    ins = new InputNode[1];
-    outs = new OutputNode[1];
-    modIns = new ModInput[1];
-    
-    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
-    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
-    modIns[0] = new ModInput(new PVector(id, 0, -1), new PVector(pos.x+size.x-8, pos.y+10), "whichPoint"+str(id));
-      
-  }
-  
-  //clunky but ok. We need a way to distinguish manual slider changes from
-  //those performed by Modifiers. Controller has a method isMousePressed(),
-  // but 
-  
-  void cp5Handler(float val){
-    if (cp5.getController("whichPoint"+str(id)).isMousePressed()){
-      if (!modIns[0].pauseInput){
-        modIns[0].baseVal = val;
-        modIns[0].pauseInput = true;
-      }
-    }
-    super.headsUp();
-  }
-  
-  void generateSeed(){
-    int in = ins[0].flowId;
-    seedPoints.clear();
-    for (int i = 0; i < globalWidth; i++){
-      for (int j = 0; j < globalHeight; j++){
-        if (stack.get(in).data[i+j*globalWidth] == 255 && seedPoints.size() < globalWidth){
-          seedPoints.add(new PVector(i, j));
-        }
-      }
-    }
-  }
-  
-  void operate(){
-    super.operate();
-    generateSeed();
-    int out = outs[0].flowId;
-    float highMap = map(seedPoints.size(), 1, globalWidth, 200, 20);
-    int whichPoint = min(seedPoints.size(), (int)cp5.getController("whichPoint"+str(id)).getValue()); 
-    if (seedPoints.size() > 0){
-      for (int i = 0; i < globalWidth; i++){
-        for (int j = 0; j < globalHeight; j++){ 
-          float[] distances = new float[seedPoints.size()];
-          for (int k = 0; k < seedPoints.size(); k++){
-            distances[k] = dist(i, j, seedPoints.get(k).x, seedPoints.get(k).y);
-          }
-          float[] sorted = sort(distances);
-          stack.get(out).data[i+j*globalWidth] = map(sorted[whichPoint-1], 0, highMap, 0, 255);
-        }
-      }
-    }
-    super.lookDown(); 
-  }
- 
-}
-
 class Random extends Module{
     
   Random(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(125, 100, 175);
     name = "random";  
     helper = new HelpBox(randomHelp);
@@ -1074,10 +991,13 @@ public class Image extends Module{
     outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));     
     outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-38, pos.y+size.y-8));   
     outs[1].col  = color(255, 0, 0);
+    outs[1].colorChannels.set(255, 0, 0);
     outs[2] = new OutputNode(new PVector(id, 2), new PVector(pos.x+size.x-23, pos.y+size.y-8));     
     outs[2].col  = color(0, 255, 0);
+    outs[2].colorChannels.set(0, 255, 0);
     outs[3] = new OutputNode(new PVector(id, 3), new PVector(pos.x+size.x-8, pos.y+size.y-8));     
     outs[3].col  = color(0, 0, 255);
+    outs[3].colorChannels.set(0, 0, 255);
   }
   
   void getImage(){
@@ -1135,7 +1055,7 @@ public class Vid extends Module{
   Vid(PVector pos_){
     super(pos_);
     size = new PVector(80, 76);
-    c = color(125, 100, 175);    
+    c = color(125, 100, 175); 
     name = "video";
     helper = new HelpBox(videoHelp);
     isMovie = true;
@@ -1210,10 +1130,13 @@ public class Vid extends Module{
     outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));     
     outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-38, pos.y+size.y-8));   
     outs[1].col  = color(255, 0, 0);
+    outs[1].colorChannels.set(255, 0, 0);
     outs[2] = new OutputNode(new PVector(id, 2), new PVector(pos.x+size.x-23, pos.y+size.y-8));     
     outs[2].col  = color(0, 255, 0);
+    outs[2].colorChannels.set(0, 255, 0);
     outs[3] = new OutputNode(new PVector(id, 3), new PVector(pos.x+size.x-8, pos.y+size.y-8));     
     outs[3].col  = color(0, 0, 255);
+    outs[3].colorChannels.set(0, 0, 255);
     modIns[0] = new ModInput(new PVector(id, 0, -1), new PVector(pos.x+size.x-8, pos.y+28), "playbackRate"+str(id));
     modIns[1] = new ModInput(new PVector(id, 1, -1), new PVector(pos.x+size.x-8, pos.y+52), "scrub"+str(id));
   }

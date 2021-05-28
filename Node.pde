@@ -9,6 +9,8 @@ public abstract class Node{
   int size = 8; 
   color col;
   color cableCol;
+  //this vector reflects whether designated color channels (from video or image) are upstream
+  PVector colorChannels = new PVector(0, 0, 0);
   boolean mouseOver = false;
   
   //id - module, #, input/output
@@ -44,7 +46,7 @@ class InputNode extends Node{
     
   InputNode(PVector id_, PVector pos_){
     super(id_, pos_);  
-    col = color(255);
+    col = color(250);
   }
   
   void onMousePressed(){
@@ -86,9 +88,10 @@ class InputNode extends Node{
 class OutputNode extends Node{
   
   ArrayList<PVector> receivers = new ArrayList<PVector>();
+  
   OutputNode(PVector id_, PVector pos_){
     super(id_, pos_);
-    col = color(255);
+    col = color(250);
     stack.add(new Flow());
     flowId = stack.size()-1;
   }
@@ -112,21 +115,24 @@ class OutputNode extends Node{
   }
   
   void onMousePressed(){
-    //assigning cable color here because something breaks when we assign it in OutputNode constructor
-    if (red(col) == 255 && green(col) == 0 && blue(col) == 0){
-      cableCol = color(255, 0, 0);
-    } else if (red(col) == 0 && green(col) == 255 && blue(col) == 0){
-      cableCol = color(0, 255, 0);
-    } else if (red(col) == 0 && green(col) == 0 && blue(col) == 255){
-      cableCol = color(0, 0, 255);
+    //assigning cable color here because Module Nodes are built before Module color is assigned in Module constructor
+    //causes issue when Modules are copied
+    if (red(col) == 255){
+      cableCol = color(200, 0, 0);
+    } else if (green(col) == 255){
+      cableCol = color(0, 200, 0);
+    } else if (blue(col) == 255){
+      cableCol = color(0, 0, 200);
     } else {
-      cableCol = color(red(modules.get((int)id.x).c)-50, green(modules.get((int)id.x).c)-50, blue(modules.get((int)id.x).c)-50);
+      color modCol = modules.get((int)id.x).c;
+      cableCol = color(red(modCol)-50, green(modCol)-50, blue(modCol)-50);
     }
     //cue is held to build a connection once an input is pressed
     if (cue == null){
       cue = id.copy();
     }
   }
+  
   
   //outputNode is responsible for making dimensions congruent. silliness
   void addReceiver(PVector nodeId){

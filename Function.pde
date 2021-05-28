@@ -226,8 +226,8 @@ class Histograb extends Module{
   Histograb(PVector pos_){
     super(pos_);
     name = "histograb";
-    size = new PVector(36, 30);
-    c = color(200);
+    size = new PVector(41, 30);
+    c = color(50, 150, 100);
     helper = new HelpBox(histoHelp);
      //these are the nodes that allow the user to interact with the module 
       
@@ -394,7 +394,7 @@ class Celato extends Module{
   
   Celato(PVector pos_){
     super(pos_);
-    name = "cellular automata";
+    name = "celato";
     size = new PVector(120, 55);
     c = color(150, 100, 50);
     helper = new HelpBox(celatoHelp); 
@@ -546,7 +546,7 @@ class Dilate extends Module{
   Dilate(PVector pos_){
     super(pos_);
     name = "dilate";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(dilateHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -627,7 +627,7 @@ class HitAndMiss extends Module{
   HitAndMiss(PVector pos_){
     super(pos_);
     name = "hit and miss";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(hitAndMissHelp);  
       
@@ -698,7 +698,7 @@ class Erode extends Module{
   Erode(PVector pos_){
     super(pos_);
     name = "erode";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(erodeHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -779,7 +779,7 @@ class Valley extends Module{
   Valley(PVector pos_){
     super(pos_);
     name = "valley";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(valleyHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -833,7 +833,7 @@ class Peak extends Module{
   Peak(PVector pos_){
     super(pos_);
     name = "peak";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(peakHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -886,7 +886,7 @@ class GrayDilate extends Module{
   GrayDilate(PVector pos_){
     super(pos_);
     name = "gray dilate";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(grayDilateHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -952,7 +952,7 @@ class GrayErode extends Module{
   GrayErode(PVector pos_){
     super(pos_);
     name = "gray erode";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(grayErodeHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -1020,7 +1020,7 @@ class Blob extends Module{
   Blob(PVector pos_){
     super(pos_);
     name = "blob";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(blobHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -1101,173 +1101,166 @@ class Blob extends Module{
       }
     }
     
-    //scan lines, doesn't work
-    //int in = ins[0].flowId;
-    //int out = outs[0].flowId;
-    //int[] vert = new int[globalWidth*globalHeight];
-    //int[] horiz = new int[globalWidth*globalHeight];
-    //int[] labels = new int[globalWidth*globalHeight];
-    //for (int i : vert){
-    //  i = 0;
-    //}
-    //for (int i : horiz){
-    //  i = 0;
-    //}
-    //for (int i : labels){
-    //  i = 0;
-    //}
-    //int vertCounter = 1;
-    //int horizCounter = 1;
-    
-    ////construct vertical regions
-    //for (int i = 0; i < globalWidth; i++){
-    //  for (int j = 0; j < globalHeight; j++){
-    //    if (stack.get(in).data[i+j*globalWidth] == 255){
-    //      while(stack.get(in).data[i+j*globalWidth] == 255 && j < globalHeight-1){
-    //        vert[i+j*globalWidth] = vertCounter;
-    //        j++;
-    //      }
-    //      vertCounter++;
-    //    }
-    //  }
-    //}
-    
-    ////construct horizontal regions
-    //for (int j = 0; j < globalHeight; j++){
-    //  for (int i = 0; i < globalWidth; i++){
-    //    if (stack.get(in).data[i+j*globalWidth] == 255){
-    //      while(stack.get(in).data[i+j*globalWidth] == 255 && i < globalWidth-1){
-    //        horiz[i+j*globalWidth] = horizCounter;
-    //        i++;
-    //      }
-    //      horizCounter++;
-    //    }
-    //  }
-    //}
-    
-    //for (int i = 0; i < globalWidth; i++){
-    //  for (int j = 0; j < globalHeight; j++){
-    //    int loc = i+j*globalWidth;
-    //    if (vert[loc] > 0){
-    //      int currentLabel = 0;
-    //      int vStep = 0;
-          
-    //      //check if any pixels in the current vertical run have already been assigned
-    //      while(vert[i+(j+vStep)*globalWidth] > 0 && j+vStep < globalHeight-1){
-            
-    //        //if so, set currentLabel to the discovered label value
-    //        if (labels[i+(j+vStep)*globalWidth] > 0 && currentLabel == 0){
-    //          currentLabel = labels[i+(j+vStep)*globalWidth];
-    //        }
-    //        vStep++;
-    //      }
-          
-    //      //if none of the pixels in the current vertical run have been assigned,
-    //      //make the current label the same as the vertical label.
-    //      if (currentLabel == 0){
-    //        currentLabel = vert[loc];
-    //      }
-          
-    //      //for every pixel in the vertical run and every horizontally connected pixel,
-    //      //assign the current label
-    //      for (int k = 0; k < vStep; k++){
-    //        labels[i+(j+k)*globalWidth] = currentLabel;
-    //        if (horiz[loc] > 0){
-    //          int hStep = 1;
-    //          while(horiz[i+hStep+j*globalWidth] > 0 && i+hStep < globalWidth-1){
-    //            labels[i+hStep+j*globalWidth] = currentLabel;
-    //            hStep++;
-    //          }
-    //        }
-    //      }
-    //    }
-    //  }
-    //}
-    
-    //for (int i = 0; i < globalWidth; i++){
-    //  for (int j = 0; j < globalHeight; j++){
-    //    int loc = i+j*globalWidth;
-    //    stack.get(out).data[loc] = labels[loc];
-    //  }
-    //}
-    //maxBlob = 0;
-    
-    //int in = ins[0].flowId;
-    //int out = outs[0].flowId;
-    //int labelCounter = 1;
-    //labels  = new float[globalWidth*globalHeight];
-    //for (float f : labels){
-    //  f = 0;
-    //}    
-    
-    ////recursive method, overflows any time blobSize > ~13000
-    
-    //for (int i = 0; i < globalWidth; i++){
-    //  for (int j = 0; j < globalHeight; j++){        
-    //    int loc = i+j*globalWidth;
-        
-    //    //if the input signal is on (white) and hasn't been labelled
-    //    //label it and all connected pixels
-    //    if (stack.get(in).data[loc] == 255 && labels[loc] == 0){
-    //      labelComponent(i, j, labelCounter, 0);
-    //      labelCounter++;
-    //    }
-        
-    //  }
-    //}  
-    
-    //for (int i = 0; i < globalWidth; i++){
-    //  for (int j = 0; j < globalHeight; j++){        
-    //    int loc = i+j*globalWidth;        
-    //    stack.get(out).data[loc] = labels[loc];      
-    //  }
-    //} 
-    
-    //totalBlobs = labelCounter;
-    
+   
     super.lookDown();
   }
   
-  //recursive method 
-  //void labelComponent(int x, int y, int label, int blobSize){
+}
+
+class DFT extends Module{
     
-  //  //label the pixel
-  //  labels[x+y*globalWidth] = label;
-    
-  //  blobSize++;
-  //  if (blobSize > maxBlob){
-  //    maxBlob = blobSize;
-  //  }
-    
-  //  //cap blob size bc stack overflow
-  //  if (blobSize < 10000){
-  //    //look at all of its cardinal neighbors to label them appropriately
-  //    for (int i = -1; i < 2; i++){
-  //      for (int j = -1; j < 2; j++){ 
-  //        if ((i == 0 && j != 0) || (j == 0 && i != 0)){
-         
-  //          int neighborX = x+i;
-  //          int neighborY = y+j;
-            
-  //          //only look at neighbors within the signal boundary
-  //          if (neighborX >= 0 && neighborX < globalWidth && neighborY >= 0 && neighborY < globalHeight){
-              
-  //            //don't label pixels that are black at the input or pixels that have already been labelled
-  //            if (!(stack.get(ins[0].flowId).data[neighborX+neighborY*globalWidth] == 0 || labels[neighborX+neighborY*globalWidth] >= 1)){
-  //              labelComponent(neighborX, neighborY, label, blobSize);
-  //            }
-  //          }       
-  //        }
-  //      }
-  //    }
-  //  }   
-  //}
+  DFT(PVector pos_){
+    super(pos_);
+    name = "DFT";
+    size = new PVector(41, 30);
+    c = color(50, 150, 100);
+    helper = new HelpBox(dftHelp);  
+    //these are the nodes that allow the user to interact with the module 
+      
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
+    ins = new InputNode[1];
+    outs = new OutputNode[2];
+   
+    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
+    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
+    outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-8, pos.y+size.y-8));
+  }
   
   
-  //void display(){
-  //  super.display();
-  //  text(str(totalBlobs)+", "+str(maxBlob), pos.x+8, pos.y+22);
-  //}
+  //add padding
+  void operate(){
+    super.operate();
+    
+    int in = ins[0].flowId;
+    int out1 = outs[0].flowId;
+    int out2 = outs[1].flowId;
+    
+    Complex[] complexInput = new Complex[globalWidth*globalHeight];
+    Complex[] complexOutput = new Complex[globalWidth*globalHeight];
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j*globalWidth;
+        complexInput[loc] = new Complex((double)stack.get(in).data[loc], 0);
+      }
+    }
+    
+    complexOutput = FFT.fft(complexInput);
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j * globalWidth;
+        stack.get(out1).data[loc] = (float)complexOutput[loc].re;
+        stack.get(out2).data[loc] = (float)complexOutput[loc].im;
+      }
+    }    
+    super.lookDown();
+  }
+}
+
+class DFTModule extends Module{
+    
+  DFTModule(PVector pos_){
+    super(pos_);
+    name = "DFT";
+    size = new PVector(41, 30);
+    c = color(50, 150, 100);
+    helper = new HelpBox(dftHelp);  
+    //these are the nodes that allow the user to interact with the module 
+      
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
+    ins = new InputNode[1];
+    outs = new OutputNode[2];
+   
+    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
+    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
+    outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-8, pos.y+size.y-8));
+  }
+  
+  
+  //add padding
+  void operate(){
+    super.operate();
+    
+    int in = ins[0].flowId;
+    int out1 = outs[0].flowId;
+    int out2 = outs[1].flowId;
+    
+    Complex[] complexInput = new Complex[globalWidth*globalHeight];
+    Complex[] complexOutput = new Complex[globalWidth*globalHeight];
+
+    //convert float inputs to complex values    
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j*globalWidth;
+        complexInput[loc] = new Complex((double)stack.get(in).data[loc], 0);
+      }
+    }
+
+    //do fft on complex values
+    complexOutput = FFT.fft(complexInput);
+    
+    //send real and imaginary components to Module output
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j * globalWidth;
+        stack.get(out1).data[loc] = (float)complexOutput[loc].re;
+        stack.get(out2).data[loc] = (float)complexOutput[loc].im;
+      }
+    }    
+    super.lookDown();
+  }
+}
+
+class IDFTModule extends Module{
+    
+  IDFTModule(PVector pos_){
+    super(pos_);
+    name = "IDFT";
+    size = new PVector(41, 30);
+    c = color(50, 150, 100);
+    helper = new HelpBox(idftHelp);  
+    //these are the nodes that allow the user to interact with the module 
+      
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
+    ins = new InputNode[2];
+    outs = new OutputNode[1];
+   
+    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
+    ins[1] = new InputNode(new PVector(id, 1), new PVector(pos.x+size.x-8, pos.y));
+    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
+  }
+  
+  
+  //add padding
+  void operate(){
+    super.operate();
+    
+    int in1 = ins[0].flowId;
+    int in2 = ins[1].flowId;
+    int out = outs[0].flowId;
+    
+    Complex[] complexInput = new Complex[globalWidth*globalHeight];
+    Complex[] complexOutput = new Complex[globalWidth*globalHeight];
+
+    //convert float inputs to complex values
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j*globalWidth;
+        complexInput[loc] = new Complex((double)stack.get(in1).data[loc], (double)stack.get(in2).data[loc]);
+      }
+    }
+    
+    //do ifft on input
+    complexOutput = FFT.ifft(complexInput);
+    
+    //send the real component out of the Module
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j * globalWidth;
+        stack.get(out).data[loc] = (float)complexOutput[loc].re;
+      }
+    }    
+    super.lookDown();
+  }
 }
 
 class LocalMin extends Module{
@@ -1275,7 +1268,7 @@ class LocalMin extends Module{
   LocalMin(PVector pos_){
     super(pos_);
     name = "local min";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(minHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -1362,7 +1355,7 @@ class LocalMax extends Module{
   LocalMax(PVector pos_){
     super(pos_);
     name = "local max";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(maxHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -1449,7 +1442,7 @@ class GlobalMin extends Module{
   GlobalMin(PVector pos_){
     super(pos_);
     name = "global min";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(globalMinHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -1491,7 +1484,7 @@ class GlobalMax extends Module{
   GlobalMax(PVector pos_){
     super(pos_);
     name = "global max";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(globalMaxHelp);  
     //these are the nodes that allow the user to interact with the module 
@@ -1538,7 +1531,7 @@ class CenterOfMass extends Module{
   
   CenterOfMass(PVector pos_){
     super(pos_);
-    name = "center of mass";
+    name = "center";
     size = new PVector(72, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(centerHelp);  
@@ -1658,7 +1651,7 @@ class DistanceTransform extends Module{
   DistanceTransform(PVector pos_){
     super(pos_);
     name = "distance";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(50, 150, 100);
     helper = new HelpBox(distanceHelp);
      //these are the nodes that allow the user to interact with the module 
@@ -1752,6 +1745,88 @@ class DistanceTransform extends Module{
     super.lookDown();
   }
 }
+
+//works on small displays! Not big or medium ones
+//class EuclideanDistanceTransform extends Module{
+  
+//  EuclideanDistanceTransform(PVector pos_){
+//    super(pos_);
+//    name = "euclidean";
+//    size = new PVector(41, 30);
+//    c = color(50, 150, 100);
+//    helper = new HelpBox(distanceHelp);
+//     //these are the nodes that allow the user to interact with the module 
+      
+//    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
+//    ins = new InputNode[1];
+//    outs = new OutputNode[1];
+   
+//    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
+//    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
+//  }
+  
+//  void operate(){
+//    super.operate();
+    
+//    int in = ins[0].flowId;
+//    int out = outs[0].flowId;
+    
+//    PVector[] roots = new PVector[globalWidth*globalHeight];
+//    float[] distance = new float[globalWidth*globalHeight];
+//    for (int i = 0; i < roots.length; i++){
+//      distance[i] = 1048576;
+//    }
+    
+//    ArrayList<PVector> queue = new ArrayList<PVector>();
+//    for (int i = 0; i < globalWidth; i++){
+//      for (int j = 0; j < globalHeight; j++){
+//        if (stack.get(in).data[i+j*globalWidth] == 255){
+//          PVector pv = new PVector(i, j);
+//          int loc = i+j*globalWidth;
+//          distance[loc] = 0;
+//          roots[loc] = pv.copy();
+//          queue.add(pv);
+//        }
+//      }
+//    }
+    
+//    PVector current;
+    
+//    //until all queued pixels have been labelled
+//    while (queue.size() > 0){
+      
+//      //grab the pixel from the top of the queue, then remove it from the queue
+//      current = queue.get(queue.size()-1).copy();
+//      queue.remove(queue.size()-1);
+      
+//      for (int i = -1; i <=1; i++){
+//        for (int j = -1; j <=1; j++){ 
+//          int neighborX = constrain((int)current.x+i, 0, globalWidth-1);
+//          int neighborY = constrain((int)current.y+j, 0, globalHeight-1);
+//          int neighborLoc = neighborX+neighborY*globalWidth;
+//          if (!(i == 0 && j == 0) && distance[neighborLoc]>0){
+//            PVector neighbor = new PVector(neighborX, neighborY);
+//            PVector currentRoot = roots[(int)current.x+(int)current.y*globalWidth].copy();
+//            float d = currentRoot.dist(neighbor);
+//            if (d < distance[neighborLoc]){
+//              distance[neighborLoc] = d;
+//              roots[neighborLoc] = currentRoot.copy();
+//              queue.add(neighbor);
+//            }
+//          } 
+//        }
+//      }
+//    }
+    
+//    for (int i = 0; i < globalWidth; i++){
+//      for (int j = 0; j < globalHeight; j++){
+//        int loc = i+j*globalWidth;
+//        stack.get(out).data[loc] = distance[loc];
+//      }
+//    }
+//  }
+//}
+
 class Interval extends Module{
     
   Interval(PVector pos_){
@@ -1851,8 +1926,8 @@ class Convolve extends Module{
   Convolve(PVector pos_){
     super(pos_);
     name = "convolve";
-    size = new PVector(36, 30);
-    c = color(50, 100, 150); 
+    size = new PVector(41, 30);
+    c = color(250, 200, 200);
     helper = new HelpBox(convolveHelp);         
     
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
@@ -1920,8 +1995,8 @@ class MedianFilter extends Module{
   MedianFilter(PVector pos_){
     super(pos_);
     name = "median";
-    size = new PVector(36, 30);
-    c = color(50, 100, 150);        
+    size = new PVector(41, 30);
+    c = color(50, 150, 100);
     helper = new HelpBox(medianHelp);  
     
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
@@ -1949,42 +2024,31 @@ class MedianFilter extends Module{
     int out = outs[0].flowId;
     int xOff = (structuringElement.length-1)/2;
     int yOff = (structuringElement[0].length-1)/2;
-    int counter = 0;
-    
-    //get number of pixels in struc el so we don't have to keep counting them up.
-    //this sort of thing should probably be a field, huh?
-    for (int x = 0; x < structuringElement.length; x++){
-      for (int y = 0; y < structuringElement[0].length; y++){            
-        if (structuringElement[x][y] == 255){     
-          counter++;
-        }
-      }
-    }
-    
-    float[] neighborhood = new float[counter];   
     
     for (int i = 1; i < globalWidth-1; i++){
       for (int j = 1; j < globalHeight-1; j++){
-        int index = 0;
+        
+        int loc = i+j*globalWidth;
+        int[] neighborhood = new int[0]; 
+        
         for (int x = -xOff; x <= xOff; x++){
-           for (int y = -yOff; y <= yOff; y++){            
+           for (int y = -yOff; y <= yOff; y++){  
              if (structuringElement[x+xOff][y+yOff] == 255){     
                int elementLoc = constrain(i+x, 0, globalWidth-1) + constrain(j+y, 0, globalHeight-1) * globalWidth;
-               neighborhood[index] = stack.get(in).data[elementLoc];
-               index++;
+               neighborhood = append(neighborhood, (int)stack.get(in).data[elementLoc]);
              }
            }
-         } 
-       if (counter > 0){
-         neighborhood = sort(neighborhood);
-         stack.get(out).data[i+j*globalWidth] = neighborhood[(int)(counter-1)/2];
-       } else {
-         stack.get(out).data[i+j*globalWidth] = 0;
+         }
+         
+         if (neighborhood.length > 1){
+           stack.get(out).data[loc] = GFG.kthSmallest(neighborhood, 0, neighborhood.length-1, (int)(neighborhood.length/2));
+         } else {
+           stack.get(out).data[loc] = 0;
+         }
        }
-      }
-    }  
+     }  
  
-    super.lookDown();    
+     super.lookDown();    
   }
   
   //quick median algorithm that recursively partitions the set
@@ -2028,8 +2092,8 @@ class Mean extends Module{
   Mean(PVector pos_){
     super(pos_);
     name = "mean";
-    size = new PVector(36, 30);
-    c = color(50, 100, 150);        
+    size = new PVector(41, 30);
+    c = color(50, 150, 100);
     helper = new HelpBox(meanHelp);
       
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
@@ -2102,8 +2166,8 @@ class Variance extends Module{
   Variance(PVector pos_){
     super(pos_);
     name = "variance";
-    size = new PVector(36, 30);
-    c = color(50, 100, 150);        
+    size = new PVector(41, 30);
+    c = color(50, 150, 100);
     helper = new HelpBox(varianceHelp);
       
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
@@ -2185,7 +2249,7 @@ class And extends Module{
   
   And(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     name = "and"; 
     helper = new HelpBox(andHelp);
@@ -2229,7 +2293,7 @@ class Or extends Module{
   
   Or(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     name = "or"; 
     helper = new HelpBox(orHelp);
@@ -2273,9 +2337,9 @@ class XOr extends Module{
   
   XOr(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
-    name = "exclusive or"; 
+    name = "xor"; 
     helper = new HelpBox(xorHelp);
     
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
@@ -2317,7 +2381,7 @@ class Not extends Module{
   
   Not(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     name = "not"; 
     helper = new HelpBox(notHelp);
@@ -2356,7 +2420,7 @@ class LessThan extends Module{
   LessThan(PVector pos_){
     super(pos_);
     name = "<";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     helper = new HelpBox(lessThanHelp);
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
@@ -2428,7 +2492,7 @@ class GreaterThan extends Module{
   GreaterThan(PVector pos_){
     super(pos_);
     name = ">";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     helper = new HelpBox(greaterThanHelp);
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
@@ -2500,7 +2564,7 @@ class Equal extends Module{
   Equal(PVector pos_){
     super(pos_);
     name = "=";
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     helper = new HelpBox(equalHelp);
     
@@ -2545,9 +2609,9 @@ class Add extends Module{
   
   Add(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
-    name = "add"; 
+    name = "+"; 
     helper = new HelpBox(addHelp);
     
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
@@ -2585,9 +2649,9 @@ class Subtract extends Module{
   
   Subtract(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
-    name = "subtract"; 
+    name = "-"; 
     helper = new HelpBox(subtractHelp);  
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
     
@@ -2624,9 +2688,9 @@ class Multiply extends Module{
   
   Multiply(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
-    name = "multiply"; 
+    name = "x"; 
     helper = new HelpBox(multiplyHelp);  
      
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
@@ -2664,9 +2728,9 @@ class Divide extends Module{
   
   Divide(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
-    name = "divide"; 
+    name = "/"; 
     helper = new HelpBox(divideHelp);  
      
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
@@ -2705,7 +2769,7 @@ class Log extends Module{
   
   Log(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     name = "log"; 
     helper = new HelpBox(logHelp);  
@@ -2745,7 +2809,7 @@ class Exp extends Module{
   
   Exp(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     name = "^"; 
     helper = new HelpBox(powerHelp);  
@@ -2786,7 +2850,7 @@ class Modulo extends Module{
   
   Modulo(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
     name = "%"; 
     helper = new HelpBox(moduloHelp);  
@@ -2827,9 +2891,9 @@ class AbsoluteValue extends Module{
   
   AbsoluteValue(PVector pos_){
     super(pos_);
-    size = new PVector(36, 30);
+    size = new PVector(41, 30);
     c = color(250, 200, 200);
-    name = "absolute value"; 
+    name = "| |"; 
     helper = new HelpBox(absHelp);  
     
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
@@ -4019,94 +4083,5 @@ public class Spindle extends Module{
     buffer.background(0);
     buffer.endDraw();
     tex = createImage(globalWidth, globalHeight, RGB);
-  }
-  
-}
-
-class Saturate extends Module{
-  
-  float Pr = .299;
-  float Pg = .587;
-  float Pb = .114;
-  
-  Saturate(PVector pos_){
-    super(pos_);
-    name = "saturate";
-    size = new PVector(108, 36);
-    c = color(50, 100, 150);
-    helper = new HelpBox(saturateHelp);
-
-     //these are the nodes that allow the user to interact with the module 
-      
-     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
-     ins = new InputNode[4];
-     outs = new OutputNode[3];
-     modIns = new ModInput[0];
-    
-     ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
-     ins[0].col   = color(255, 0, 0);
-     ins[1] = new InputNode(new PVector(id, 1), new PVector(pos.x+15, pos.y));
-     ins[1].col  = color(0, 255, 0);
-     ins[2] = new InputNode(new PVector(id, 2), new PVector(pos.x+30, pos.y));
-     ins[2].col  = color(0, 0, 255);
-     ins[3] = new InputNode(new PVector(id, 3), new PVector(pos.x+size.x-8, pos.y));
-
-     outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x+size.x-38, pos.y+size.y-8));   
-     outs[0].col  = color(255, 0, 0);
-     outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-23, pos.y+size.y-8));     
-     outs[1].col  = color(0, 255, 0);
-     outs[2] = new OutputNode(new PVector(id, 2), new PVector(pos.x+size.x-8, pos.y+size.y-8));     
-     outs[2].col  = color(0, 0, 255);
-    
-  }
-  
-  void operate(){
-    
-  //  public-domain function by Darel Rex Finley
-  //
-  //  The passed-in RGB values can be on any desired scale, such as 0 to
-  //  to 1, or 0 to 255.  (But use the same scale for all three!)
-  //
-  //  The "change" parameter works like this:
-  //    0.0 creates a black-and-white image.
-  //    0.5 reduces the color saturation by half.
-  //    1.0 causes no change.
-  //    2.0 doubles the color saturation.
-  //  Note:  A "change" value greater than 1.0 may project your RGB values
-  //  beyond their normal range, in which case you probably should truncate
-  //  them to the desired range before trying to use them in an image.
-    super.operate();
- 
-    int in1 = ins[0].flowId;
-    int in2 = ins[1].flowId;
-    int in3 = ins[2].flowId;
-    int in4 = ins[3].flowId;
-    int out1 = outs[0].flowId;
-    int out2 = outs[1].flowId;
-    int out3 = outs[2].flowId;
-    
-    for (int i = 0; i < globalWidth; i++){
-      for (int j = 0; j < globalHeight; j++){ 
-        
-        int loc = i + j * globalWidth;
-        float change = stack.get(in4).data[loc];
-        
-        float R = stack.get(in1).data[loc];
-        float G = stack.get(in2).data[loc];
-        float B = stack.get(in3).data[loc];
-        
-        float  P = sqrt(
-        (R)*(R)*Pr+
-        (G)*(G)*Pg+
-        (B)*(B)*Pb ) ;
-      
-        stack.get(out1).data[loc] = P+(R-P)*change;
-        stack.get(out2).data[loc] = P+(G-P)*change;
-        stack.get(out3).data[loc] = P+(B-P)*change;
-
-      }
-    }
-      
-    super.lookDown();
-  }
+  } 
 }

@@ -371,7 +371,7 @@ class MidiMod extends Module{
     
   MidiMod(PVector pos_){
     super(pos_);
-    size = new PVector(113, 20);
+    size = new PVector(113, 36);
     c = color(250, 150, 50);
     name = "midi";
     helper = new HelpBox(midiHelp);

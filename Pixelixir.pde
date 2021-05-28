@@ -7,32 +7,38 @@ Click the triangle to run.
 
 ~  ~  ~  ~  ~
 
-~ ~ ~ PRE-RELEASE WORK ~ ~ ~
-
 BUGS 
 
 -iterator sometimes stackoverflows with filter depending on connection order
 -feedback not initiating properly sometimes
 -why does adding a rotate module glitch
 -random NullPointerException in Constant, copied big chunk, rerouted a few things, then hooked up to a display
+-Modules upstream are sometimes operating unnecessarily after changes downstream
+-when loading patches, we get concurrentmodificationexception when using the fileSelect prompt. Issue seems to
+go away when we type the file name instead.
 
 IMPROVEMENTS
 
-- method of synchronizing video modules and starting recording in a display module when video playback is at frame 0
+- add a comment feature
 
-- improve Distance Transform algorithm and/or implement others
+- currently, saving records module info including type, position and signal connections. Modifier
+connections and other module info (slider position, imagePath, etc) aren't being recorded. Let's not
+complete the saving/loading situation until we rewrite the Module class
 
-- bring the readme into the app
+- accomodate larger convolution kernels. Maybe leave kernel as a Gen for example kernels
+but generalize structuring element to accomodate both binary/ternary elements and conv. kernels
 
-- modules inside loops should somehow communicate to the parent iterator when they should headsUp(). Maybe 
+- method of synchronizing videos, displays, recording, etc.
+
+- some sort of instructional graphic beyond the help boxes
+
+- modules inside loops should communicate to the parent iterator when they should headsUp(). Maybe 
 int loopId = -1 in Module that gets reassigned to every Module that is contained in a loop? Then we override
 headsUp() and just call headsUp in the Iterator? Loop logic is still not tight. Could rewrite the whole mess
 
-- HistMatch needs a better algorithm, it kinda sucks right now. I think it struggles with leftovers and outliers
-
 - 3D modules need reworked. Honestly just make the camera usable
 
-- implement fast median algorithm (almost done)
+- fix fast median and test it against (the currently implemented) quickSelect
 
 - Try/Catch list
   - creating a closed loop with module connections
@@ -42,12 +48,21 @@ headsUp() and just call headsUp in the Iterator? Loop logic is still not tight. 
   
 ~ ~ ~ REFACTOR NOTES ~ ~ ~
 
+- double precision might be necessary
+
 - get rid of Flow. It does nothing. stack should be an arrayList of float[]
 
 - collapse() method in Module. Look at number of ins, outs, modIns and modOuts to determine size
-Only draw nodes, no CP5. Maybe shift+click the grabber collapes?
+Only draw nodes, no CP5. Maybe shift+click the grabber collapes? 
 
 - make a node initialization method in Module
+
+- iterator and filter need reconceived. unreliable, bad
+
+- automate Module UI based on number of ins/outs, module name, etc. Every Module has a collapse
+that just shows ins/outs and name
+
+- pass module id into constructor for flexibility
 
 - Can we store every Node in a container in Module? Then have overwritten methods
 like we do in lots of Module extensions? 
@@ -63,11 +78,6 @@ should we store only PVectors pointing to the neighborhood instead of iterating 
 dimension of the neighborhood for every pixel? Seems faster. Test it.
 
 ~ ~ ~ DREAM WORK ~ ~ ~
-
-- saving patches 
-  - figure out the best way to format and read text files
-  - Store all relevant module info (id, pos, output receivers, slider positions)
-  - build UI for saving and loading patches
   
 - subpatches (once saving/loading is figured out, subpatches should be straightforward)
   - build module for subpatches, where user indicates number of inputs and outputs
@@ -76,8 +86,6 @@ dimension of the neighborhood for every pixel? Seems faster. Test it.
 - resolution is determined by each display instead of globally. If module dimensions
   disagree, scale the larger one down to the smaller one
   
-- fully fleshed out neighborhood functionality? Maybe a neighborhood logic/arithmetic section?
-
 - Start thinking about Modules that store multiple signals.
 
 */
@@ -93,16 +101,15 @@ MidiBus myBus;
 OpenSimplexNoise noise;
 
 String[] generators = {"GENERATE", "constant", "math", "noise", "random", "video", "image", "text", "kernel", "structure", "large structure"};
-String[] arithmetic = {"MATH/LOGIC", "and", "or", "xor", "not", "<", ">", "=", "+", "-", "x", "/", "log", "exp", "%", "abs"};
-String[] analysis = {"ANALYZE", "dilate", "erode", "peak", "valley", "hit and miss", "local min", "local max", "global min", "global max", "center", "distance", "gray dilate", "gray erode", "blob"};
+String[] arithmetic = {"MATH/LOGIC", "and", "or", "xor", "not", "<", ">", "=", "+", "-", "x", "/", "^", "log", "%", "abs", "convolve"};
+String[] analysis = {"ANALYZE", "dilate", "erode", "peak", "valley", "hit and miss", "local min", "local max", "global min", "global max", "mean", "median", "variance", "center", "distance", "gray dilate", "gray erode", "blob", "histograb", "DFT", "IDFT"};
 String[] transformation = {"TRANSFORM", "translate", "scale", "rotate", "reflect"};
-String[] filters = {"FILTER", "convolve", "mean", "median", "variance", "saturate"};
-String[] utility = {"UTILITY", "feedback", "interval", "iterator", "histograb"};
-String[] miscellaneous = {"MISC", "celato", "heightmap", "spheroid", "spindle"};
+String[] utility = {"UTILITY", "feedback", "interval", "iterator"};
+String[] miscellaneous = {"MISC", "celato", "height map", "spheroid", "spindle"};
 String[] modifiers = {"MODIFY", "basicMod", "sampler", "midi"};
 String[] output = {"OUTPUT", "display"};
 
-String[][] UIText = {generators, arithmetic, analysis, transformation, filters, utility, miscellaneous, modifiers, output};
+String[][] UIText = {generators, arithmetic, analysis, transformation, utility, miscellaneous, modifiers, output};
 
 Accordion mainAcc;
 Group mainMenu;
@@ -121,6 +128,10 @@ boolean menuActive = true;
 boolean helpMode = false;
 boolean messageActive = false;
 boolean shiftPressed;
+boolean wPressed;
+boolean aPressed;
+boolean sPressed;
+boolean dPressed;
 MessageBox message;
 //stores a Node.id when we click it. Used to build node connections.
 PVector cue;
@@ -266,114 +277,133 @@ void gui(){
     .show()
     .setText("300")
     ; 
+    
+  cp5.addButton("save")
+    .setPosition(150, 10)
+    .setSize(15, 15)
+    .setLabel("save")
+    .plugTo(this,"savePatch")
+    ;   
+    
+  cp5.addTextfield("savePath")
+    .setLabel("")     
+    .setPosition(170, 10)
+    .setSize(75, 15)
+    .setColor(color(255,0,0))
+    .show()
+    .setText("pix")
+    ;
+    
+  cp5.addButton("load")
+    .setPosition(255, 10)
+    .setSize(15, 15)
+    .setLabel("load")
+    .plugTo(this,"loadPatch")
+    ;
+    
+  cp5.addTextfield("loadPath")
+    .setLabel("")     
+    .setPosition(280, 10)
+    .setSize(75, 15)
+    .setColor(color(255,0,0))
+    .show()
+    .setText("pix")
+    ;  
   
   //offset the entire menu vertically
-  int sum = 10;
+  int sum = 0;
     
   for (int i = 1; i < generators.length; i++){
     cp5.addButton(generators[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ;
   }
   
-  sum += 10*generators.length+10;
+  sum += 11*generators.length+8;
   
   for (int i = 1; i < arithmetic.length; i++){
     cp5.addButton(arithmetic[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ; 
   }
   
-  sum += 10*arithmetic.length+10;
+  sum += 11*arithmetic.length+8;
   
   for (int i = 1; i < analysis.length; i++){
     cp5.addButton(analysis[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ;      
   }
   
-  sum += 10*analysis.length+10;
+  sum += 11*analysis.length+8;
 
   
   for (int i = 1; i < transformation.length; i++){
     cp5.addButton(transformation[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ;      
   }
   
-  sum += 10*transformation.length+10;
+  sum += 11*transformation.length+8;
 
-  
-  for (int i = 1; i < filters.length; i++){
-    cp5.addButton(filters[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
-    .setLabel("")
-    .moveTo(mainMenu)
-    ;      
-  }
-  
-  sum += 10*filters.length+10;
-
-  
   for (int i = 1; i < utility.length; i++){
     cp5.addButton(utility[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ;      
   }
   
-  sum += 10*utility.length+10;
+  sum += 11*utility.length+8;
 
   
   for (int i = 1; i < miscellaneous.length; i++){
     cp5.addButton(miscellaneous[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ;      
   }
   
-  sum += 10*miscellaneous.length+10;
+  sum += 11*miscellaneous.length+8;
 
   
   for (int i = 1; i < modifiers.length; i++){
     cp5.addButton(modifiers[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ;      
   }  
   
-  sum += 10*modifiers.length+10;
+  sum += 11*modifiers.length+8;
 
   
   for (int i = 1; i < output.length; i++){
     cp5.addButton(output[i])
-    .setPosition(0, 15+sum+i*10)
-    .setSize(9, 9)
+    .setPosition(0, 15+sum+i*11)
+    .setSize(10, 10)
     .setLabel("")
     .moveTo(mainMenu)
     ;      
   }  
   
-  sum += 10*output.length+10;
+  sum += 11*output.length+8;
 
        
    mainAcc = cp5.addAccordion("mainAcc")
@@ -420,11 +450,14 @@ void keyPressed(){
   if (key == 'q'){
     messageActive = false;
   }
+  
+  //setKeyState handles multi-key interactions
+  setKeyState(key, keyCode, true);
   if (keyCode == UP){
     for (Module m : modules){
-      if (m.active && m.selected){
-        if (shiftPressed){      
-          m.drag(new PVector(0, -12));
+      if (m.active && m.selected){  
+        if (shiftPressed){
+          m.drag(new PVector(0, -11));
         } else {
           m.drag(new PVector(0, -1));
         }
@@ -433,9 +466,9 @@ void keyPressed(){
   }
   if (keyCode == DOWN){
     for (Module m : modules){
-      if (m.active && m.selected){
-        if (shiftPressed){      
-          m.drag(new PVector(0, 12));
+      if (m.active && m.selected){  
+        if (shiftPressed){
+          m.drag(new PVector(0, 11));
         } else {
           m.drag(new PVector(0, 1));
         }
@@ -444,9 +477,9 @@ void keyPressed(){
   }
   if (keyCode == LEFT){
     for (Module m : modules){
-      if (m.active && m.selected){
-        if (shiftPressed){      
-          m.drag(new PVector(-12, 0));
+      if (m.active && m.selected){  
+        if (shiftPressed){
+          m.drag(new PVector(-11, 0));
         } else {
           m.drag(new PVector(-1, 0));
         }
@@ -455,25 +488,36 @@ void keyPressed(){
   }
   if (keyCode == RIGHT){
     for (Module m : modules){
-      if (m.active && m.selected){
-        if (shiftPressed){      
-          m.drag(new PVector(12, 0));
+      if (m.active && m.selected){  
+        if (shiftPressed){
+          m.drag(new PVector(11, 0));
         } else {
           m.drag(new PVector(1, 0));
         }
       }
     }
   }
-  setKeyState(keyCode, true);
 }
 
 void keyReleased(){
-  setKeyState(keyCode, false);
+  setKeyState(key, keyCode, false);
 }
 
-void setKeyState(int k, boolean isPressed){
-  if (k == SHIFT){
+void setKeyState(int k, int kc, boolean isPressed){
+  if (kc == SHIFT){
     shiftPressed = isPressed;
+  }
+  if (k == 'w'){
+    wPressed = isPressed;
+  }
+  if (k == 'a'){
+    aPressed = isPressed;
+  }
+  if (k == 's'){
+    sPressed = isPressed;
+  }
+  if (k == 'd'){
+    dPressed = isPressed;
   }
 }
 
@@ -548,6 +592,66 @@ void resizeAll(){
   stack.get(0).blankFlow();
   for (Module m : modules){
     m.changeDataDimensions();
+  }
+}
+
+
+
+void savePatch(){
+  String[] patchInfo = new String[0];
+  String[] connections = new String[0];
+  int total = 0;
+  for (Module m : modules){
+    if (m.active){
+      total++;
+    }
+  }
+  
+  //first line of the save file is number of modules so we know which line to look at
+  //when it's time to build the appropriate connections
+  patchInfo = append(patchInfo, str(total));      
+
+  //save name, id, and position. Also save connections separately
+  for (int i = 0; i < modules.size(); i++){
+    if (modules.get(i).active){
+      String theName = modules.get(i).name+",";
+      String theId = str(modules.get(i).id)+",";
+      String xPos = str((int)modules.get(i).pos.x)+",";
+      String yPos = str((int)modules.get(i).pos.y)+",";      
+      for (int j = 0; j < modules.get(i).outs.length; j++){
+        for (PVector p : modules.get(i).outs[j].receivers){
+          connections = append(connections, theId+str(j)+","+str((int)p.x)+","+str((int)p.y));
+        }
+      }
+      String info = theName+theId+xPos+yPos;
+      patchInfo = append(patchInfo, info);      
+    }
+  }
+  
+  //after the modules, a line that tells us how many connections are being made so we know where
+  //to look to update Module UI
+  //patchInfo = append(patchInfo, str(connections.length)); 
+  
+  //append all connections present in the patch to the end of the info String[]
+  for (int i = 0; i < connections.length; i++){
+    patchInfo = append(patchInfo, connections[i]);
+  }
+
+  //save the project as a text file
+  String savePath =  "patches/"+cp5.get(Textfield.class, "savePath").getText()+".txt";
+  saveStrings(savePath, patchInfo);
+}
+
+void loadPatch(){
+  String loadPath =  "patches/"+cp5.get(Textfield.class, "loadPath").getText()+".txt";
+  int prevCount = modules.size();
+  try {
+    String[] moduleInfo = loadStrings(loadPath);
+    buildModulesFromSaveFile(moduleInfo);
+    buildConnections(moduleInfo, prevCount);
+  } catch (NullPointerException e){
+    message = new MessageBox("no such file", new PVector(150, 50));
+    messageActive = true;
   }
 }
 
@@ -657,7 +761,27 @@ void controlEvent(ControlEvent theEvent) {
   if (modules.size() == 0){
     pos_ = new PVector(500, 20);
   } else{
-    pos_ = new PVector(modules.get(modules.size()-1).pos.x, (modules.get(modules.size()-1).pos.y+modules.get(modules.size()-1).size.y+15)%800);
+    
+    //lets the user choose where the module spawns with respect to the previously spawned module
+    pos_ = new PVector(modules.get(modules.size()-1).pos.x, modules.get(modules.size()-1).pos.y);
+    if (wPressed){
+      pos_.add(new PVector(0, -modules.get(modules.size()-1).size.y-14));
+    }
+    if (aPressed){
+      pos_.add(new PVector(-modules.get(modules.size()-1).size.x-14, 0));  
+    }
+    if (sPressed){
+      pos_.add(new PVector(0, modules.get(modules.size()-1).size.y+14));
+    }
+    if (dPressed){
+      pos_.add(new PVector(modules.get(modules.size()-1).size.x+14, 0));   
+    } 
+    
+    //default puts the module below the previous one
+    if (!(wPressed || aPressed || sPressed || dPressed)){
+      pos_ = new PVector(modules.get(modules.size()-1).pos.x, modules.get(modules.size()-1).pos.y+modules.get(modules.size()-1).size.y+14);
+    }
+    pos_.set(constrain(pos_.x, 4, width-4), constrain(pos_.y, 4, height-4));
   }
   switch(theEvent.getController().getName()){
   case "noise" :
@@ -707,7 +831,7 @@ void controlEvent(ControlEvent theEvent) {
     break; 
   case "x" :
     modules.add(new Multiply(pos_));
-    break; 
+    break;  
   case "/" :
     modules.add(new Divide(pos_));
     break; 
@@ -723,7 +847,7 @@ void controlEvent(ControlEvent theEvent) {
   case "random" :
     modules.add(new Random(pos_));
     break;
-  case "heightmap" :
+  case "height map" :
     modules.add(new HeightMap(pos_));
     break;
   case "spheroid" :
@@ -746,10 +870,7 @@ void controlEvent(ControlEvent theEvent) {
     break;
   case "iterator" :
     modules.add(new Iterator(pos_));
-    break;
-  case "saturate" :
-    modules.add(new Saturate(pos_));
-    break;   
+    break;  
   case "kernel" :
     modules.add(new Kernel(pos_));
     break;
@@ -782,7 +903,7 @@ void controlEvent(ControlEvent theEvent) {
     break;  
   case "distance" :
     modules.add(new DistanceTransform(pos_));
-    break;
+    break; 
   case "histograb" :
     modules.add(new Histograb(pos_));
     break;
@@ -818,7 +939,13 @@ void controlEvent(ControlEvent theEvent) {
     break;
   case "blob" :
     modules.add(new Blob(pos_));
-    break;  
+    break;   
+  case "DFT" :
+    modules.add(new DFTModule(pos_));
+    break; 
+  case "IDFT" :
+    modules.add(new IDFTModule(pos_));
+    break;   
   case "hit and miss" :
     modules.add(new HitAndMiss(pos_));
     break;
@@ -837,8 +964,238 @@ void controlEvent(ControlEvent theEvent) {
   case "log" :
     modules.add(new Log(pos_));
     break; 
-  case "exp" :
+  case "^" :
     modules.add(new Exp(pos_));
     break;   
   }
+}
+
+void buildModulesFromSaveFile(String[] info) {
+  
+  for (int i = 1; i < info.length; i++){
+    String[] splitInfo = split(info[i], ",");
+    PVector pos = new PVector(int(splitInfo[2]), int(splitInfo[3]));
+    switch(splitInfo[0]){
+    case "noise" :
+      modules.add(new NoiseGenerator(pos));
+      break;
+    case "constant" :
+      modules.add(new Constant(pos));
+      break;  
+    case "display" :
+      modules.add(new Displayer(pos));
+      break;
+    case "basicMod" :
+      modules.add(new Modifier(pos));
+      break;  
+    case "image" :
+      modules.add(new Image(pos));
+      break;
+    case "video" :
+      modules.add(new Vid(pos));
+      break;  
+    case "math" :
+      modules.add(new Math(pos));
+      break; 
+    case "abs" :
+      modules.add(new AbsoluteValue(pos));
+      break; 
+    case "sampler" :
+      modules.add(new Sampler(pos));
+      break;
+    case "and" :
+      modules.add(new And(pos));
+      break;
+    case "or" :
+      modules.add(new Or(pos));
+      break;
+    case "xor" :
+      modules.add(new XOr(pos));
+      break; 
+    case "not" :
+      modules.add(new Not(pos));
+      break;   
+    case "+" :
+      modules.add(new Add(pos));
+      break;
+    case "-" :
+      modules.add(new Subtract(pos));
+      break; 
+    case "x" :
+      modules.add(new Multiply(pos));
+      break;  
+    case "/" :
+      modules.add(new Divide(pos));
+      break; 
+    case "feedback" :
+      modules.add(new Feedback(pos));
+      break;
+    case "rotate" :
+      modules.add(new Rotate(pos));
+      break;
+    case "reflect" :
+      modules.add(new Reflect(pos));
+      break;   
+    case "random" :
+      modules.add(new Random(pos));
+      break;
+    case "height map" :
+      modules.add(new HeightMap(pos));
+      break;
+    case "spheroid" :
+      modules.add(new Spheroid(pos));
+      break;   
+    case "scale" :
+      modules.add(new Scale(pos));
+      break;
+    case "convolve" :
+      modules.add(new Convolve(pos));
+      break;
+    case "interval" :
+      modules.add(new Interval(pos));
+      break;
+    case "translate" :
+      modules.add(new Translate(pos));
+      break; 
+    case "spindle" :
+      modules.add(new Spindle(pos));
+      break;
+    case "iterator" :
+      modules.add(new Iterator(pos));
+      break;  
+    case "kernel" :
+      modules.add(new Kernel(pos));
+      break;
+    case "structure" :
+      modules.add(new StructuringElement(pos));
+      break;
+    case "large structure" :
+      modules.add(new LargeStructuringElement(pos));
+      break;  
+    case "midi" :
+      modules.add(new MidiMod(pos));
+      break;
+    case "celato" :
+      modules.add(new Celato(pos));
+      break;
+    case "median" :
+      modules.add(new MedianFilter(pos));
+      break;
+    case "mean" :
+      modules.add(new Mean(pos));
+      break; 
+    case "variance" :
+      modules.add(new Variance(pos));
+      break;   
+    case "text" :
+      modules.add(new TextGen(pos));
+      break;
+    case "center" :
+      modules.add(new CenterOfMass(pos));
+      break;  
+    case "distance" :
+      modules.add(new DistanceTransform(pos));
+      break; 
+    case "histograb" :
+      modules.add(new Histograb(pos));
+      break;
+    case "dilate" :
+      modules.add(new Dilate(pos));
+      break;
+    case "erode" :
+      modules.add(new Erode(pos));
+      break; 
+    case "valley" :
+      modules.add(new Valley(pos));
+      break; 
+    case "peak" :
+      modules.add(new Peak(pos));
+      break;
+    case "local min" :
+      modules.add(new LocalMin(pos));
+      break;   
+    case "local max" :
+      modules.add(new LocalMax(pos));
+      break;
+    case "global min" :
+      modules.add(new GlobalMin(pos));
+      break;   
+    case "global max" :
+      modules.add(new GlobalMax(pos));
+      break;  
+    case "gray dilate" :
+      modules.add(new GrayDilate(pos));
+      break;
+    case "gray erode" :
+      modules.add(new GrayErode(pos));
+      break;
+    case "blob" :
+      modules.add(new Blob(pos));
+      break;   
+    case "DFT" :
+      modules.add(new DFTModule(pos));
+      break; 
+    case "IDFT" :
+      modules.add(new IDFTModule(pos));
+      break;   
+    case "hit and miss" :
+      modules.add(new HitAndMiss(pos));
+      break;
+    case "<" :
+      modules.add(new LessThan(pos));
+      break;  
+    case ">" :
+      modules.add(new GreaterThan(pos));
+      break;  
+    case "=" :
+      modules.add(new Equal(pos));
+      break;  
+    case "%" :
+      modules.add(new Modulo(pos));
+      break; 
+    case "log" :
+      modules.add(new Log(pos));
+      break; 
+    case "^" :
+      modules.add(new Exp(pos));
+      break;   
+    }
+  }
+}
+
+//this method takes the total number of modules prior to the load,
+//the id of the module as written in the save file, and a mapping
+//from the old to new id in order to create a vector pointing to 
+//the appropriate node in the current sketch.
+int getIdFromMap(int count, int id, int[] map){
+  int newId = 0;
+  for (int i = 0; i < map.length; i++){
+    if (map[i] == id){
+      newId = count+i;
+      //println(map[i], newId);
+    }
+  }
+  return newId;
+}
+
+void buildConnections(String[] info, int prevCount){
+  
+  int totalAdded = int(info[0]);
+  int[] idMap = new int[totalAdded];
+  
+  //build a connection mapping from old id to new id
+  for (int i = 1; i <= totalAdded; i++){
+    String[] splitInfo = split(info[i], ",");
+    idMap[i-1] = int(splitInfo[1]);
+  }
+    
+  for (int i = totalAdded+1; i < info.length; i++){    
+    String[] splitInfo = split(info[i], ",");
+    //println(splitInfo);
+    PVector senderId = new PVector(getIdFromMap(prevCount, int(splitInfo[0]), idMap), int(splitInfo[1]));
+    PVector receiverId = new PVector(getIdFromMap(prevCount, int(splitInfo[2]), idMap), int(splitInfo[3]));
+    cue = new PVector(senderId.x, senderId.y);
+    modules.get((int)receiverId.x).ins[(int)receiverId.y].onMousePressed();
+  }
+  
 }
