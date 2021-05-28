@@ -3227,21 +3227,20 @@ class Reflect extends Module{
   
 }
 
-public class HeightMap extends Module{
+public class ThreeD extends Module{
     
   //not sure why we can't createGraphics here, but it for sure breaks
   PGraphics buffer;
   PImage tex = createImage(globalWidth, globalHeight, RGB);
   boolean updatingModel = false;
   boolean updatingTexture = false;
-  boolean roundMode = false;
   
-  HeightMap(PVector pos_){
+  ThreeD(PVector pos_){
     super(pos_);    
     size = new PVector(120, 100);
     c = color(150, 100, 50);
-    name = "height map";  
-    helper = new HelpBox(heightmapHelp);
+    name = "3D";  
+    helper = new HelpBox(threeDHelp);
     
     cp5.addSlider("zoom"+str(id))
       .setLabel("")
@@ -3272,28 +3271,7 @@ public class HeightMap extends Module{
       .setValue(0)
       .plugTo(this, "cp5Handler")
       .setGroup("g"+str(id))      
-      ;
-      
-    cp5.addSlider("cameraPan"+str(id))
-      .setLabel("")
-      .setPosition(8, 48)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-1000, 1000)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;
-    cp5.addSlider("cameraHeight"+str(id))
-      .setLabel("")
-      .setPosition(8, 60)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-1000, 1000)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;  
+      ; 
         
     cp5.addSlider("resolution"+str(id))
       .setLabel("")
@@ -3306,31 +3284,37 @@ public class HeightMap extends Module{
       .setGroup("g"+str(id))      
       ; 
       
-    cp5.addButton("roundMode"+str(id))
-      .setLabel("")
-      .setPosition(86, 78)
-      .setSize(10, 10)
-      .plugTo(this, "flickRoundMode")
-      .setGroup("g"+str(id))      
-      ; 
 
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
     
-    ins = new InputNode[3];
-    outs = new OutputNode[1];
-    modIns = new ModInput[5];
+    ins = new InputNode[6];
+    outs = new OutputNode[3];
+    modIns = new ModInput[3];
     
     ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
-    ins[1] = new InputNode(new PVector(id, 1), new PVector(pos.x+14, pos.y));
-    ins[2] = new InputNode(new PVector(id, 2), new PVector(pos.x+size.x-8, pos.y));
-    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
+    ins[1] = new InputNode(new PVector(id, 1), new PVector(pos.x+16, pos.y));
+    ins[2] = new InputNode(new PVector(id, 2), new PVector(pos.x+32, pos.y));
+    ins[3] = new InputNode(new PVector(id, 3), new PVector(pos.x+size.x-40, pos.y));
+    ins[4] = new InputNode(new PVector(id, 4), new PVector(pos.x+size.x-24, pos.y));
+    ins[5] = new InputNode(new PVector(id, 5), new PVector(pos.x+size.x-8, pos.y));
+    
+    
+    ins[3].col = color(255, 0, 0);
+    ins[4].col = color(0, 255, 0);
+    ins[5].col = color(0, 0, 255);
+
+    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x+size.x-40, pos.y+size.y-8));
+    outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-24, pos.y+size.y-8));
+    outs[2] = new OutputNode(new PVector(id, 2), new PVector(pos.x+size.x-8, pos.y+size.y-8));
+    
+    outs[0].col = color(255, 0, 0);
+    outs[1].col = color(0, 255, 0);
+    outs[2].col = color(0, 0, 255);
     
     modIns[0] = new ModInput(new PVector(id, 0, -1), new PVector(pos.x+size.x-8, pos.y+11), "zoom"+str(id));
     modIns[1] = new ModInput(new PVector(id, 1, -1), new PVector(pos.x+size.x-8, pos.y+23), "cameraYaw"+str(id));
     modIns[2] = new ModInput(new PVector(id, 2, -1), new PVector(pos.x+size.x-8, pos.y+35), "cameraPitch"+str(id));
-    modIns[3] = new ModInput(new PVector(id, 3, -1), new PVector(pos.x+size.x-8, pos.y+47), "cameraPan"+str(id));
-    modIns[4] = new ModInput(new PVector(id, 4, -1), new PVector(pos.x+size.x-8, pos.y+59), "cameraHeight"+str(id));
-
+    
     //have to createGraphics here for reasons
     buffer = createGraphics(globalWidth, globalHeight, P3D);
     model = createShape();
@@ -3340,14 +3324,7 @@ public class HeightMap extends Module{
     buffer.background(0);
     buffer.endDraw();
   }
-  
-  void flickRoundMode(boolean switcher){
-    roundMode = flick(roundMode);
-    updatingTexture = true;
-    updatingModel = true;
-    headsUp();
-  }
-  
+ 
   void changeRes(){
     updatingModel = true;
     headsUp();
@@ -3376,27 +3353,15 @@ public class HeightMap extends Module{
         modIns[2].pauseInput = true;
       }
     }
-    if (cp5.getController("cameraPan"+str(id)).isMousePressed()){
-      if (!modIns[3].pauseInput){
-        modIns[3].baseVal = val+1000;
-        modIns[3].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraHeight"+str(id)).isMousePressed()){
-      if (!modIns[4].pauseInput){
-        modIns[4].baseVal = val+1000;
-        modIns[4].pauseInput = true;
-      }
-    }
     headsUp();
   }
 
 
   void headsUp(){    
-    if (ins[2].lookUp){
+    if (ins[3].lookUp || ins[4].lookUp || ins[5].lookUp){
       updatingTexture = true;
     }
-    if (ins[0].lookUp || ins[1].lookUp){
+    if (ins[0].lookUp || ins[1].lookUp || ins[2].lookUp){
       updatingModel = true;
     }
     super.headsUp();
@@ -3406,75 +3371,60 @@ public class HeightMap extends Module{
   boolean allSystemsGo(){
     if (ins[0].flowId == 0){
       return false;
+    } else {
+      return true;
     }
-    return super.allSystemsGo();     
   }
   
   void updateTexture(){
-    int in = ins[2].flowId;
+    int redIn = ins[3].flowId;
+    int greenIn = ins[4].flowId;
+    int blueIn = ins[5].flowId;
+    
     tex.loadPixels();
-    for (int i = 0; i < stack.get(in).data.length; i++){
-      tex.pixels[i] = color(stack.get(in).data[i]);
+    
+    if (redIn >= 1 || greenIn >= 1 || blueIn >= 1){
+      for (int i = 0; i < globalWidth; i++){
+        for (int j = 0; j < globalHeight; j++){
+          int loc = i+j*globalWidth;
+          tex.pixels[loc] = color(stack.get(redIn).data[loc], stack.get(greenIn).data[loc], stack.get(blueIn).data[loc]);
+        }
+      }      
     }
+    
     tex.updatePixels();
   }
   
   void updateModel(){
-    int in = ins[0].flowId;
-    int in1 = ins[1].flowId;
+    int xIn = ins[0].flowId;
+    int yIn = ins[1].flowId;
+    int zIn = ins[2].flowId;
     int res = (int)cp5.getController("resolution"+str(id)).getValue();
-    PVector[] offsetPlane = new PVector[globalWidth*globalHeight];
                
-    for (int i = 0; i < globalWidth; i++){
-      for (int j = 0; j < globalHeight; j++){
-        offsetPlane[i+j*globalWidth] = new PVector(globalWidth/2-i, globalHeight/2-j).mult(stack.get(in1).data[i+j*globalWidth]/255);
-      }
-    }
     model = createShape(); 
     model.beginShape(TRIANGLE_STRIP);
     model.noStroke();
     model.texture(tex); 
-    if (roundMode){
-      float rad = min(globalWidth, globalHeight)/2;
-      PVector center = new PVector(globalWidth/2, globalHeight/2);
-      for (int i = 0; i < globalWidth-1; i++){       
-        for (int j = 0; j < globalHeight-1; j++){
-          if (new PVector(i, j).dist(center) < rad){ 
-            if (i%res == 0 && j%res == 0){
-              if (i%2 == 0){          
-                PVector v1 = offsetPlane[i+j*globalWidth].copy();
-                PVector v2 = offsetPlane[i+1+j*globalWidth].copy();
-                model.vertex(v1.x, v1.y, stack.get(in).data[i+j*globalWidth], map(i, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height));
-                model.vertex(v2.x, v2.y, stack.get(in).data[i+1+j*globalWidth], map(i+1, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height)); 
-              } else {
-                PVector v1 = offsetPlane[i+(globalHeight-1-j)*globalWidth].copy();
-                PVector v2 = offsetPlane[i+1+(globalHeight-1-j)*globalWidth].copy();
-                model.vertex(v1.x, v1.y, stack.get(in).data[i+(globalHeight-1-j)*globalWidth], map(i, 0, globalWidth, 0, tex.width), map(globalHeight-1-j, 0, globalHeight, 0, tex.height));
-                model.vertex(v2.x, v2.y, stack.get(in).data[i+1+(globalHeight-1-j)*globalWidth], map(i+1, 0, globalWidth, 0, tex.width), map(globalHeight-1-j, 0, globalHeight, 0, tex.height));
-              } 
-            }
-          }
+   
+    for (int i = 0; i < globalWidth-1; i++){       
+      for (int j = 0; j < globalHeight-1; j++){
+        if (i%res == 0 && j%res == 0){
+          if (i%2 == 0){
+            int loc = i+j*globalWidth;
+            int rightOne = i+1+j*globalWidth;
+            model.vertex(stack.get(xIn).data[loc], stack.get(yIn).data[loc], stack.get(zIn).data[loc], map(i, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height));
+            model.vertex(stack.get(xIn).data[rightOne], stack.get(yIn).data[rightOne], stack.get(zIn).data[rightOne], map(i+1, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height)); 
+          } else {
+            //huh?
+            int weird = i+(globalHeight-1-j)*globalWidth;
+            int weirdAndOver = i+1+(globalHeight-1-j)*globalWidth;
+            model.vertex(stack.get(xIn).data[weird], stack.get(yIn).data[weird], stack.get(zIn).data[weird], map(i, 0, globalWidth, 0, tex.width), map(globalHeight-1-j, 0, globalHeight, 0, tex.height));
+            model.vertex(stack.get(xIn).data[weirdAndOver], stack.get(yIn).data[weirdAndOver], stack.get(zIn).data[weirdAndOver], map(i+1, 0, globalWidth, 0, tex.width), map(globalHeight-1-j, 0, globalHeight, 0, tex.height));
+          } 
         }
-      } 
-    } else {    
-      for (int i = 0; i < globalWidth-1; i++){       
-        for (int j = 0; j < globalHeight-1; j++){
-          if (i%res == 0 && j%res == 0){
-            if (i%2 == 0){          
-              PVector v1 = offsetPlane[i+j*globalWidth].copy();
-              PVector v2 = offsetPlane[i+1+j*globalWidth].copy();
-              model.vertex(v1.x, v1.y, stack.get(in).data[i+j*globalWidth], map(i, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height));
-              model.vertex(v2.x, v2.y, stack.get(in).data[i+1+j*globalWidth], map(i+1, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height)); 
-            } else {
-              PVector v1 = offsetPlane[i+(globalHeight-1-j)*globalWidth].copy();
-              PVector v2 = offsetPlane[i+1+(globalHeight-1-j)*globalWidth].copy();
-              model.vertex(v1.x, v1.y, stack.get(in).data[i+(globalHeight-1-j)*globalWidth], map(i, 0, globalWidth, 0, tex.width), map(globalHeight-1-j, 0, globalHeight, 0, tex.height));
-              model.vertex(v2.x, v2.y, stack.get(in).data[i+1+(globalHeight-1-j)*globalWidth], map(i+1, 0, globalWidth, 0, tex.width), map(globalHeight-1-j, 0, globalHeight, 0, tex.height));
-            } 
-          }
-        }
-      } 
-    }
+      }
+    } 
+
     model.endShape(CLOSE);     
   }
   
@@ -3492,17 +3442,25 @@ public class HeightMap extends Module{
     
     writeToBuffer();
     
-    int in = ins[0].flowId;
-    int out = outs[0].flowId;
-  
+    int redIn = ins[2].flowId;
+    int greenIn = ins[3].flowId;
+    int blueIn = ins[4].flowId;
+    
+    int redOut = outs[0].flowId;
+    int greenOut = outs[1].flowId;
+    int blueOut = outs[2].flowId;
+    
     buffer.loadPixels();
+    
     for (int i = 0; i < globalWidth; i++){
       for (int j = 0; j < globalHeight; j++){
-        stack.get(out).data[i+j*globalWidth] = buffer.pixels[i+j*globalWidth] & 0xFF;
+        int loc = i+j*globalWidth;
+        stack.get(redOut).data[loc] = (buffer.pixels[loc] >> 16) & 0xFF;
+        stack.get(greenOut).data[loc] = (buffer.pixels[loc] >> 8) & 0xFF;
+        stack.get(blueOut).data[loc] = buffer.pixels[loc] & 0xFF;
       }
-    }
-    buffer.updatePixels();
-    
+    }  
+       
     super.lookDown();
   }
   
@@ -3514,8 +3472,6 @@ public class HeightMap extends Module{
     float zoom = cp5.getController("zoom"+str(id)).getValue();
     float yaw = cp5.getController("cameraYaw"+str(id)).getValue();
     float pitch = cp5.getController("cameraPitch"+str(id)).getValue();
-    float pan = cp5.getController("cameraPan"+str(id)).getValue();
-    float camHeight = cp5.getController("cameraHeight"+str(id)).getValue();
     
     float x = zoom*cos(pitch)*sin(yaw);
     float y = zoom*sin(pitch)*sin(yaw);
@@ -3524,8 +3480,8 @@ public class HeightMap extends Module{
     //unsure if buffer.clear() is necessary somewhere here
     buffer.beginDraw();
     buffer.clear();
-    buffer.camera(x-pan, y, z+camHeight, -pan, 0, globalHeight/2+camHeight, 0, 0, -1);
-    buffer.lights();
+    buffer.camera(x, y, z, 0, 0, 0, 0, 1, 0);
+   // buffer.l;
     buffer.background(0);
     buffer.shape(model, 0, 0);   
     buffer.endDraw();
@@ -3538,550 +3494,7 @@ public class HeightMap extends Module{
     buffer.background(0);
     buffer.endDraw();
     tex = createImage(globalWidth, globalHeight, RGB);
-  }
-  
-}
-
-public class Spheroid extends Module{
-    
-  //not sure why we can't createGraphics here, but it for sure breaks
-  PGraphics buffer;
-  PImage tex = createImage(globalWidth, globalHeight, RGB);
-  boolean updatingModel = false;
-  boolean updatingTexture = false;
-  
-  Spheroid(PVector pos_){
-    super(pos_);    
-    size = new PVector(120, 100);
-    c = color(150, 100, 50);
-    name = "spheroid";  
-    helper = new HelpBox(spheroidHelp);
-    
-    cp5.addSlider("zoom"+str(id))
-      .setLabel("")
-      .setPosition(8, 12)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(0, 2000)
-      .setValue(500)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;     
-    cp5.addSlider("cameraYaw"+str(id))
-      .setLabel("")
-      .setPosition(8, 24)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-PI+.01, -.01)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;
-    cp5.addSlider("cameraPitch"+str(id))
-      .setLabel("")
-      .setPosition(8, 36)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-2*PI, 2*PI)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;
-      
-    cp5.addSlider("cameraPan"+str(id))
-      .setLabel("")
-      .setPosition(8, 48)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-1000, 1000)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;
-    cp5.addSlider("cameraHeight"+str(id))
-      .setLabel("")
-      .setPosition(8, 60)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-1000, 1000)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;  
-      
-    
-    cp5.addSlider("resolution"+str(id))
-      .setLabel("")
-      .setPosition(8, 78)
-      .setWidth(80)
-      .setHeight(10)
-      .setRange(1, 10)
-      .setValue(10)
-      .plugTo(this, "changeRes")
-      .setGroup("g"+str(id))      
-      ;  
-
-    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
-    
-    ins = new InputNode[2];
-    outs = new OutputNode[1];
-    modIns = new ModInput[5];
-    
-    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
-    ins[1] = new InputNode(new PVector(id, 1), new PVector(pos.x+size.x-8, pos.y));
-    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
-    
-    modIns[0] = new ModInput(new PVector(id, 0, -1), new PVector(pos.x+size.x-8, pos.y+11), "zoom"+str(id));
-    modIns[1] = new ModInput(new PVector(id, 1, -1), new PVector(pos.x+size.x-8, pos.y+23), "cameraYaw"+str(id));
-    modIns[2] = new ModInput(new PVector(id, 2, -1), new PVector(pos.x+size.x-8, pos.y+35), "cameraPitch"+str(id));
-    modIns[3] = new ModInput(new PVector(id, 3, -1), new PVector(pos.x+size.x-8, pos.y+47), "cameraPan"+str(id));
-    modIns[4] = new ModInput(new PVector(id, 4, -1), new PVector(pos.x+size.x-8, pos.y+59), "cameraHeight"+str(id));
-
-    //have to createGraphics here for reasons
-    buffer = createGraphics(globalWidth, globalHeight, P3D);
-    model = createShape();
-    updateTexture();
-    
-    buffer.beginDraw();
-    buffer.background(0);
-    buffer.endDraw();
-  }
-  
-  void cp5Handler(float val){
-    //don't recreate the model when 3D UI is changed. It's ok to put this here because
-    //all CP5 happens after draw(), so if the model needs to update, it will happen
-    //before we reach this method
-    updatingModel = false;
-    if (cp5.getController("zoom"+str(id)).isMousePressed()){
-      if (!modIns[0].pauseInput){
-        modIns[0].baseVal = val;
-        modIns[0].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraYaw"+str(id)).isMousePressed()){
-      if (!modIns[1].pauseInput){
-        modIns[1].baseVal = val+PI-.01;
-        modIns[1].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraPitch"+str(id)).isMousePressed()){
-      if (!modIns[2].pauseInput){
-        modIns[2].baseVal = val+2*PI;
-        modIns[2].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraPan"+str(id)).isMousePressed()){
-      if (!modIns[3].pauseInput){
-        modIns[3].baseVal = val+1000;
-        modIns[3].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraHeight"+str(id)).isMousePressed()){
-      if (!modIns[4].pauseInput){
-        modIns[4].baseVal = val+1000;
-        modIns[4].pauseInput = true;
-      }
-    }
-    headsUp();
-  }
-  
-  void changeRes(){
+    updatingTexture = true;
     updatingModel = true;
-    headsUp();
-  }
-  
-  void headsUp(){    
-    if (ins[1].lookUp){
-      updatingTexture = true;
-    }
-    if (ins[0].lookUp){
-      updatingModel = true;
-    }
-    super.headsUp();
-  }
-  
-  // operate if input 1 and output 1 have a connection. Other inputs are optional 
-  boolean allSystemsGo(){
-    if (ins[0].flowId == 0){
-      return false;
-    }
-    return super.allSystemsGo();     
-  }
-  
-  void updateTexture(){
-    int in = ins[1].flowId;
-    tex.loadPixels();
-    for (int i = 0; i < stack.get(in).data.length; i++){
-      tex.pixels[i] = color(stack.get(in).data[i]);
-    }
-    tex.updatePixels();
-  }
-  
-  void updateModel(){
-    int in = ins[0].flowId;
-    int res = (int)cp5.getController("resolution"+str(id)).getValue(); 
-    PVector[][] globe;    
-    float r = 0;
-    globe = new PVector[globalWidth][globalHeight];
-    
-    for (int i = 0; i < globalWidth; i++){
-      float lon = map(i, 0, globalWidth-1, -PI, PI);
-      for (int j = 0; j < globalHeight; j++){
-        float lat = map(j, 0, globalWidth-1, -HALF_PI, HALF_PI);
-        r = stack.get(in).data[i+j*globalWidth]; 
-        float x = r * sin(lon) * cos(lat);
-        float y = r * sin(lon) * sin(lat);
-        float z = r * cos(lon);
-        globe[i][j] = new PVector(x, y, z);
-
-      }
-    }
-    
-    model = createShape(); 
-    model.beginShape(TRIANGLE_STRIP);
-    model.noStroke();
-    model.texture(tex);
-    
-    for (int i = 0; i < globalWidth-1; i++){    
-      for (int j = 0; j < globalHeight; j++){
-        PVector v1 = globe[i][j];
-        PVector v2 = globe[i+1][j];        
-        model.vertex(v1.x, v1.y, v1.z, map(i, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height));
-        model.vertex(v2.x, v2.y, v2.z, map(i+1, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height));
-      }
-    }    
-    model.endShape(CLOSE);
-  }
-  
-  void operate(){
-    super.operate();    
-    if (updatingTexture){
-      updateTexture();
-      updatingTexture = false;
-    }
-    if (updatingModel){
-      updateModel();
-      updatingModel = false; 
-    }
-    
-    writeToBuffer();
-    
-    int in = ins[0].flowId;
-    int out = outs[0].flowId;
-    
-    buffer.loadPixels();
-    for (int i = 0; i < globalWidth; i++){
-      for (int j = 0; j < globalHeight; j++){
-        stack.get(out).data[i+j*globalWidth] = buffer.pixels[i+j*globalWidth] & 0xFF;
-      }
-    }
-    buffer.updatePixels();
-    super.lookDown();
-  }
-  
-  //this method positions the model, then draws it in a PGraphics object. The operate()
-  //method then reads the values of the PGraphics object into the output data array
-  
-  void writeToBuffer(){   
-    
-    float zoom = cp5.getController("zoom"+str(id)).getValue();
-    float yaw = cp5.getController("cameraYaw"+str(id)).getValue();
-    float pitch = cp5.getController("cameraPitch"+str(id)).getValue();
-    float pan = cp5.getController("cameraPan"+str(id)).getValue();
-    float camHeight = cp5.getController("cameraHeight"+str(id)).getValue();
-    
-    float x = zoom*cos(pitch)*sin(yaw);
-    float y = zoom*sin(pitch)*sin(yaw);
-    float z = zoom*cos(yaw);
-    
-    //unsure if buffer.clear() is necessary somewhere here
-    buffer.beginDraw();
-    buffer.clear();
-    buffer.camera(x, y-pan, z+camHeight, 0, -pan, globalHeight/2+camHeight, 0, 0, -1);
-    buffer.lights();
-    buffer.background(0);
-    buffer.shape(model, 0, 0);   
-    buffer.endDraw();
   }  
-  
-  void changeDataDimensions(){
-    super.changeDataDimensions();
-    buffer = createGraphics(globalWidth, globalHeight, P3D);
-    buffer.beginDraw();
-    buffer.background(0);
-    buffer.endDraw();
-    tex = createImage(globalWidth, globalHeight, RGB);
-  }
- 
-}
-
-public class Spindle extends Module{
-    
-  //not sure why we can't createGraphics here, but it for sure breaks
-  PGraphics buffer;
-  PImage tex = createImage(globalWidth, globalHeight, RGB);
-  boolean updatingModel = false;
-  boolean updatingTexture = false;
-  
-  Spindle(PVector pos_){
-    super(pos_);    
-    size = new PVector(120, 100);
-    c = color(150, 100, 50);
-    name = "spindle";  
-    helper = new HelpBox(spindleHelp);
-    
-    cp5.addSlider("zoom"+str(id))
-      .setLabel("")
-      .setPosition(8, 12)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(0, 2000)
-      .setValue(500)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;     
-    cp5.addSlider("cameraYaw"+str(id))
-      .setLabel("")
-      .setPosition(8, 24)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-PI+.01, -.01)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;
-    cp5.addSlider("cameraPitch"+str(id))
-      .setLabel("")
-      .setPosition(8, 36)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-2*PI, 2*PI)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;
-      
-    cp5.addSlider("cameraPan"+str(id))
-      .setLabel("")
-      .setPosition(8, 48)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-1000, 1000)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;
-    cp5.addSlider("cameraHeight"+str(id))
-      .setLabel("")
-      .setPosition(8, 60)
-      .setWidth(100)
-      .setHeight(10)
-      .setRange(-1000, 1000)
-      .setValue(0)
-      .plugTo(this, "cp5Handler")
-      .setGroup("g"+str(id))      
-      ;  
-      
-    
-    cp5.addSlider("resolution"+str(id))
-      .setLabel("")
-      .setPosition(8, 78)
-      .setWidth(80)
-      .setHeight(10)
-      .setRange(1, 10)
-      .setValue(10)
-      .plugTo(this, "changeRes")
-      .setGroup("g"+str(id))      
-      ;  
-
-    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
-    
-    ins = new InputNode[2];
-    outs = new OutputNode[1];
-    modIns = new ModInput[5];
-    
-    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
-    ins[1] = new InputNode(new PVector(id, 1), new PVector(pos.x+size.x-8, pos.y));
-    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
-    
-    modIns[0] = new ModInput(new PVector(id, 0, -1), new PVector(pos.x+size.x-8, pos.y+11), "zoom"+str(id));
-    modIns[1] = new ModInput(new PVector(id, 1, -1), new PVector(pos.x+size.x-8, pos.y+23), "cameraYaw"+str(id));
-    modIns[2] = new ModInput(new PVector(id, 2, -1), new PVector(pos.x+size.x-8, pos.y+35), "cameraPitch"+str(id));
-    modIns[3] = new ModInput(new PVector(id, 3, -1), new PVector(pos.x+size.x-8, pos.y+47), "cameraPan"+str(id));
-    modIns[4] = new ModInput(new PVector(id, 4, -1), new PVector(pos.x+size.x-8, pos.y+59), "cameraHeight"+str(id));
-
-    //have to createGraphics here for reasons
-    buffer = createGraphics(globalWidth, globalHeight, P3D);
-    model = createShape();
-    updateTexture();
-    
-    buffer.beginDraw();
-    buffer.background(0);
-    buffer.endDraw();
-  }
-  
-  void cp5Handler(float val){
-    //don't recreate the model when 3D UI is changed. It's ok to put this here because
-    //all CP5 happens after draw(), so if the model needs to update, it will happen
-    //before we reach this method
-    updatingModel = false;
-    if (cp5.getController("zoom"+str(id)).isMousePressed()){
-      if (!modIns[0].pauseInput){
-        modIns[0].baseVal = val;
-        modIns[0].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraYaw"+str(id)).isMousePressed()){
-      if (!modIns[1].pauseInput){
-        modIns[1].baseVal = val+PI-.01;
-        modIns[1].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraPitch"+str(id)).isMousePressed()){
-      if (!modIns[2].pauseInput){
-        modIns[2].baseVal = val+2*PI;
-        modIns[2].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraPan"+str(id)).isMousePressed()){
-      if (!modIns[3].pauseInput){
-        modIns[3].baseVal = val+1000;
-        modIns[3].pauseInput = true;
-      }
-    }
-    if (cp5.getController("cameraHeight"+str(id)).isMousePressed()){
-      if (!modIns[4].pauseInput){
-        modIns[4].baseVal = val+1000;
-        modIns[4].pauseInput = true;
-      }
-    }
-    headsUp();
-  }
-  
-  void changeRes(){
-    updatingModel = true;
-    headsUp();
-  }
-  
-  void headsUp(){    
-    if (ins[1].lookUp){
-      updatingTexture = true;
-    }
-    if (ins[0].lookUp){
-      updatingModel = true;
-    }
-    super.headsUp();
-  }
-  
-  // operate if input 1 and output 1 have a connection. Other inputs are optional 
-  boolean allSystemsGo(){
-    if (ins[0].flowId == 0){
-      return false;
-    }
-    return super.allSystemsGo();     
-  }
-  
-  void updateTexture(){
-    int in = ins[1].flowId;
-    tex.loadPixels();
-    for (int i = 0; i < stack.get(in).data.length; i++){
-      tex.pixels[i] = color(stack.get(in).data[i]);
-    }
-    tex.updatePixels();
-  }
-  
-  void updateModel(){
-    int in = ins[0].flowId;
-    int res = (int)cp5.getController("resolution"+str(id)).getValue(); 
-    PVector[][] object;    
-    float r = 0;
-    object = new PVector[globalWidth][globalHeight];
-    
-    for (int i = 0; i < globalWidth; i++){
-      float lon = map(i, 0, globalWidth-1, -PI, PI);
-      for (int j = 0; j < globalHeight; j++){
-        r = stack.get(in).data[i+j*globalWidth]; 
-        float x = r * sin(lon);
-        float y = r * cos(lon);
-        float z = j;
-        object[i][j] = new PVector(x, y, z);
-
-      }
-    }
-    
-    model = createShape(); 
-    model.beginShape(TRIANGLE_STRIP);
-    model.noStroke();
-    model.texture(tex);
-    
-    for (int j = 0; j < globalHeight-1; j++){    
-      for (int i = 0; i < globalWidth; i++){
-        PVector v1 = object[i][j];
-        PVector v2 = object[i][j+1];        
-        model.vertex(v1.x, v1.y, v1.z, map(i, 0, globalWidth, 0, tex.width), map(j, 0, globalHeight, 0, tex.height));
-        model.vertex(v2.x, v2.y, v2.z, map(i, 0, globalWidth, 0, tex.width), map(j+1, 0, globalHeight, 0, tex.height));
-      }
-    }    
-    model.endShape(CLOSE);
-  }
-  
-  void operate(){
-    super.operate();    
-    if (updatingTexture){
-      updateTexture();
-      updatingTexture = false;
-    }
-    if (updatingModel){
-      updateModel();
-      updatingModel = false; 
-    }
-    
-    writeToBuffer();
-    
-    int in = ins[0].flowId;
-    int out = outs[0].flowId;
-    
-    buffer.loadPixels();
-    for (int i = 0; i < globalWidth; i++){
-      for (int j = 0; j < globalHeight; j++){
-        stack.get(out).data[i+j*globalWidth] = buffer.pixels[i+j*globalWidth] & 0xFF;
-      }
-    }
-    buffer.updatePixels();
-    super.lookDown();
-  }
-  
-  //this method positions the model, then draws it in a PGraphics object. The operate()
-  //method then reads the values of the PGraphics object into the output data array
-  
-  void writeToBuffer(){   
-    
-    float zoom = cp5.getController("zoom"+str(id)).getValue();
-    float yaw = cp5.getController("cameraYaw"+str(id)).getValue();
-    float pitch = cp5.getController("cameraPitch"+str(id)).getValue();
-    float pan = cp5.getController("cameraPan"+str(id)).getValue();
-    float camHeight = cp5.getController("cameraHeight"+str(id)).getValue();
-    
-    float x = zoom*cos(pitch)*sin(yaw);
-    float y = zoom*sin(pitch)*sin(yaw);
-    float z = zoom*cos(yaw);
-    
-    //unsure if buffer.clear() is necessary somewhere here
-    buffer.beginDraw();
-    buffer.clear();
-    buffer.camera(x, y-pan, z+camHeight, 0, -pan, globalHeight/2+camHeight, 0, 0, -1);
-    buffer.lights();
-    buffer.background(0);
-    buffer.shape(model, 0, 0);   
-    buffer.endDraw();
-  }  
-  
-  void changeDataDimensions(){
-    super.changeDataDimensions();
-    buffer = createGraphics(globalWidth, globalHeight, P3D);
-    buffer.beginDraw();
-    buffer.background(0);
-    buffer.endDraw();
-    tex = createImage(globalWidth, globalHeight, RGB);
-  } 
 }

@@ -141,7 +141,7 @@ class Displayer extends Module{
       for (int i = 0; i < globalWidth; i++){
         for (int j = 0; j < globalHeight; j++){
           int loc = i+j*globalWidth;
-          img.pixels[loc] = color(stack.get(in0).data[loc]%256); //should we try to get rid of %256?
+          img.pixels[loc] = color(stack.get(in0).data[loc]); //should we try to get rid of %256?
         }
       }
     }

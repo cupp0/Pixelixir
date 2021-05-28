@@ -36,7 +36,7 @@ but generalize structuring element to accomodate both binary/ternary elements an
 int loopId = -1 in Module that gets reassigned to every Module that is contained in a loop? Then we override
 headsUp() and just call headsUp in the Iterator? Loop logic is still not tight. Could rewrite the whole mess
 
-- 3D modules need reworked. Honestly just make the camera usable
+- 3D is better, dropped all three in favor of a more general 3d module
 
 - fix fast median and test it against (the currently implemented) quickSelect
 
@@ -105,7 +105,7 @@ String[] arithmetic = {"MATH/LOGIC", "and", "or", "xor", "not", "<", ">", "=", "
 String[] analysis = {"ANALYZE", "dilate", "erode", "peak", "valley", "hit and miss", "local min", "local max", "global min", "global max", "mean", "median", "variance", "center", "distance", "gray dilate", "gray erode", "blob", "histograb", "DFT", "IDFT"};
 String[] transformation = {"TRANSFORM", "translate", "scale", "rotate", "reflect"};
 String[] utility = {"UTILITY", "feedback", "interval", "iterator"};
-String[] miscellaneous = {"MISC", "celato", "height map", "spheroid", "spindle"};
+String[] miscellaneous = {"MISC", "celato", "3D"};
 String[] modifiers = {"MODIFY", "basicMod", "sampler", "midi"};
 String[] output = {"OUTPUT", "display"};
 
@@ -847,12 +847,9 @@ void controlEvent(ControlEvent theEvent) {
   case "random" :
     modules.add(new Random(pos_));
     break;
-  case "height map" :
-    modules.add(new HeightMap(pos_));
-    break;
-  case "spheroid" :
-    modules.add(new Spheroid(pos_));
-    break;   
+  case "3D" :
+    modules.add(new ThreeD(pos_));
+    break; 
   case "scale" :
     modules.add(new Scale(pos_));
     break;
@@ -865,9 +862,6 @@ void controlEvent(ControlEvent theEvent) {
   case "translate" :
     modules.add(new Translate(pos_));
     break; 
-  case "spindle" :
-    modules.add(new Spindle(pos_));
-    break;
   case "iterator" :
     modules.add(new Iterator(pos_));
     break;  
@@ -1039,12 +1033,9 @@ void buildModulesFromSaveFile(String[] info) {
     case "random" :
       modules.add(new Random(pos));
       break;
-    case "height map" :
-      modules.add(new HeightMap(pos));
-      break;
-    case "spheroid" :
-      modules.add(new Spheroid(pos));
-      break;   
+    case "3D" :
+      modules.add(new ThreeD(pos));
+      break; 
     case "scale" :
       modules.add(new Scale(pos));
       break;
@@ -1057,9 +1048,6 @@ void buildModulesFromSaveFile(String[] info) {
     case "translate" :
       modules.add(new Translate(pos));
       break; 
-    case "spindle" :
-      modules.add(new Spindle(pos));
-      break;
     case "iterator" :
       modules.add(new Iterator(pos));
       break;  

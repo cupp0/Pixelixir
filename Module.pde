@@ -347,8 +347,8 @@ public abstract class Module{
     case "random" :
       modules.add(new Random(newPos));
       break;
-    case "height map" :
-      modules.add(new HeightMap(newPos));
+    case "3D" :
+      modules.add(new ThreeD(newPos));
       break;  
     case "scale" :
       modules.add(new Scale(newPos));
@@ -379,12 +379,6 @@ public abstract class Module{
       break;
     case "celato" :
       modules.add(new Celato(newPos));
-      break; 
-    case "spheroid" :
-      modules.add(new Spheroid(newPos));
-      break;   
-    case "spindle" :
-      modules.add(new Spindle(newPos));
       break;
     case "mean" :
       modules.add(new MedianFilter(newPos));
