@@ -66,6 +66,96 @@ void copySelectedModules(){
   }
 }
 
+void buildMacroPatch(){
+  int[] macroIns = new int[0];
+  int[] macroOuts = new int[0];
+  
+  for (Module m : modules){
+    if (m.active && m.selected){
+      m.macroId = modules.size();
+      m.hide();
+      if (m.isMacroIn){
+        macroIns = append(macroIns, m.id);
+      }
+      if (m.isMacroOut){
+        macroOuts = append(macroOuts, m.id);
+      }
+    }
+  }
+  
+  modules.add(new MacroPatch(new PVector(mouseX, mouseY), macroIns, macroOuts));
+}
+
+class MacroPatch extends Module{
+  
+  //stores all the SignalIn and SignalOut modules in the order in which they were created
+  int[] incoming;
+  int[] outgoing;
+  
+  MacroPatch(PVector pos_, int[] incoming_, int[] outgoing_){
+    super(pos_);
+    incoming = new int[incoming_.length];
+    outgoing = new int[outgoing_.length];
+    arrayCopy(incoming_, incoming);
+    arrayCopy(outgoing_, outgoing);
+    int dim = max(incoming.length, outgoing.length);
+    size = new PVector(max(16*dim-8, 41), 41);
+    c = color(200);
+    name = "macro";  
+    isMacro = true;
+    helper = new HelpBox(macroPatchHelp);
+    
+    cp5.addButton("open"+str(id))
+      .setLabel("")
+      .setPosition(size.x-10, size.y/2-5)
+      .setSize(10, 10)
+      .plugTo(this, "openMacro")
+      .setGroup("g"+str(id))
+      ;
+      
+    //keep grabber out of the way for now
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x, pos.y+size.y/2-4));
+    
+    ins = new InputNode[incoming.length];
+    outs = new OutputNode[outgoing.length]; 
+    
+    for (int i = 0; i < incoming.length; i++){
+      ins[i] = new InputNode(new PVector(id, i), new PVector(pos.x+16*i, pos.y));
+    } 
+    
+    for (int i = 0; i < outgoing.length; i++){
+      outs[i] = new OutputNode(new PVector(id, i), new PVector(pos.x+16*i, pos.y+size.y-8));
+    }
+  }
+  
+  //not perfect, we're telling every input to headsUp any time any of them need to, some unnecessary
+  //calculation
+  void headsUp(){
+    
+    for (int i = 0; i < incoming.length; i++){
+      modules.get((int)incoming[i]).headsUp();
+    }
+    
+    super.headsUp();    
+  }
+  
+  void assignInput(int whichSignalIn, int flow){
+    modules.get((int)incoming[whichSignalIn]).outs[0].flowId = flow;
+  }
+  
+  void assignOutput(PVector receivingNode){
+    modules.get((int)receivingNode.x).ins[(int)receivingNode.y].flowId = ins[0].flowId;   
+  }
+  
+  void operate(){
+    super.operate();
+    for (int i = 0; i < incoming.length; i++){
+      modules.get((int)incoming[i]).operate();
+    }
+    super.lookDown();
+  }
+}
+
 //this method determines if a patch contains a closed loop
 //current = the output that was cued for connection
 //id = the input that was just pressed
@@ -411,8 +501,11 @@ String feedbackHelp = "FEEDBACK\n-feedback loops! very unstable!\n-";
 String intervalHelp = "INTERVAL\n-intervallically send a signal!\n-the slider determines how many frames pass before INTERVAL sends its input signal to its output";
 String iteratorHelp = "ITERATOR\n-do something many times! kind of unstable!\n-for when you have a section of your patch you'd like to repeat some number of times before continuing\n-the section to be looped will connect with the input and output nodes on the right side of the ITERATOR module\n-text box is for setting the max number of iterations; clicking the button next to the text box will update the max\n-the slider at the bottom sets the number of iterations executed\n-for instance, if you want a more dramatic blur/filter effect, put your filter inside the iterator loop and increase the number of iterations";
 String celatoHelp = "CELATO\n-make your own cellular automata!\n-The default ruleset is Conway's Game of Life\n-The module works with a binary input and will output the next configuration as a binary signal\n-that means that you would need to hook it up to a FEEDBACK module to watch several consecutive configurations play out\n-rules are added by clicking the add button\n-the rules are of the following form, and everything in parnetheses is selected by the user by using the buttons, text box, and slider: If a cell is (dead/alive) and has (</>/=) (0, 1, 2, 3, 4, 5, 6, 7, 8) living neighbors, then in the next configuration, that cell will be (dead/alive)\n-clear the current ruleset with the clear button";
-String threeDHelp = "3D\n-generate a 3D model using signals!\n-the leftmost input's pixels determine the x axis offset for each vertex in the mesh. Next input is y axis, then z axis\n-The colored inputs apply a texture to the mesh. If left without connection, the mesh gets no texture.\n-camera controls are funky/improvable/not worth explaining";
+String threeDHelp = "3D\n-generate a 3D model using signals!\n-the leftmost input's pixels determine the x axis offset for each vertex in the mesh. Next input is y axis, then z axis. The camera in the Module will always look at the point (0, 0, 0), so be sure to translate your signals for proper viewing!\n-The colored inputs apply a texture to the mesh. If left without connection, the mesh gets no texture(is invisible :O).\n-camera controls: first slider is viewing distance, second is angle of inclination, third is rotation around the object\n-the camera doesn't implement proper rotations so it might feel a bit wonky!\n-smaller slider is a broken resolution control but it's kind of fun";
 String modifierHelp = "MODULATOR\n-automate slider changes!\n-choose from several envelope types.\n-output is the gray node at bottom left. Can plug into gray nodes to the right of sliders in other modules.\n-Six buttons at left indicate envelope type. Seed text box allows you to sync noise seeds with another module\n-duration text box is the number of frames to get through one cycle through the envelope\n-phase should be a number less that the duration. It shifts the envelope\n-inv and rev buttons invert and reverse the envelope\n-the slider to the right is amplitude. it gets normalized to whatever it is plugged into.";
 String samplerHelp = "SAMPLER\n-sample the first row of a signal to generate an envelope!\n-maybe you want an envelope that BASICMOD can't make\n-if you can generate a signal that approximates the envelope along the x axis, plug it into SAMPLER\n-it will sample the first row of the signal and generate an envelope\n-text box is duration\n-slider is an amplitude multiplier";
 String midiHelp = "MIDI\n-drive animation with a midi controller!\n-if you have a USB midi device, plug it in before running.\n-in the Processing IDE, a message should print indicating which input your midi device is connected to\n- in the setup() method in modify.pde, change the line 'myBus = new MidiBus(this, 1, 1);' to 'myBus = new MidiBus(this, (your device input number here), 1);'\n- the module is currently set up for a controller with 8 faders, so the output number is constrained. that means any faders you have whose number is greater than 7 will be sent to the last output node of this module";
+String signalInHelp = "SIGNAL IN";
+String signalOutHelp = "SIGNAL OUT";
+String macroPatchHelp = "MACROPATCH";
 String displayHelp = "DISPLAY\n-see the signal!\n-the four inputs are graylevel and RGB\n-any inputs in RGB will override the graylevel input\n-the active button will activate/deactivate the display and all the calculations associated with that display. This is useful when you are doing work on a patch that is chuggaluggin. When deactivated, the frame rate will kick back up, making it easier to change connections, add modules etc. Click again to resume calculations and display\n-the still button takes a screenshot of the current display and saves it as a .tif in the 'screenshots' folder inside the main sketch folder\n- the record button saves the sequence of images that the display generates. It will save them at the location specified by the textbox to the right. A new folder will be created inside the sketch folder, which will be populated with whatever comes into the display module";

@@ -1603,7 +1603,7 @@ class Translate extends Module{
     size = new PVector(72, 30);
     c = color(150, 50, 50);  
     helper = new HelpBox(translateHelp);
-     //these are the nodes that allow the user to interact with the module 
+    //these are the nodes that allow the user to interact with the module 
       
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
     ins = new InputNode[3];
@@ -1632,10 +1632,10 @@ class Translate extends Module{
     for (int i = 0; i < globalWidth; i++){
       for (int j = 0; j < globalHeight; j++){
         int loc = i+j*globalWidth;
-        int horizontal = i+(int)stack.get(in2).data[loc];
-        int vertical = j+(int)stack.get(in3).data[loc];
+        float horizontal = (float)i+stack.get(in2).data[loc];
+        float vertical = (float)j+stack.get(in3).data[loc];
         if (horizontal >= 0 && horizontal < globalWidth && vertical >= 0 && vertical < globalHeight){
-          stack.get(out).data[loc] = stack.get(in).data[horizontal+vertical*globalWidth];
+          stack.get(out).data[loc] = stack.get(in).data[(int)(horizontal+vertical*(float)globalWidth)];
         } else {
           stack.get(out).data[loc] = 0;
         }
@@ -3114,6 +3114,52 @@ class Iterator extends Module{
   } 
 }
 
+class SignalIn extends Module{
+  
+  SignalIn(PVector pos_){
+    super(pos_);
+    size = new PVector(41, 30);
+    c = color(200);
+    name = "in";
+    isMacroIn = true;
+    helper = new HelpBox(signalInHelp);
+      
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
+    
+    outs = new OutputNode[1];    
+    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
+  }
+  
+  //this module doesn't have to do anything, just carries the signal to the macro
+  void operate(){
+    super.operate();
+    super.lookDown();
+  } 
+}
+
+class SignalOut extends Module{
+  
+  SignalOut(PVector pos_){
+    super(pos_);
+    size = new PVector(41, 30);
+    c = color(200);
+    name = "out";  
+    isMacroOut = true;
+    helper = new HelpBox(signalOutHelp);
+      
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
+    
+    ins = new InputNode[1];    
+    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
+  }
+  
+  //this module doesn't have to do anything, just carries the signal back to the main patch
+  void operate(){
+    super.operate();
+    super.lookDown();
+  } 
+}
+
 class Rotate extends Module{
     
   Rotate(PVector pos_){
@@ -3237,34 +3283,36 @@ public class ThreeD extends Module{
   
   ThreeD(PVector pos_){
     super(pos_);    
-    size = new PVector(120, 100);
+    size = new PVector(120, 85);
     c = color(150, 100, 50);
     name = "3D";  
     helper = new HelpBox(threeDHelp);
     
-    cp5.addSlider("zoom"+str(id))
+    cp5.addSlider("distance"+str(id))
       .setLabel("")
-      .setPosition(8, 12)
+      .setPosition(8, 22)
       .setWidth(100)
       .setHeight(10)
-      .setRange(0, 2000)
-      .setValue(500)
+      .setRange(0, 1500)
+      .setValue(350)
       .plugTo(this, "cp5Handler")
       .setGroup("g"+str(id))      
-      ;     
-    cp5.addSlider("cameraYaw"+str(id))
+      ;  
+      
+    cp5.addSlider("height"+str(id))
       .setLabel("")
-      .setPosition(8, 24)
+      .setPosition(8, 34)
       .setWidth(100)
       .setHeight(10)
-      .setRange(-PI+.01, -.01)
-      .setValue(0)
+      .setRange(0, 2500)
+      .setValue(700)
       .plugTo(this, "cp5Handler")
       .setGroup("g"+str(id))      
       ;
-    cp5.addSlider("cameraPitch"+str(id))
+      
+    cp5.addSlider("rotation"+str(id))
       .setLabel("")
-      .setPosition(8, 36)
+      .setPosition(8, 46)
       .setWidth(100)
       .setHeight(10)
       .setRange(-PI, PI)
@@ -3275,7 +3323,7 @@ public class ThreeD extends Module{
         
     cp5.addSlider("resolution"+str(id))
       .setLabel("")
-      .setPosition(8, 78)
+      .setPosition(8, 63)
       .setWidth(80)
       .setHeight(10)
       .setRange(1, 50)
@@ -3284,7 +3332,6 @@ public class ThreeD extends Module{
       .setGroup("g"+str(id))      
       ; 
       
-
     grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
     
     ins = new InputNode[6];
@@ -3296,8 +3343,7 @@ public class ThreeD extends Module{
     ins[2] = new InputNode(new PVector(id, 2), new PVector(pos.x+32, pos.y));
     ins[3] = new InputNode(new PVector(id, 3), new PVector(pos.x+size.x-40, pos.y));
     ins[4] = new InputNode(new PVector(id, 4), new PVector(pos.x+size.x-24, pos.y));
-    ins[5] = new InputNode(new PVector(id, 5), new PVector(pos.x+size.x-8, pos.y));
-    
+    ins[5] = new InputNode(new PVector(id, 5), new PVector(pos.x+size.x-8, pos.y));   
     
     ins[3].col = color(255, 0, 0);
     ins[4].col = color(0, 255, 0);
@@ -3305,15 +3351,15 @@ public class ThreeD extends Module{
 
     outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x+size.x-40, pos.y+size.y-8));
     outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-24, pos.y+size.y-8));
-    outs[2] = new OutputNode(new PVector(id, 2), new PVector(pos.x+size.x-8, pos.y+size.y-8));
+    outs[2] = new OutputNode(new PVector(id, 1), new PVector(pos.x+size.x-8, pos.y+size.y-8));
     
     outs[0].col = color(255, 0, 0);
     outs[1].col = color(0, 255, 0);
     outs[2].col = color(0, 0, 255);
     
-    modIns[0] = new ModInput(new PVector(id, 0, -1), new PVector(pos.x+size.x-8, pos.y+11), "zoom"+str(id));
-    modIns[1] = new ModInput(new PVector(id, 1, -1), new PVector(pos.x+size.x-8, pos.y+23), "cameraYaw"+str(id));
-    modIns[2] = new ModInput(new PVector(id, 2, -1), new PVector(pos.x+size.x-8, pos.y+35), "cameraPitch"+str(id));
+    modIns[0] = new ModInput(new PVector(id, 0, -1), new PVector(pos.x+size.x-8, pos.y+23), "distance"+str(id));
+    modIns[1] = new ModInput(new PVector(id, 1, -1), new PVector(pos.x+size.x-8, pos.y+35), "height"+str(id));
+    modIns[2] = new ModInput(new PVector(id, 2, -1), new PVector(pos.x+size.x-8, pos.y+47), "rotation"+str(id));
     
     //have to createGraphics here for reasons
     buffer = createGraphics(globalWidth, globalHeight, P3D);
@@ -3335,21 +3381,21 @@ public class ThreeD extends Module{
     //all CP5 happens after draw(), so if the model needs to update, it will happen
     //before we reach this method
     updatingModel = false;
-    if (cp5.getController("zoom"+str(id)).isMousePressed()){
+    if (cp5.getController("distance"+str(id)).isMousePressed()){
       if (!modIns[0].pauseInput){
         modIns[0].baseVal = val;
         modIns[0].pauseInput = true;
       }
     }
-    if (cp5.getController("cameraYaw"+str(id)).isMousePressed()){
+    if (cp5.getController("height"+str(id)).isMousePressed()){
       if (!modIns[1].pauseInput){
-        modIns[1].baseVal = val+PI-.01;
+        modIns[1].baseVal = val;
         modIns[1].pauseInput = true;
       }
     }
-    if (cp5.getController("cameraPitch"+str(id)).isMousePressed()){
+    if (cp5.getController("rotation"+str(id)).isMousePressed()){
       if (!modIns[2].pauseInput){
-        modIns[2].baseVal = val+2*PI;
+        modIns[2].baseVal = val;
         modIns[2].pauseInput = true;
       }
     }
@@ -3464,24 +3510,33 @@ public class ThreeD extends Module{
     super.lookDown();
   }
   
-  //this method positions the model, then draws it in a PGraphics object. The operate()
+  //this method positions the camera, then draws the model in a PGraphics object. The operate()
   //method then reads the values of the PGraphics object into the output data array
   
   void writeToBuffer(){   
     
-    float zoom = cp5.getController("zoom"+str(id)).getValue();
-    float yaw = cp5.getController("cameraYaw"+str(id)).getValue();
-    float pitch = cp5.getController("cameraPitch"+str(id)).getValue();
+    //didn't bother implementing real rotations. The camera basically picks a vector on a cylinder
+    //of given radius surrounding (0, 0, 0), then normalizes that vector to the given radius.
     
-    float x = zoom*cos(pitch)*sin(yaw);
-    float y = zoom*sin(pitch)*sin(yaw);
-    float z = zoom*cos(yaw);
+    //cylinder radius / viewing distance
+    float dist = cp5.getController("distance"+str(id)).getValue();
+    
+    //rotation along outside of cylinder
+    float rotation = cp5.getController("rotation"+str(id)).getValue();
+    float xrot = dist*sin(rotation);
+    float yrot = dist*cos(rotation);
+    
+    //height above the origin
+    float camHeight = cp5.getController("height"+str(id)).getValue();
+    
+    //normalize position on cylinder to position on sphere of the given radius
+    PVector camPos = new PVector(xrot, yrot, camHeight).normalize().mult(dist);
     
     //unsure if buffer.clear() is necessary somewhere here
     buffer.beginDraw();
     buffer.clear();
-    buffer.camera(x, y, z, 0, 0, 0, 0, 1, 0);
-   // buffer.l;
+    buffer.camera(camPos.x, camPos.y, camPos.z, 0, 0, 0, 0, 0, -1);
+    //buffer.lights();
     buffer.background(0);
     buffer.shape(model, 0, 0);   
     buffer.endDraw();

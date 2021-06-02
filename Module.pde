@@ -46,9 +46,14 @@ public abstract class Module{
   PVector size;
   color c;
   
+  //used to point to the MacroPatch Module that contains this module
+  int macroId = -1;
   
   //made false when a module is deleted
   boolean active = true;
+  
+  //made false when a module is collapsed into a MacroPatch
+  boolean visible = true;
   
   //for moving, copying, deleting etc.
   boolean selected = true;
@@ -60,6 +65,8 @@ public abstract class Module{
   PShape model;
   
   //at what point do we decide to extend module further before concrete classes? Would that help?
+  //all this garbage is a symptom of what bad practice? Like what about the class structure is bad?
+  //how do i do it different????
   boolean isModifier = false;
   boolean isMidi = false;
   boolean isDisplay = false;
@@ -68,6 +75,9 @@ public abstract class Module{
   boolean loopReady = false;
   boolean isIterator = false;
   boolean isMovie = false;
+  boolean isMacro = false;
+  boolean isMacroIn = false;
+  boolean isMacroOut = false;
   int[][] structuringElement = new int[3][3];
   float[][] kernel = new float[3][3];
   
@@ -116,7 +126,7 @@ public abstract class Module{
     
     if (name.length() < 5){
       textAlign(CENTER);
-      text(name, pos.x+size.x/2, pos.y+20);
+      text(name, pos.x+size.x/2, pos.y+size.y/2+5);
     } else {    
       textAlign(LEFT);
       text(name, pos.x+10, pos.y-3);
@@ -165,12 +175,6 @@ public abstract class Module{
     }
     for (OutputNode n : outs){
       for (PVector p : n.receivers){
-        //if (modules.get((int)p.x).isFeedback && (int)p.y == 1){
-        //  if (!modules.get((int)p.x).loopReady){
-        //    modules.get((int)p.x).loopReady = true;
-        //    modules.get((int)p.x).headsUp();
-        //  }
-        //}
         if (!modules.get((int)p.x).isDisplay && !(modules.get((int)p.x).isFeedback && (int)p.y == 1) && !(modules.get((int)p.x).isIterator && (int)p.y == 1)){
           modules.get((int)p.x).headsUp();
           if(modules.get((int)p.x).isFeedback){
@@ -279,6 +283,24 @@ public abstract class Module{
   //we should write a general cp5Handler. Would need each module to have a String[] 
   //controllerNames that stores the names of all the cp5 that takes a ModInput.
   void cp5Handler(){
+  }
+  
+  void openMacro(){
+    for (Module m : modules){
+      if (m.active){
+        if (m.macroId == this.id){
+          m.macroId = -1;
+          m.show();
+        }
+      }
+    }
+    deleteModule();
+  }
+  
+  void assignInput(int whichSignalIn, int flow){
+  }
+  
+  void assignOutput(PVector receivingNode){
   }
   
   void copyModule(){
@@ -461,7 +483,12 @@ public abstract class Module{
     case "%" :
       modules.add(new Modulo(newPos));
       break;
-      
+    case "in" :
+      modules.add(new SignalIn(pos));
+      break; 
+    case "out" :
+      modules.add(new SignalOut(pos));
+      break;         
     }
     
     int moduleId = modules.size()-1;
@@ -475,6 +502,16 @@ public abstract class Module{
         modules.get(modules.size()-1).outs[i].cableCol = theColor;
       }
     }
+  }
+  
+  void hide(){
+    visible = false;
+    cp5.getGroup("g"+str(id)).hide();
+  }
+  
+  void show(){
+    visible = true;
+    cp5.getGroup("g"+str(id)).show();
   }
   
   // Remove connections, remove cp5, and set active = false. Missing anything?

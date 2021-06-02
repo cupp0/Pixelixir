@@ -5,88 +5,55 @@
 
 Click the triangle to run.
 
-~  ~  ~  ~  ~
-
-BUGS 
-
+~ ~ ~ BUGS ~ ~ ~
 -iterator sometimes stackoverflows with filter depending on connection order
 -feedback not initiating properly sometimes
 -why does adding a rotate module glitch
 -random NullPointerException in Constant, copied big chunk, rerouted a few things, then hooked up to a display
 -Modules upstream are sometimes operating unnecessarily after changes downstream
 -when loading patches, we get concurrentmodificationexception when using the fileSelect prompt. Issue seems to
-go away when we type the file name instead.
+go away when we use cp5 to lad patches. We can leave that as is for now
 
-IMPROVEMENTS
-
+~ ~ ~ IMPROVEMENTS ~ ~ ~
+- math eval range accepts input like "2p"
 - add a comment feature
-
 - currently, saving records module info including type, position and signal connections. Modifier
 connections and other module info (slider position, imagePath, etc) aren't being recorded. Let's not
 complete the saving/loading situation until we rewrite the Module class
-
 - accomodate larger convolution kernels. Maybe leave kernel as a Gen for example kernels
 but generalize structuring element to accomodate both binary/ternary elements and conv. kernels
-
-- method of synchronizing videos, displays, recording, etc.
-
 - some sort of instructional graphic beyond the help boxes
-
+- Is there a place for modules that store signals from previous frames? try out a Module that stores 
+some number of images and has that number of outputs. Every time it operates, it pushes the queue
 - modules inside loops should communicate to the parent iterator when they should headsUp(). Maybe 
 int loopId = -1 in Module that gets reassigned to every Module that is contained in a loop? Then we override
 headsUp() and just call headsUp in the Iterator? Loop logic is still not tight. Could rewrite the whole mess
-
-- 3D is better, dropped all three in favor of a more general 3d module
-
 - fix fast median and test it against (the currently implemented) quickSelect
+- try/catch for invalid inputs in Modules
 
-- Try/Catch list
-  - creating a closed loop with module connections
-  - typing a string into the save path text box
-  - invalid inputs for the exp eval
-  - if onMousePressed() in inputNode, try (array index out of bounds)
-  
 ~ ~ ~ REFACTOR NOTES ~ ~ ~
-
-- double precision might be necessary
-
+- double might be necessary in some cases, like for FFT, whose output is very large. 
 - get rid of Flow. It does nothing. stack should be an arrayList of float[]
-
 - collapse() method in Module. Look at number of ins, outs, modIns and modOuts to determine size
 Only draw nodes, no CP5. Maybe shift+click the grabber collapes? 
-
 - make a node initialization method in Module
-
 - iterator and filter need reconceived. unreliable, bad
-
 - automate Module UI based on number of ins/outs, module name, etc. Every Module has a collapse
 that just shows ins/outs and name
-
 - pass module id into constructor for flexibility
-
 - Can we store every Node in a container in Module? Then have overwritten methods
 like we do in lots of Module extensions? 
-
 - make a cp5Handler method in Module
-
 - make an abstract InputNode and OutputNode from which SignalInputNode and ModInputNode extend?
-
 - address double counting scenarios in headsUp()
 
--For elements that use a structuring element and only care about the on state for their neighborhood,
-should we store only PVectors pointing to the neighborhood instead of iterating through the whole 
-dimension of the neighborhood for every pixel? Seems faster. Test it.
-
-~ ~ ~ DREAM WORK ~ ~ ~
-  
-- subpatches (once saving/loading is figured out, subpatches should be straightforward)
-  - build module for subpatches, where user indicates number of inputs and outputs
-  - idk how to do it
-
-- resolution is determined by each display instead of globally. If module dimensions
-  disagree, scale the larger one down to the smaller one
-  
-- Start thinking about Modules that store multiple signals.
+~ ~ ~ DREAM WORK ~ ~ ~ 
+- method of synchronizing videos, displays, recording, etc. More cohesive/intuitive recording flow
+- macropatch by grouping then hitting 'm'. Add SignalIn and SignalOut module. When creating a macropatch,
+count the number of SignalIn and SignalOut to generate macro UI. Need to be able to .hide() a Module while 
+keeping it active. Macropatch contains a single button that will .open() (.show() every Module it contains) 
+and then .hide() itself.
+- live videoooooooooo, aAAHHHH
 
 */
 
@@ -104,7 +71,7 @@ String[] generators = {"GENERATE", "constant", "math", "noise", "random", "video
 String[] arithmetic = {"MATH/LOGIC", "and", "or", "xor", "not", "<", ">", "=", "+", "-", "x", "/", "^", "log", "%", "abs", "convolve"};
 String[] analysis = {"ANALYZE", "dilate", "erode", "peak", "valley", "hit and miss", "local min", "local max", "global min", "global max", "mean", "median", "variance", "center", "distance", "gray dilate", "gray erode", "blob", "histograb", "DFT", "IDFT"};
 String[] transformation = {"TRANSFORM", "translate", "scale", "rotate", "reflect"};
-String[] utility = {"UTILITY", "feedback", "interval", "iterator"};
+String[] utility = {"UTILITY", "feedback", "interval", "iterator", "signal in", "signal out"};
 String[] miscellaneous = {"MISC", "celato", "3D"};
 String[] modifiers = {"MODIFY", "basicMod", "sampler", "midi"};
 String[] output = {"OUTPUT", "display"};
@@ -195,7 +162,9 @@ void draw(){
         m.headsUp();
       }
       //See Displayer.display() in output tab, this method drives all the calculation 
-      m.display();
+      if (m.visible){
+        m.display();
+      }
     }
   }
   
@@ -449,6 +418,17 @@ void keyPressed(){
   }
   if (key == 'q'){
     messageActive = false;
+  }
+  
+  if (key == 'm'){
+    for (Module m : modules){
+      if (m.active){
+        if (m.grabber.mouseOver){
+          buildMacroPatch();
+          return;
+        }
+      }
+    }
   }
   
   //setKeyState handles multi-key interactions
@@ -960,6 +940,12 @@ void controlEvent(ControlEvent theEvent) {
     break; 
   case "^" :
     modules.add(new Exp(pos_));
+    break; 
+  case "signal in" :
+    modules.add(new SignalIn(pos_));
+    break; 
+  case "signal out" :
+    modules.add(new SignalOut(pos_));
     break;   
   }
 }
@@ -1146,7 +1132,13 @@ void buildModulesFromSaveFile(String[] info) {
       break; 
     case "^" :
       modules.add(new Exp(pos));
-      break;   
+      break; 
+    case "in" :
+      modules.add(new SignalIn(pos));
+      break; 
+    case "out" :
+      modules.add(new SignalOut(pos));
+      break; 
     }
   }
 }

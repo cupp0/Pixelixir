@@ -264,7 +264,7 @@ class Constant extends Module{
   
   Constant(PVector pos_){
     super(pos_);
-    size = new PVector(288, 44);
+    size = new PVector(287, 44);
     c = color(125, 100, 175);
     name = "constant";
     helper = new HelpBox(constantHelp);
@@ -272,9 +272,9 @@ class Constant extends Module{
     cp5.addSlider("val"+str(id))
       .setLabel("")
       .setPosition(20, 12)
-      .setWidth(256)
+      .setWidth(255)
       .setHeight(10)
-      .setRange(-1, 255)
+      .setRange(0, 255)
       .setValue(0)
       .plugTo(this, "cp5Handler")
       .setGroup("g"+str(id))
@@ -285,7 +285,7 @@ class Constant extends Module{
       .setPosition(20, 24)
       .setWidth(256)
       .setHeight(10)
-      .setRange(0, 1)
+      .setRange(-1, 1)
       .setValue(1)
       .plugTo(this, "cp5Handler")
       .setGroup("g"+str(id))
@@ -888,7 +888,7 @@ class Math extends Module{
       .setSize(90, 12)
       .setColor(color(255,0,0))
       .show()
-      .setText("xs")
+      .setText("x")
       .setGroup("g"+str(id))      
       ;
       
@@ -898,7 +898,7 @@ class Math extends Module{
       .setSize(15, 12)
       .setColor(color(255,0,0))
       .show()
-      .setText("-10")
+      .setText("-150")
       .setGroup("g"+str(id))      
       ;
       
@@ -908,7 +908,7 @@ class Math extends Module{
       .setSize(15, 12)
       .setColor(color(255,0,0))
       .show()
-      .setText("-10")
+      .setText("-150")
       .setGroup("g"+str(id))
       ;
       
@@ -918,7 +918,7 @@ class Math extends Module{
       .setSize(15, 12)
       .setColor(color(255,0,0))
       .show()
-      .setText("10")
+      .setText("150")
       .setGroup("g"+str(id))      
       ;
       
@@ -928,7 +928,7 @@ class Math extends Module{
       .setSize(15, 12)
       .setColor(color(255,0,0))
       .show()
-      .setText("10")
+      .setText("150")
       .setGroup("g"+str(id))
       ;   
       

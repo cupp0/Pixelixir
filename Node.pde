@@ -68,6 +68,17 @@ class InputNode extends Node{
             lookUp = true;
             modules.get((int)cue.x).operate();
           }
+          if (modules.get((int)id.x).isMacro){
+            //if we are clicking on a Macro Input, tell it which
+            //SignalIn Module to assign its flowId
+            modules.get((int)id.x).assignInput((int)id.y, flowId);
+          }
+          if (modules.get((int)cue.x).isMacro){
+            //if the cue is a Macro output, tell it which
+            //SignalOut Module the Module id it should forward 
+            //its flowId to. 
+            modules.get((int)cue.x).assignOutput(id);
+          }
           if (!(keyPressed && key == CODED && keyCode == SHIFT)){
             cue = null;
           }
