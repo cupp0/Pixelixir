@@ -386,7 +386,10 @@ public abstract class Module{
       break;      
     case "iterator" :
       modules.add(new Iterator(newPos));
-      break;  
+      break;
+    case "delay" :
+      modules.add(new Delay(newPos));
+      break; 
     case "kernel" :
       modules.add(new Kernel(newPos));
       break;  

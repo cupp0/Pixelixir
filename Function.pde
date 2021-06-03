@@ -3273,6 +3273,58 @@ class Reflect extends Module{
   
 }
 
+class Delay extends Module{
+  
+  float[] previousSignal = new float[globalWidth*globalHeight];
+  
+  Delay(PVector pos_){
+    super(pos_);
+    size = new PVector(36, 30);
+    c = color(200);  
+    name = "delay";  
+    helper = new HelpBox(delayHelp);
+    
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));
+    
+    ins = new InputNode[1];
+    outs = new OutputNode[1];
+    
+    ins[0] = new InputNode(new PVector(id, 0), new PVector(pos.x, pos.y));
+    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));
+  }
+  
+  void operate(){
+    super.operate();
+    
+    int in = ins[0].flowId;
+    int out = outs[0].flowId;
+    
+    //push the stored signal to the output
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j*globalWidth;
+        stack.get(out).data[loc] = previousSignal[loc];
+      }
+    }
+    
+    //write the input signal to the storage array
+    for (int i = 0; i < globalWidth; i++){
+      for (int j = 0; j < globalHeight; j++){
+        int loc = i+j*globalWidth;
+        previousSignal[loc] = stack.get(in).data[loc];
+      }
+    }
+    
+    super.lookDown();
+  }
+  
+  void changeDataDimensions(){
+    super.changeDataDimensions();
+    previousSignal = new float[globalWidth*globalHeight];
+    headsUp();
+  }
+}
+
 public class ThreeD extends Module{
     
   //not sure why we can't createGraphics here, but it for sure breaks

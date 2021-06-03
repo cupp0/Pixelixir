@@ -32,6 +32,7 @@ headsUp() and just call headsUp in the Iterator? Loop logic is still not tight. 
 - try/catch for invalid inputs in Modules
 
 ~ ~ ~ REFACTOR NOTES ~ ~ ~
+- Patch class contains signalTree
 - double might be necessary in some cases, like for FFT, whose output is very large. 
 - get rid of Flow. It does nothing. stack should be an arrayList of float[]
 - collapse() method in Module. Look at number of ins, outs, modIns and modOuts to determine size
@@ -71,7 +72,7 @@ String[] generators = {"GENERATE", "constant", "math", "noise", "random", "video
 String[] arithmetic = {"MATH/LOGIC", "and", "or", "xor", "not", "<", ">", "=", "+", "-", "x", "/", "^", "log", "%", "abs", "convolve"};
 String[] analysis = {"ANALYZE", "dilate", "erode", "peak", "valley", "hit and miss", "local min", "local max", "global min", "global max", "mean", "median", "variance", "center", "distance", "gray dilate", "gray erode", "blob", "histograb", "DFT", "IDFT"};
 String[] transformation = {"TRANSFORM", "translate", "scale", "rotate", "reflect"};
-String[] utility = {"UTILITY", "feedback", "interval", "iterator", "signal in", "signal out"};
+String[] utility = {"UTILITY", "feedback", "interval", "iterator", "delay", "signal in", "signal out"};
 String[] miscellaneous = {"MISC", "celato", "3D"};
 String[] modifiers = {"MODIFY", "basicMod", "sampler", "midi"};
 String[] output = {"OUTPUT", "display"};
@@ -844,7 +845,10 @@ void controlEvent(ControlEvent theEvent) {
     break; 
   case "iterator" :
     modules.add(new Iterator(pos_));
-    break;  
+    break;
+  case "delay" :
+    modules.add(new Delay(pos_));
+    break;   
   case "kernel" :
     modules.add(new Kernel(pos_));
     break;
@@ -1031,6 +1035,9 @@ void buildModulesFromSaveFile(String[] info) {
     case "interval" :
       modules.add(new Interval(pos));
       break;
+    case "delay" :
+      modules.add(new Delay(pos));
+      break;  
     case "translate" :
       modules.add(new Translate(pos));
       break; 
