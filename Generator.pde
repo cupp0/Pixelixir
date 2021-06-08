@@ -1048,6 +1048,7 @@ public class Vid extends Module{
   int currentFrameIndex = 1;
   int scrubOffset;
   int totalFrames;
+  int lastOperatingFrame = -1;
   float frameChanger = 0;
   boolean isPlaying = false;
   boolean updating = true;
@@ -1208,53 +1209,56 @@ public class Vid extends Module{
   
   void operate(){
     
-    if (isPlaying){
-      frameChanger += cp5.getController("playbackRate"+str(id)).getValue();
-      if (abs(frameChanger) >= 1.0){
-        if (frameChanger>0){
-          advance();
-          frameChanger--;
-        } else{
-          retreat();
-          frameChanger++;
-        }
-      }
-    }
-    
-    if (updating){
-      currentFrameIndex = currentFrameIndex%(totalFrames-1) ;
-      currentFrame = loadImage(dataDirectory+str(1+currentFrameIndex)+fileType); 
-      currentFrame.resize(globalWidth, globalHeight);
-      currentFrame.loadPixels();
-      
-      //updates grayscale output if there is a connection
-      if (outs[0].receivers.size() > 0){
-        int grayOutput = outs[0].flowId;
-        for (int i = 0; i < globalWidth; i++){
-          for (int j = 0; j < globalHeight; j++){
-            stack.get(grayOutput).data[i+j*globalWidth] = brightness(currentFrame.pixels[i+j*globalWidth]);      
-          }
-        }
+    //bad way of making sure we don't operate twice in one frame
+    if (lastOperatingFrame != frameCount){
+      if (isPlaying){
+        //frameChanger += cp5.getController("playbackRate"+str(id)).getValue();
+        //if (abs(frameChanger) >= 1.0){
+        //  if (frameChanger>0){
+        //    advance();
+        //    frameChanger--;
+        //  } else{
+        //    retreat();
+        //    frameChanger++;
+        //  }
+        //}
+        advance();
       }
       
-      //updates color channels if they have connections
-      for (int x = 1; x < 4; x++){
-        if (outs[x].receivers.size() > 0){
-          int colorOutput = outs[x].flowId;
-          int shiftAmount = 16-(8*(x-1));
+      if (updating){
+        currentFrameIndex = currentFrameIndex%(totalFrames-1) ;
+        currentFrame = loadImage(dataDirectory+str(1+currentFrameIndex)+fileType); 
+        currentFrame.resize(globalWidth, globalHeight);
+        currentFrame.loadPixels();
+        
+        //updates grayscale output if there is a connection
+        if (outs[0].receivers.size() > 0){
+          int grayOutput = outs[0].flowId;
           for (int i = 0; i < globalWidth; i++){
             for (int j = 0; j < globalHeight; j++){
-              stack.get(colorOutput).data[i+j*globalWidth] = (currentFrame.pixels[i+j*globalWidth] >> shiftAmount) & 0xFF;
+              stack.get(grayOutput).data[i+j*globalWidth] = brightness(currentFrame.pixels[i+j*globalWidth]);      
             }
           }
         }
-      }
-      currentFrame.updatePixels();
-      updating = false;
+        
+        //updates color channels if they have connections
+        for (int x = 1; x < 4; x++){
+          if (outs[x].receivers.size() > 0){
+            int colorOutput = outs[x].flowId;
+            int shiftAmount = 16-(8*(x-1));
+            for (int i = 0; i < globalWidth; i++){
+              for (int j = 0; j < globalHeight; j++){
+                stack.get(colorOutput).data[i+j*globalWidth] = (currentFrame.pixels[i+j*globalWidth] >> shiftAmount) & 0xFF;
+              }
+            }
+          }
+        }
+        currentFrame.updatePixels();
+        updating = false;
+      }         
     }
-         
-    super.lookDown();
-
+    lastOperatingFrame = frameCount;
+    super.lookDown();    
   }
   
   boolean allSystemsGo(){
@@ -1272,3 +1276,84 @@ public class Vid extends Module{
   }
 
 }  
+
+public class D435 extends Module{
+  
+  D435(PVector pos_){
+    super(pos_);
+    size = new PVector(72, 30);
+    c = color(125, 100, 175); 
+    name = "d435";
+    helper = new HelpBox(depthCamHelp);
+    isMovie = true;    
+      
+    depthCam.enableDepthStream(globalWidth, globalHeight); 
+    depthCam.enableColorStream(globalWidth, globalHeight);
+    depthCam.enableIRStream(globalWidth, globalHeight);
+
+    //depthCam.enableAlign();
+    depthCam.start();  
+    
+    grabber = new GrabberNode(new PVector(id, 1), new PVector(pos.x+size.x/2-4, pos.y));    
+    outs = new OutputNode[5];
+    
+    outs[0] = new OutputNode(new PVector(id, 0), new PVector(pos.x, pos.y+size.y-8));  
+    outs[1] = new OutputNode(new PVector(id, 1), new PVector(pos.x+16, pos.y+size.y-8));     
+    outs[1].col  = color(127, 0, 0);
+    outs[1].colorChannels.set(127, 0, 0);
+    outs[2] = new OutputNode(new PVector(id, 2), new PVector(pos.x+32, pos.y+size.y-8));     
+    outs[2].col  = color(255, 0, 0);
+    outs[2].colorChannels.set(255, 0, 0);
+    outs[3] = new OutputNode(new PVector(id, 3), new PVector(pos.x+48, pos.y+size.y-8));     
+    outs[3].col  = color(0, 255, 0);
+    outs[3].colorChannels.set(0, 255, 0);
+    outs[4] = new OutputNode(new PVector(id, 4), new PVector(pos.x+64, pos.y+size.y-8));     
+    outs[4].col  = color(0, 0, 255);
+    outs[4].colorChannels.set(0, 0, 255);
+
+  }
+  
+  void operate(){ 
+    
+    int depthOut = outs[0].flowId;
+    int ir = outs[1].flowId;
+    int r = outs[2].flowId;
+    int g = outs[3].flowId;
+    int b = outs[4].flowId;
+
+    depthCam.readFrames();
+    
+    if (outs[0].receivers.size() > 0){  
+      short[][] depthData = depthCam.getDepthData();      
+      for (int y = 0; y < 480; y++){
+        for (int x = 0; x < 640; x++){
+          stack.get(depthOut).data[x+y*globalWidth] = constrain((float)depthData[y][x], 0, 5000);
+        }
+      }
+    }
+    
+    if (outs[1].receivers.size() > 0){
+          depthCam.readFrames();
+
+      for (int y = 0; y < 480; y++){
+        for (int x = 0; x < 640; x++){
+          int loc = x+y*globalWidth;
+          stack.get(ir).data[loc] = depthCam.getIRImage().pixels[loc] & 0xFF;        
+        }
+      }
+    }
+    
+    if (outs[2].receivers.size() > 0 || outs[3].receivers.size() > 0 || outs[4].receivers.size() > 0){
+      for (int i = 0; i < globalWidth; i++){
+        for (int j = 0; j < globalHeight; j++){
+          int loc = i+j*globalWidth;
+          stack.get(r).data[loc] = (depthCam.getColorImage().pixels[loc] >> 16) & 0xFF;
+          stack.get(g).data[loc] = (depthCam.getColorImage().pixels[loc] >> 8) & 0xFF;
+          stack.get(b).data[loc] = depthCam.getColorImage().pixels[loc] & 0xFF;
+        }
+      }
+    }
+         
+    super.lookDown();
+  }
+}

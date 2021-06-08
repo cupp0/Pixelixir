@@ -63,12 +63,15 @@ and then .hide() itself.
 import controlP5.*;
 import java.io.*;
 import themidibus.*;
+import ch.bildspur.realsense.*;
+import ch.bildspur.realsense.type.*;
 
+RealSenseCamera depthCam; 
 ControlP5 cp5;
 MidiBus myBus;
 OpenSimplexNoise noise;
 
-String[] generators = {"GENERATE", "constant", "math", "noise", "random", "video", "image", "text", "kernel", "structure", "large structure"};
+String[] generators = {"GENERATE", "constant", "math", "noise", "random", "video", "image", "text", "d435", "kernel", "structure", "large structure"};
 String[] arithmetic = {"MATH/LOGIC", "and", "or", "xor", "not", "<", ">", "=", "+", "-", "x", "/", "^", "log", "%", "abs", "convolve"};
 String[] analysis = {"ANALYZE", "dilate", "erode", "peak", "valley", "hit and miss", "local min", "local max", "global min", "global max", "mean", "median", "variance", "center", "distance", "gray dilate", "gray erode", "blob", "histograb", "DFT", "IDFT"};
 String[] transformation = {"TRANSFORM", "translate", "scale", "rotate", "reflect"};
@@ -122,6 +125,7 @@ void setup(){
   // Connect to input, output
   myBus = new MidiBus(this, 1, 1);
   noise = new OpenSimplexNoise();
+  depthCam = new RealSenseCamera(this);
   gui();
   stroke(0);
   strokeWeight(1);
@@ -281,7 +285,7 @@ void gui(){
     ;  
   
   //offset the entire menu vertically
-  int sum = 0;
+  int sum = -10;
     
   for (int i = 1; i < generators.length; i++){
     cp5.addButton(generators[i])
@@ -848,7 +852,10 @@ void controlEvent(ControlEvent theEvent) {
     break;
   case "delay" :
     modules.add(new Delay(pos_));
-    break;   
+    break;  
+  case "d435" :
+    modules.add(new D435(pos_));
+    break;  
   case "kernel" :
     modules.add(new Kernel(pos_));
     break;
@@ -1076,6 +1083,9 @@ void buildModulesFromSaveFile(String[] info) {
       break;  
     case "distance" :
       modules.add(new DistanceTransform(pos));
+      break; 
+    case "d435" :
+      modules.add(new D435(pos));
       break; 
     case "histograb" :
       modules.add(new Histograb(pos));

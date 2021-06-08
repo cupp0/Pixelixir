@@ -78,6 +78,7 @@ public abstract class Module{
   boolean isMacro = false;
   boolean isMacroIn = false;
   boolean isMacroOut = false;
+  int lastOperatingFrame;
   int[][] structuringElement = new int[3][3];
   float[][] kernel = new float[3][3];
   
@@ -465,6 +466,9 @@ public abstract class Module{
     case "DFT" :
       modules.add(new DFTModule(newPos));
       break; 
+    case "d435" :
+      modules.add(new D435(newPos));
+      break;   
     case "IDFT" :
       modules.add(new IDFTModule(newPos));
       break;    

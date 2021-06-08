@@ -509,4 +509,5 @@ String midiHelp = "MIDI\n-drive animation with a midi controller!\n-if you have 
 String signalInHelp = "SIGNAL IN";
 String signalOutHelp = "SIGNAL OUT";
 String macroPatchHelp = "MACROPATCH";
+String depthCamHelp = "DEPTH CAM";
 String displayHelp = "DISPLAY\n-see the signal!\n-the four inputs are graylevel and RGB\n-any inputs in RGB will override the graylevel input\n-the active button will activate/deactivate the display and all the calculations associated with that display. This is useful when you are doing work on a patch that is chuggaluggin. When deactivated, the frame rate will kick back up, making it easier to change connections, add modules etc. Click again to resume calculations and display\n-the still button takes a screenshot of the current display and saves it as a .tif in the 'screenshots' folder inside the main sketch folder\n- the record button saves the sequence of images that the display generates. It will save them at the location specified by the textbox to the right. A new folder will be created inside the sketch folder, which will be populated with whatever comes into the display module";
