@@ -1,0 +1,296 @@
+//~SelectionManager
+class SelectionManager{
+  
+  ArrayList<Module> modules = new ArrayList<Module>();            //what is selected
+  ArrayList<Module> copiedModules = new ArrayList<Module>();      //stored for copy/paste and what not
+  String clipboard;
+  
+  boolean containsModule(Module m){
+    if (modules.contains(m)){return true;}
+    return false;
+  }
+
+  //returns string representaion of selection
+  WindowData copyModules(ArrayList<Module> mods) {
+    WindowData wdata = new WindowData();
+    
+    //store module info
+    for (Module m : mods) {
+      
+      //module name and id
+      ModuleData mdata = new ModuleData();
+      mdata.name = m.name;
+      mdata.id = m.id;
+      mdata.ins = m.ins.size();
+      mdata.outs = m.outs.size();
+      mdata.position = m.getBodyPosition();
+      
+      //info for each piece of UI that isn't default (so not ports, body)
+      for (ModuleUI ui : m.uiBits){    
+        if (ui.state instanceof DataBender){
+          mdata.uiElements.add(ui.state); 
+        }
+      }
+            
+      // If this module has a subwindow (composite), recurse:      
+      if (mdata.name.equals("composite")) {
+        Window subWin = windows.get(m.owner); 
+        if (subWin != null){
+          mdata.subwindow = copyModules(subWin.modules);
+        }
+      }
+      wdata.modules.add(mdata);
+    }
+    
+    //store connection info
+    if (mods.size() > 0){  //could copy an empty composite
+      Window where = windows.get(mods.get(0).owner.parent);
+      for (Connection c : where.connections) {      
+        if (mods.contains(c.source.parent) && mods.contains(c.destination.parent)) {
+          ConnectionData cdata = new ConnectionData();
+          cdata.fromModule = c.source.parent.id;
+          cdata.fromPortIndex = c.source.index;
+          cdata.toModule = c.destination.parent.id;
+          cdata.toPortIndex = c.destination.index;
+          wdata.connections.add(cdata);
+        }
+      }
+    }
+    
+    clipboard = gson.toJson(wdata);
+    println(clipboard);
+    return wdata;
+  }
+  
+ 
+  //doing everything separately & recursively to keep everything isolated  and (hopefully) easier to maintain
+  HashMap<String, Module> pasteModules(String json, Window where, PVector offset) {
+    
+    WindowData wdata = gson.fromJson(json, WindowData.class);
+    
+    //create mod/op pairs and any new windows. return a map from old Module.id -> new Module
+    HashMap<String, Module> newMods = addModules(wdata, where, offset); 
+
+    //rebuild ports
+    rebuildPorts(wdata, newMods);
+    
+    //populate each new Module with the stored UI
+    buildUI(wdata, newMods);  
+
+    //only the outermost scope has a nonzero offset, typically based on where the cursor is on paste
+    positionMods(wdata, newMods, offset);
+        
+    //rebuild connections
+    rebuildConnections(wdata, newMods); 
+
+    //update the graph that manages operation order
+    where.boundary.graph.computeTopoSort();
+    
+    //tell every primitive data provider to update
+    primer(newMods);
+    
+    return newMods;
+  } 
+  
+  //this method creates the module/operator pairs, and returns a map from old module id to new module
+  HashMap<String, Module> addModules(WindowData wdata, Window where, PVector offset){
+    
+    //WindowData wdata = gson.fromJson(json, WindowData.class);            //module data
+    HashMap<String, Module> oldIdstoNewMods = new HashMap<String, Module>();  
+    for (ModuleData mdata : wdata.modules) { 
+      
+      //build, position module, and update module map
+      Module newMod = where.addModule(mdata.name); 
+      newMod.drag(mdata.position);
+      oldIdstoNewMods.put(mdata.id, newMod);
+
+      if (newMod.name.equals("composite")){
+        //here, we recurse, adding all modules to the subwindow and appending the results to our id->module map.
+        oldIdstoNewMods.putAll(addModules(mdata.subwindow, windows.get(newMod.owner), new PVector(0, 0)));
+      }
+    }
+    
+    return oldIdstoNewMods;
+  }
+  
+  //before building connections, we have to initialize ports. Some mods/ops can change PortUI count dynamically,
+  //so we store PortUI count and create ports here (since we can't rely on default PortUI settings per mod/op
+  void rebuildPorts(WindowData wdata, HashMap<String, Module> newMods){
+    for (ModuleData mdata : wdata.modules){
+      
+      //let internal sends/receives build composite ports
+      if (!mdata.name.equals("composite")){
+        while(newMods.get(mdata.id).ins.size() < mdata.ins){
+          newMods.get(mdata.id).owner.addInPork(DataCategory.UNKNOWN);
+        }
+        while(newMods.get(mdata.id).outs.size() < mdata.outs){
+          newMods.get(mdata.id).owner.addOutPork(DataCategory.UNKNOWN);
+        }
+      } else {
+        
+        //if composite, recurse
+        rebuildPorts(mdata.subwindow, newMods);
+      }      
+    }    
+  }
+  
+  //adds DataBender UI elements to composites. Also copies UIState over to primitives
+  //BodyUI is created in Module constructor. PortUI are created in rebuildPorts 
+  //(Modules listen to their owners (Operator) and add ports iff owner does)
+  void buildUI(WindowData wdata, HashMap<String, Module> newMods){
+    
+    for (ModuleData mdata : wdata.modules){
+        
+      //create UI on composites
+      if (mdata.name.equals("composite")){
+        for (UIState uis : mdata.uiElements){           
+          ModuleUI newUI = (ModuleUI)partsFactory.createUI(uis.getType());
+          ((DBUIState)newUI.state).copyData((DBUIState)uis);
+          newMods.get(mdata.id).addUI(newUI);
+        }
+        
+        //recurse and build UI inside
+        buildUI(mdata.subwindow, newMods);
+      } else {
+        
+        //if the code gets here, we are in a Primitive, which automatically add its
+        //default UI upon creation, so we just have to copy the state data over
+        //primitives can have at most 1 databender so this should be fine
+        
+        //better alternative is to not have primitive UI modules create their own UI by default
+        for (UIState uis : mdata.uiElements){   //this will always be a databender
+          for (ModuleUI ui : newMods.get(mdata.id).uiBits){
+            if (ui.state instanceof DataBender){   //this is the target where we need to copy data over to
+              ((DBUIState)ui.state).copyData((DBUIState)uis);
+            }
+          }
+        }       
+      }
+      
+      newMods.get(mdata.id).organizeUI();
+    }
+  }
+  
+  //add position offset to top layer modules (for copy/paste with mouse position). 
+  //All other windows store module position in BodyUI.state 
+  void positionMods(WindowData wdata, HashMap<String, Module> newMods, PVector offset){
+       
+    PVector tl = new PVector(Float.MAX_VALUE, Float.MAX_VALUE);
+    for (ModuleData mdata : wdata.modules){
+      tl.set(min(tl.x, mdata.position.x), min(tl.y, mdata.position.y));
+    }
+    for (ModuleData mdata : wdata.modules){
+      newMods.get(mdata.id).uiBits.get(0).setPosition(mdata.position);
+      newMods.get(mdata.id).uiBits.get(0).drag(PVector.sub(offset,tl));
+      
+      if (newMods.get(mdata.id).owner instanceof CompositeOperator && mdata.subwindow != null){
+        positionMods(mdata.subwindow, newMods, new PVector(0, 0));
+      }
+    }
+
+  }
+  
+  void rebuildConnections(WindowData wdata, HashMap<String, Module> newMods){
+    
+    // Rebuild connections
+    for (ConnectionData cdata : wdata.connections) {
+      Window where = windows.get(newMods.get(cdata.fromModule).owner.parent);
+      OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
+      InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);
+      where.attemptConnection(src, dest);
+    }
+    
+    //find any composite and rebuild those connections too
+    for (ModuleData mdata : wdata.modules){
+      if (mdata.name.equals("composite")){
+        rebuildConnections(mdata.subwindow, newMods);
+      }
+    }
+  }
+  
+  void primer(HashMap<String, Module> newMods){
+    for (String s : newMods.keySet()){
+      if (newMods.get(s).owner instanceof UIOperator){
+        for (ModuleUI ui : newMods.get(s).uiBits){
+          if (ui.state instanceof DataBender){
+            ((DataBender)ui.state).tryUpdateOperator();
+          }
+        }
+      }
+    }
+  }
+
+  //clear stored selection 
+  void clearSelection(){
+    modules.clear();
+  }
+  
+  void addTo(Module m){
+    if (!modules.contains(m)){
+      modules.add(m);
+    }
+  }
+  
+  void drag(PVector amount){
+    for (Module m : modules){
+      m.uiBits.get(0).drag(amount);
+    }
+  }
+  
+  //Deleting stuff way simpler with centralized graph and Ports/Porks not knowing eachother 
+  void onBackSpace(){
+    
+    Window w = currentWindow;    
+    //delete any connections associated with modules we are deleting
+    for (int i = modules.size()-1; i >= 0; i--){
+      for (int j = w.boundary.graph.edges.size()-1; j >= 0; j--){
+        if (w.boundary.graph.edges.get(j).isConnectedToModule(modules.get(i))){
+          w.removeConnection(w.boundary.graph.edges.get(j));
+        }
+      }
+      
+      //remove the operator and remove the module
+      w.boundary.kids.remove(modules.get(i).owner);
+      w.modules.remove(modules.get(i));
+      
+      //remove window
+      if (modules.get(i).owner instanceof CompositeOperator){
+        windows.remove(modules.get(i).owner);
+      }
+    } 
+    
+    modules.clear();
+  }
+  
+  PVector copiedPosition(Module m){
+    PVector topLeft = topLeft(copiedModules).copy();
+    PVector maus = currentWindow.cam.toWorld(new PVector (mouseX, mouseY)).copy();
+    PVector mPos = m.uiBits.get(0).state.pos.copy().sub(topLeft);
+    return mPos.add(maus);
+  }
+  
+  //returns average position of selected modules
+  PVector avgModPos(ArrayList<Module> mods){
+    PVector p = new PVector(0, 0);
+    int count = 0;
+    for (Module m : mods){
+      p.add(m.uiBits.get(0).state.pos);
+      count++;
+    }
+    return p.div(count);
+  }
+  
+  //returns the toppest leftest of whatever is selected
+  PVector topLeft(ArrayList<Module> modList){
+    List<Float> xList = new ArrayList<>();
+    List<Float> yList = new ArrayList<>();
+
+    for (Module m : modList){
+      xList.add(m.uiBits.get(0).state.pos.x);
+      yList.add(m.uiBits.get(0).state.pos.y);
+    }
+    
+    return new PVector(Collections.min(xList), Collections.min(yList));    
+  }
+  
+}

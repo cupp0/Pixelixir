@@ -1,0 +1,96 @@
+//~PortUI
+//PortUI is responsible for managing and displaying connections between modules
+//Pork is responsible for routing data between Operators
+public abstract class PortUI extends ModuleUI<PortUIState>{
+   
+  int[] radii = new int[4];     //tells us which corners get rounded based on position of PortUI within the module
+  int index;                    //for convenience
+  
+  PortUI(){
+    super();
+    setSize(new PVector(portSize, portSize)); style.fill = color(120);
+  } 
+  
+  Pork getPorkPair(){
+    return getWindow().portMap.getPork(this);
+  }
+  
+  void setIndex(int ind){
+    index = ind;
+  }
+  
+  //this method looks at a Ports position within the module to determine how to round over its corners
+  void setCornerRadii(boolean isInPort){
+    for (int i = 0; i < 4; i++){
+      radii[i] = 0;
+    }    
+
+    if (isInPort){
+      if (index == 0){
+        radii[0] = roundOver;
+        radii[2] = roundOver;
+      } else if (index == parent.owner.ins.size()-1){
+        radii[1] = roundOver;
+        radii[3] = roundOver;
+      } else {
+        radii[2] = roundOver;        
+        radii[3] = roundOver;        
+      }
+    } else {
+      if (index == 0){
+        radii[1] = roundOver;
+        radii[3] = roundOver;
+      } else if (index == parent.owner.outs.size()-1){
+        radii[0] = roundOver;
+        radii[2] = roundOver;
+      } else {
+        radii[1] = roundOver;        
+        radii[0] = roundOver;        
+      }
+    }
+  }
+  
+  void display(){   
+    rect(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y, radii[0], radii[1], radii[2], radii[3]);
+    fill(255);
+    Flow f = getPorkPair().data;
+    String val = "";
+    val += f.valueToString();
+    if (this instanceof OutPortUI){
+      text(val, getAbsolutePosition().x, getAbsolutePosition().y+15);
+    }
+  }
+
+}
+
+//~InPortUI
+class InPortUI extends PortUI{
+   
+  InPortUI(){
+    super();
+    name = "InPort"; 
+  }
+  
+  OutPortUI getSource(){
+    return ((OutPortUI)getWindow().portMap.getPort(((InPork)getPorkPair()).getSource()));
+  }
+
+}
+
+//~OutPortUI
+class OutPortUI extends PortUI{
+  
+  OutPortUI(){
+    super();
+    name = "OutPort";
+  } 
+  
+  ArrayList<InPortUI> getDestinations(){    
+    ArrayList<InPortUI> list = new ArrayList<>();
+    for (InPork i : ((OutPork)getPorkPair()).getDestinations()){
+      list.add(((InPortUI)getWindow().portMap.getPort(i)));
+    }
+    return list;
+  }
+
+}
