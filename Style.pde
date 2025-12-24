@@ -44,6 +44,7 @@ class StyleResolver {
     //color ports
     if (ui instanceof PortUI){      
       modifiedStyle.fill = getColorByPork(w.portMap.getPork((PortUI) ui));
+      modifiedStyle.stroke = getStrokeByPork(w.portMap.getPork((PortUI) ui));
     }
     
     //if module is selected, change module body appearance
@@ -139,5 +140,23 @@ class StyleResolver {
       case UNKNOWN : return getUnknownColor();
       default : return color(0);
     } 
+  }
+  
+  color getStrokeByPork(Pork p){
+
+    if (p.currentStatus != null){
+      switch (p.currentStatus) {
+        case CONTINUATION: return 0;
+        case OBSERVATION: return getColorByPork(p);
+      } 
+    } else {
+      if (p.allowsStatus(DataStatus.CONTINUATION) && !(p.allowsStatus(DataStatus.OBSERVATION))){
+        return color(0);
+      } else {
+        return addColor(getColorByPork(p), color(30));
+      }
+    }
+    
+    return color(0);
   }
 }

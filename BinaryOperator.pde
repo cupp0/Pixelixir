@@ -12,8 +12,6 @@ public abstract class BinaryOp extends PrimeOperator{
   }
   
   void execute(){    
-                          //gather input data
-    
     //apply lambda expression
     outs.get(0).data.setFloatValue(expr.apply(inFlows.get(0).getFloatValue(), inFlows.get(1).getFloatValue()));
   }

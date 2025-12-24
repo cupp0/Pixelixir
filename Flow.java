@@ -21,8 +21,7 @@ public class Flow {
   private String textValue;
   private List<Flow> listValue;
   //private ImageBuffer imageValue;
-  
-  boolean hotData = false;
+ 
 
   // ---------- Constructors are private: use factories ----------
   //private Flow(Category type) {
@@ -68,27 +67,19 @@ public class Flow {
   // ---------- Getters ----------
 
   public float getFloatValue() {
-      ensure(DataCategory.FLOAT);
       return floatValue;
   }
 
   public boolean getBoolValue() {
-      ensure(DataCategory.BOOL);
       return boolValue;
   }
 
   public String getTextValue() {
-      ensure(DataCategory.TEXT);
       return textValue;
   }
 
   public java.util.List<Flow> getListValue() {
-      ensure(DataCategory.LIST);
       return listValue;
-  }
-  
-  public boolean getHot(){
-    return hotData;
   }
   
   public String valueToString(){
@@ -153,11 +144,7 @@ public class Flow {
       System.out.println("setListAtIndex, out of bounds");
     }
   }
-  
-  public void setHot(boolean hot){
-    hotData = hot;
-  }
-  
+
   public void addToList(Flow f){
     listValue.add(f);
   }
@@ -186,13 +173,6 @@ public class Flow {
       a.setType(b.getType());
     } else {
       b.setType(a.getType());
-    }
-  }
-  
-  private void ensure(DataCategory expected) {
-    if (this.type != expected) {
-      throw new IllegalStateException(
-      "Flow contains " + this.type + " but tried to read as " + expected);
     }
   }
 

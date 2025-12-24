@@ -10,10 +10,13 @@ abstract class DBUI extends ModuleUI<DBUIState> implements Interactable{
   }
   
   void displayIdentity(){
-    if (state.identityToken != null){
-      PVector p = getAbsolutePosition().copy();
-      fill(255);
-      text(state.identityToken, p.x, p.y+5);
+    HoverTarget h = parent.getWindow().windowManager.hoverManager.getCurrent();
+    if (h.modUI == this){
+      if (state.identityToken != null){
+        PVector p = getAbsolutePosition().copy();
+        fill(255);
+        text(state.identityToken, p.x, p.y+5);
+      }
     }
   }
 

@@ -9,11 +9,11 @@ class Graph {
   //construct Graph from list of Modules and their edges
   Graph(){}
   
-  void addEdge(OutPork from, InPork towards){
+  void addEdge(OutPork from, InPork towards, DataStatus ds){
     //if making a connection between different, but compatible ports, collapse type
     //Flow.mergeTypes(from.data, towards.data);
     
-    edges.add(new Edge(from, towards));
+    edges.add(new Edge(from, towards, ds));
     from.onConnection(towards);
     towards.onConnection(from);
         
@@ -89,19 +89,19 @@ class Graph {
     return null;
   }
   
-  void stringExp(){
-    String oprtrs = "";
-    String oprnds = "";
-    int oprndCount = 0;
-    for (Operator op : topoSort){
-      if (op instanceof BinaryOp){
-        oprtrs += op.expSymbol+",";
-      } else {
-        oprnds += "x"+str(oprndCount)+","; 
-        oprndCount++;
-      }
-    }
-  }
+  //void stringExp(){
+  //  String oprtrs = "";
+  //  String oprnds = "";
+  //  int oprndCount = 0;
+  //  for (Operator op : topoSort){
+  //    if (op instanceof BinaryOp){
+  //      oprtrs += op.expSymbol+",";
+  //    } else {
+  //      oprnds += "x"+str(oprndCount)+","; 
+  //      oprndCount++;
+  //    }
+  //  }
+  //}
   
   //return list of receiving porks
   ArrayList<InPork> getDestinations(OutPork from){

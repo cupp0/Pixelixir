@@ -15,7 +15,7 @@ String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "com
 String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};
 String[] unary = {"UNARY", "sin", "cos", "tan", "abs"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
-String[] utility = {"UTILITY", "mouse", "key", "toFloat", "list", "read", "write", "set", "get", "concat", "split", "delay","send", "receive"};
+String[] utility = {"UTILITY", "mouse", "key", "toFloat", "list", "read", "write", "set", "get", "copy", "valve", "concat", "split", "delay","send", "receive"};
 
 String[][] UIText = {UI, binary, unary, logic, utility};
 

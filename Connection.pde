@@ -1,9 +1,14 @@
 //~Connection
+
+
+enum ConnectionStyle {CABLE, DOTS}
+
 //spring physics for connection animation
 class Connection implements Hoverable{
   
   final PortUI source;
   final PortUI destination;
+  ConnectionStyle connectionStyle;
   
   PVector[] pos = new PVector[4];       //anchor points
   PVector[] prev = new PVector[4];      //previous anchors
@@ -16,8 +21,11 @@ class Connection implements Hoverable{
   float damping;                        // slows down motion
   PVector gravity;
 
-  Connection(PortUI source_, PortUI destination_){
+  Connection(PortUI source_, PortUI destination_, DataStatus ds){
     source = source_; destination = destination_;
+    if (ds == DataStatus.CONTINUATION){ connectionStyle = ConnectionStyle.CABLE; }
+    if (ds == DataStatus.OBSERVATION){ connectionStyle = ConnectionStyle.DOTS; }
+
     PVector sPos = source.getAbsolutePosition().copy().add(4, 8);
     PVector dPos = destination.getAbsolutePosition().copy().add(4, 0);
     stiffness = 0.5+random(100)/1000;                
@@ -44,15 +52,48 @@ class Connection implements Hoverable{
   }
   
   void display(){
+    
+    applyStyle(source.parent.getWindow().eventManager.styleResolver.resolve(this));
+
+    if (connectionStyle == ConnectionStyle.CABLE){
+      displayCable();
+    }
+
+    if (connectionStyle == ConnectionStyle.DOTS){
+      displayDots(); 
+    }
+    
+  }
+  
+  void displayCable(){
+
     //update pos if we are jiggly
     if (!source.getAbsolutePosition().equals(pos[0]) || 
-      !destination.getAbsolutePosition().equals(pos[3]) ||
-      vecDistance(pos[1], prev[1]) > .1){
+        !destination.getAbsolutePosition().equals(pos[3]) ||
+        vecDistance(pos[1], prev[1]) > .1){
         computeAnchorPoints();
     } 
-
-    applyStyle(source.parent.getWindow().eventManager.styleResolver.resolve(this));
+      
     bezier(pos[0].x, pos[0].y, pos[1].x, pos[1].y, pos[2].x, pos[2].y, pos[3].x, pos[3].y); 
+  }
+  
+  void displayDots(){
+    PVector start = source.getAbsolutePosition().copy().add(4, 8);
+    PVector dir = PVector.sub(destination.getAbsolutePosition().copy().add(4, 8), start);
+    float dist = dir.mag();
+    dir.normalize();
+    PVector offsetVector = dir.copy().mult(5);
+    
+    float spacing = 10;   // distance between dots
+    float speed = 1;      // animation speed
+    float offset = (frameCount * speed) % spacing;
+
+    // draw the flowing lines
+    for (float d = offset; d < dist-spacing; d += spacing) {
+      PVector pos = PVector.add(start, PVector.mult(dir, d));
+      PVector pos2 = PVector.add(pos, offsetVector);
+      line(pos.x, pos.y, pos2.x, pos2.y);
+    }
   }
 
   void applyStyle(Style s){

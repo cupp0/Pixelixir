@@ -8,10 +8,11 @@ class ReadOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.TEXT); addInPork(DataCategory.BOOL); addOutPork(DataCategory.UNKNOWN);
+    addInPork(DataCategory.TEXT); addOutPork(DataCategory.UNKNOWN);
   }
   
   void execute(){
+    println("reading");
     String address = inFlows.get(0).getTextValue(); 
     Flow receivedData = flowRegistry.readFlow(address);
     
@@ -22,14 +23,4 @@ class ReadOperator extends PrimeOperator{
     outs.get(0).data = receivedData.copyFlow();
   }
   
-  boolean shouldExecute(){
-    if (inFlows.get(1).getBoolValue()){
-      return true;
-    }
-    
-    return false;
-  }
-  
-  boolean isSpeaker() { return true; }
-
 }

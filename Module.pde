@@ -11,7 +11,7 @@ public class Module implements OperatorListener{
   boolean isFocus;
   
   Module(String name_){ 
-    name = name_; initializeUI();
+    name = name_; label = name; initializeUI();
   }
   
   void setOwner(Operator op){
@@ -209,15 +209,16 @@ public class Module implements OperatorListener{
       ui.display();
     }
     
-    if (label != null){
+    if (label != null && !(owner instanceof UIOperator)){
       displayLabel();
     }
   }
   
   void displayLabel(){
     fill(0);   
-    textSize(14);     
-    text(label, uiBits.get(0).state.pos.x+2, uiBits.get(0).state.pos.y+20); 
+    textSize(10); 
+    
+    text(label, uiBits.get(0).state.pos.x+2, uiBits.get(0).state.pos.y+12); 
   }
   
   void drag(PVector dragAmount){

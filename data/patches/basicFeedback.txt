@@ -1,0 +1,186 @@
+{
+  "modules": [
+    {
+      "name": "slider",
+      "id": "41746259-ccf7-4ef5-a312-8f2853fa2853",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 131.0,
+        "y": -4.0,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "range": {
+            "x": -100.0,
+            "y": 100.0,
+            "z": 0.0
+          },
+          "identityToken": "46de9ed8-6ac6-459c-ba50-d8939ef3cf22",
+          "data": {
+            "type": "FLOAT",
+            "floatValue": 57.0,
+            "boolValue": false
+          },
+          "id": "aa1956b9-1aa2-4165-b72d-9996baee7a82",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "slider"
+        }
+      ]
+    },
+    {
+      "name": "read",
+      "id": "43eaeb6c-ece6-4369-9afc-70e75b73dcfb",
+      "ins": 1,
+      "outs": 1,
+      "position": {
+        "x": 55.0,
+        "y": 91.0,
+        "z": 0.0
+      },
+      "uiElements": []
+    },
+    {
+      "name": "write",
+      "id": "54fffe00-4686-419c-84e6-0bf143c59312",
+      "ins": 2,
+      "outs": 0,
+      "position": {
+        "x": 35.0,
+        "y": 180.0,
+        "z": 0.0
+      },
+      "uiElements": []
+    },
+    {
+      "name": "textfield",
+      "id": "5c989b68-525b-4cb3-be40-84f5a85e1312",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 19.0,
+        "y": -7.0,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "identityToken": "675e2399-3378-4b64-9d33-16124f4217a0",
+          "data": {
+            "type": "TEXT",
+            "floatValue": 0.0,
+            "textValue": "abcasddsa",
+            "boolValue": false
+          },
+          "id": "026f2c9d-0e3d-400c-b217-9e922e772f26",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "textfield"
+        }
+      ]
+    },
+    {
+      "name": "add",
+      "id": "7167a87e-6f6a-49a4-91c4-9f1e1f9c3a01",
+      "ins": 2,
+      "outs": 1,
+      "position": {
+        "x": 55.0,
+        "y": 136.0,
+        "z": 0.0
+      },
+      "uiElements": []
+    },
+    {
+      "name": "valve",
+      "id": "d648982c-d3bd-4972-b463-218644bbab34",
+      "ins": 2,
+      "outs": 1,
+      "position": {
+        "x": 55.00003,
+        "y": 43.00003,
+        "z": 0.0
+      },
+      "uiElements": []
+    },
+    {
+      "name": "switch",
+      "id": "edcf7eda-7087-43eb-adde-c93743ec9904",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 83.00037,
+        "y": -3.9996338,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "identityToken": "335cdebc-f681-48c8-96db-5ff1d3294aea",
+          "data": {
+            "type": "BOOL",
+            "floatValue": 0.0,
+            "boolValue": false
+          },
+          "id": "6d473f06-366d-45fd-b2f0-897dc55c9d48",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "switch"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "fromModule": "5c989b68-525b-4cb3-be40-84f5a85e1312",
+      "fromPortIndex": 0,
+      "toModule": "54fffe00-4686-419c-84e6-0bf143c59312",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "41746259-ccf7-4ef5-a312-8f2853fa2853",
+      "fromPortIndex": 0,
+      "toModule": "7167a87e-6f6a-49a4-91c4-9f1e1f9c3a01",
+      "toPortIndex": 1
+    },
+    {
+      "fromModule": "7167a87e-6f6a-49a4-91c4-9f1e1f9c3a01",
+      "fromPortIndex": 0,
+      "toModule": "54fffe00-4686-419c-84e6-0bf143c59312",
+      "toPortIndex": 1
+    },
+    {
+      "fromModule": "43eaeb6c-ece6-4369-9afc-70e75b73dcfb",
+      "fromPortIndex": 0,
+      "toModule": "7167a87e-6f6a-49a4-91c4-9f1e1f9c3a01",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "5c989b68-525b-4cb3-be40-84f5a85e1312",
+      "fromPortIndex": 0,
+      "toModule": "d648982c-d3bd-4972-b463-218644bbab34",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "d648982c-d3bd-4972-b463-218644bbab34",
+      "fromPortIndex": 0,
+      "toModule": "43eaeb6c-ece6-4369-9afc-70e75b73dcfb",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "edcf7eda-7087-43eb-adde-c93743ec9904",
+      "fromPortIndex": 0,
+      "toModule": "d648982c-d3bd-4972-b463-218644bbab34",
+      "toPortIndex": 1
+    }
+  ]
+}

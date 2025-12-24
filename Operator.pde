@@ -1,4 +1,8 @@
 //~Operator
+enum ExecutionSemantics{
+  MUTATE,
+  GENERATE
+}
 
 public abstract class Operator{
   
@@ -16,7 +20,8 @@ public abstract class Operator{
   ArrayList<Flow> inFlows = new ArrayList<>();                        //data at the inports
   Graph graph = new Graph();                                          //the graph that kids are in, not the one this is in
   ArrayList<Operator> evaluationSequence = new ArrayList<Operator>(); //derived from toposort of graph. 
-
+  ExecutionSemantics semantics;
+  
   Operator(){
   }
   
@@ -54,7 +59,7 @@ public abstract class Operator{
     //if any data is hot, we should execute
     for (InPork i : ins){
       if (i.getSource() != null){
-        if (i.getSource().data.getHot()){
+        if (i.getSource().getHot()){
           return true;
         }
       }
@@ -90,17 +95,19 @@ public abstract class Operator{
     if (executed){
       lastEval = frameCount;
       for (OutPork o : outs){
-        o.data.setHot(true);
+        o.setHot(true);
       }
     } else {
       for (OutPork o : outs){
-        o.data.setHot(false);
+        o.setHot(false);
       }
     }
     
     //we've done what we need with the inputs, set to cold
     for (InPork i : ins){
-     i.data.setHot(false); 
+      if (i.getSource() != null){
+        i.getSource().setHot(false);
+      }
     }
     
   }

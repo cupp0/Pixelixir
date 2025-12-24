@@ -5,14 +5,28 @@ abstract class Pork {
   final Operator owner;
   int index;
   Flow data;
+  EnumSet<DataStatus> allowedStatuses;      //determined by Operator
+  DataStatus currentStatus;                 //set on connection
   boolean speaking = false;
   
   Pork(Operator owner_, int index_){
-    owner = owner_;index = index_;data = new Flow(DataCategory.UNKNOWN);
+    owner = owner_;index = index_;
   }
   
   String getAddress(){
     return this.toString().substring(this.toString().indexOf('@'));
+  }
+  
+  void addAllowedStatus(DataStatus ds){
+    allowedStatuses.add(ds);
+  }
+  
+  void allowAllStatuses(){
+    allowedStatuses = EnumSet.of(DataStatus.CONTINUATION, DataStatus.OBSERVATION);
+  }
+  
+  boolean allowsStatus(DataStatus ds){
+    return allowedStatuses.contains(ds);
   }
   
 }
@@ -22,6 +36,8 @@ class InPork extends Pork  implements PorkListener{
   
   InPork(Operator owner_, int index_){ 
     super(owner_, index_);
+    
+    allowedStatuses = EnumSet.noneOf(DataStatus.class);
   }
   
   OutPork getSource(){
@@ -46,10 +62,14 @@ class InPork extends Pork  implements PorkListener{
 //~OutPork
 class OutPork extends Pork {
   
+  boolean hotData;
   List<PorkListener> listeners = new ArrayList<>();  //InPorks that need to know about speaking
   
   OutPork(Operator owner_, int index_){
     super(owner_, index_);
+    
+    //outs default to allowing any type of connection
+    allowAllStatuses();
   }
   
   ArrayList<InPork> getDestinations(){
@@ -103,6 +123,14 @@ class OutPork extends Pork {
     else {
       owner.parent.addUpdater(new UpdateObject(this.owner));
     }
+  }
+  
+  void setHot(boolean b){
+    hotData = b;
+  }
+  
+  boolean getHot(){
+    return hotData;
   }
 
 }

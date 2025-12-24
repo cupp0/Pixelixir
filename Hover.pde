@@ -45,13 +45,12 @@ class HoverTarget {
 class HoverManager {
   
   Window scope;
+  HoverTarget current = new HoverTarget();
+  HoverTarget previous = new HoverTarget();
   
   HoverManager(Window scope_){
     scope = scope_;
   }
-
-  HoverTarget current = new HoverTarget();
-  HoverTarget previous = new HoverTarget();
 
   HoverTarget update(float cx, float cy) {
 

@@ -26,8 +26,8 @@ class ConnectionLine extends Animation{
     float dist = dir.mag();
     dir.normalize();
     
-    float spacing = 20;   // distance between dots
-    float speed = 1.5;      // animation speed
+    float spacing = 10;   // distance between dots
+    float speed = 1;      // animation speed
     float offset = (frameCount * speed) % spacing;
     
     strokeWeight(3);

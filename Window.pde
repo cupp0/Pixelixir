@@ -90,12 +90,18 @@ class Window{
     }
   }
   
-  void attemptConnection(OutPortUI src, InPortUI dest){
-    Flow srcData = ((OutPork)portMap.getPork(src)).data;
-    Flow destData = ((InPork)portMap.getPork(dest)).data;
+  void attemptConnection(OutPortUI src, InPortUI dest, DataStatus ds){
+    OutPork srcPork = ((OutPork)portMap.getPork(src));
+    InPork destPork = ((InPork)portMap.getPork(dest));
     
-    if (Flow.compatible(srcData.getType(), destData.getType())){
-      buildConnection(src, dest);
+    //are we dealing with a reference or a value
+    boolean compatibleDataStatus = srcPork.allowsStatus(ds) && destPork.allowsStatus(ds);
+    
+    //are the actual types compatible (float vs text, etc)
+    boolean compatibleDataType = Flow.compatible(srcPork.data.getType(), destPork.data.getType());
+    
+    if (compatibleDataStatus && compatibleDataType){
+      buildConnection(src, dest, ds);
     } else {
       println("incompatible ports");
     }
@@ -103,15 +109,19 @@ class Window{
   }
 
   //add edge to the graph, visible in this window, update references in porks, update listeners
-  void buildConnection(OutPortUI src, InPortUI dest){
+  void buildConnection(OutPortUI src, InPortUI dest, DataStatus ds){
     
     //corresponding data ports
     OutPork srcPork = ((OutPork)portMap.getPork(src));
     InPork destPork = ((InPork)portMap.getPork(dest));
     
+    //set data status of each pork
+    srcPork.currentStatus = ds;
+    destPork.currentStatus = ds;
+    
     //add connection, both in UI land and Data land
-    connections.add(new Connection(src, dest));
-    boundary.graph.addEdge(srcPork, destPork); 
+    connections.add(new Connection(src, dest, ds));
+    boundary.graph.addEdge(srcPork, destPork, ds); 
     
     //update Window state stuff and call the newly connected op to update
     boundary.rebuildListeners();   
@@ -181,6 +191,9 @@ class Window{
     
     //sets up ports, update graph
     newMod.owner.initialize();
+    if (newMod.owner instanceof PrimeOperator){
+      ((PrimeOperator)newMod.owner).setDefaultDataStatuses();
+    }
     boundary.graph.computeTopoSort();
     
     newMod.organizeUI();

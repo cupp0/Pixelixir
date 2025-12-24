@@ -1,11 +1,15 @@
 //~Edge
+
+enum DataStatus {CONTINUATION, OBSERVATION}
+
 class Edge{
   
   OutPork source;
   InPork destination;
+  final DataStatus dataStatus;
   
-  Edge(OutPork from, InPork towards){
-    source = from; destination = towards;
+  Edge(OutPork from, InPork towards, DataStatus dataStatus_){
+    source = from; destination = towards; dataStatus = dataStatus_; 
   }
   
   Operator sourceOwner(){return source.owner;}

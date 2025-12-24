@@ -8,23 +8,12 @@ class WriteOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN); addInPork(DataCategory.TEXT); addInPork(DataCategory.BOOL);
-  }
-  
-  boolean shouldExecute(){
-    if (inFlows.get(2).getBoolValue()){
-      return true;
-    }
-    
-    return false;
+    addInPork(DataCategory.TEXT); addInPork(DataCategory.UNKNOWN); 
   }
   
   void execute(){
-    flowRegistry.removeFlow(address);                  //remove previous entry
-    address = inFlows.get(1).getTextValue(); 
-    flowRegistry.writeFlow(address, inFlows.get(0));  //add new flow to registry
+    address = inFlows.get(0).getTextValue(); 
+    flowRegistry.writeFlow(address, inFlows.get(1));  //add new flow to registry
   }
   
-  boolean isListener() { return true; }
-
 }
