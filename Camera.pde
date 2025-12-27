@@ -69,8 +69,12 @@ class Camera {
     return ((float)screen-yOff)/scl;
   }
 
-  public PVector toScreen(PVector world){
-    return world.mult(scl).add(xOff, yOff);
+  public float toScreenX(float world){
+    return world*scl+xOff;
+  }
+  
+  public float toScreenY(float world){
+    return world*scl+yOff;
   }
   
   public void pan(PVector amount){

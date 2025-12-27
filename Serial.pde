@@ -6,7 +6,7 @@ class ModuleData {
   int ins, outs;
   PVector position;
   ArrayList<UIState> uiElements = new ArrayList<UIState>(); //should only serialize when the state is different from default (or if composite)  
-  WindowData subwindow;                                       //for composites
+  WindowData subwindow;                                     //for composites
 }
 
 class ConnectionData {

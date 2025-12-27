@@ -49,12 +49,10 @@ public abstract class Operator{
   //but we should eventually override.
   boolean shouldExecute(){
     
-    //here, we check if any inports have hot (recently updated) data.
-    //in the case of speakers (sources, generators), these should always
-    //execute as their "hot" inports come from user interaction typically
-    if (isSpeaker()){
-      return true;
-    }
+    //don't allow execution if we are missing inputs
+    if (!inPorksFull()){ return false; }
+    
+    if (isSpeaker()){ return true; }
     
     //if any data is hot, we should execute
     for (InPork i : ins){
@@ -72,8 +70,11 @@ public abstract class Operator{
   abstract void execute();
   
   void evaluate(){
+    if (this instanceof PrimeOperator){
+      //println(name, frameCount);
+    }
     if (shouldExecute()){
-      execute();
+      execute();      
       postEvaluation(true);
     } else {
       postEvaluation(false);
@@ -87,7 +88,6 @@ public abstract class Operator{
     //at each scope
     for (OutPork o : outs){ o.speaking = false; }
     for (InPork i : ins){ i.speaking = false; }
-
       
     //this updates outs that dynamically affect evaluation
     //at "runtime" (mid evaluation sequence)
@@ -99,13 +99,6 @@ public abstract class Operator{
     } else {
       for (OutPork o : outs){
         o.setHot(false);
-      }
-    }
-    
-    //we've done what we need with the inputs, set to cold
-    for (InPork i : ins){
-      if (i.getSource() != null){
-        i.getSource().setHot(false);
       }
     }
     
@@ -136,6 +129,10 @@ public abstract class Operator{
   
   void setListener(Module m){
     listener = m;
+  }
+  
+  OperatorListener getListener(){
+    return listener;
   }
   
   //most onConnection stuff is handled directly through ports but some Operators need to know as well

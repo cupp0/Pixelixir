@@ -1,0 +1,38 @@
+class ModuleYOperator extends PrimeOperator {
+  
+  ModuleYOperator(){
+    super();
+    name = "moduleY";
+  }
+  
+  void initialize(){    
+    addInPork(DataCategory.MODULE);
+    addOutPork(DataCategory.FLOAT).setTargetFlow(new Flow(DataCategory.FLOAT));
+  }
+  
+  void execute(){
+    
+    if (ins.get(0).targetFlow != null){
+      Module m = getModule(ins.get(0).targetFlow.getModuleValue());
+
+      if (m != null){
+        float y = m.getWindow().cam.toScreenY(m.getBodyPosition().y);
+        outs.get(0).targetFlow.setFloatValue(y);
+      }
+    }
+  }
+  
+  Module getModule(String id){
+    for (Window w : windows.values()){
+      for (Module m : w.modules){
+        if (m.getId() == id){
+          return m;
+        }
+      }
+    }
+    
+    println("module not found");
+    return null;
+  }
+ 
+}

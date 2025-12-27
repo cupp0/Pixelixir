@@ -78,9 +78,30 @@ class CompositeOperator extends Operator implements DynamicPorts{
   }
   
   void execute(){
-    for (Operator op : evaluationSequence){
-      op.evaluate(); 
+    for (int i = 0; i < evaluationSequence.size(); i++){
+      evaluationSequence.get(i).evaluate(); 
+      
+      //if nothing downstream relies on the same data, set to upstream to cold
+      for (InPork in : ins){
+        
+        boolean stillHot = false;
+        for (InPork lateralIn : in.getSource().getDestinations()){
+          if (this.evaluatesBefore(lateralIn.owner)){
+            stillHot = true;
+          }
+        }
+        in.getSource().setHot(stillHot);
+
+      }
     }
+  }
+  
+  boolean evaluatesBefore(Operator other){
+    for (int i = 0; i < evaluationSequence.size(); i++){
+      if (evaluationSequence.get(i) == this) return true;
+      if (evaluationSequence.get(i) == other) return false;
+    }
+    return false;
   }
   
   boolean isSpeaker() { return true; }

@@ -148,6 +148,7 @@ class StyleResolver {
       case FLOAT : return color(200, 150, 100);
       case TEXT : return color(100, 200, 150);
       case LIST : return color(100, 150, 200);
+      case MODULE : return color(200, 100, 150);
       case UNKNOWN : return getUnknownColor();
       default : return color(0);
     } 

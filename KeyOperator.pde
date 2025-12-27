@@ -8,8 +8,7 @@ class KeyOperator extends RawInputOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.TEXT).setTargetFlow(new Flow(DataCategory.BOOL));
-    outs.get(0).targetFlow.setTextValue(""); 
+    addOutPork(DataCategory.TEXT).setTargetFlow(new Flow(DataCategory.TEXT));
   }  
 
   

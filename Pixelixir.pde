@@ -16,8 +16,9 @@ String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "
 String[] unary = {"UNARY", "sin", "cos", "tan", "abs"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
 String[] utility = {"UTILITY", "print", "mouse", "key", "toFloat", "list", "read", "write", "set", "get", "copy", "valve", "concat", "split", "send", "receive"};
+String[] meta = {"META", "mouseX", "mouseY", "leftMouse", "rightMouse", "mouseWheel", "key", "toModule", "drag", "moduleX", "moduleY"};
 
-String[][] UIText = {UI, binary, unary, logic, utility};
+String[][] UIText = {UI, binary, unary, logic, utility, meta};
 
 color UICol = color(125, 100, 175);
 color binaryCol = color(175, 100, 125);

@@ -8,6 +8,7 @@ enum DataCategory {
   TEXT,
   LIST,
   IMAGE, 
+  MODULE,
   UNKNOWN
 }
 
@@ -20,6 +21,7 @@ public class Flow {
   private boolean boolValue;
   private String textValue;
   private List<Flow> listValue;
+  private String moduleValue;        //module id
   //private ImageBuffer imageValue;
  
 
@@ -58,6 +60,12 @@ public class Flow {
       f.listValue = value;
       return f;
   }
+  
+  public static Flow ofModule(String value) {
+      Flow f = new Flow(DataCategory.MODULE);
+      f.moduleValue = value;
+      return f;
+  }
 
   // ---------- Type ----------
   public DataCategory getType() {
@@ -71,19 +79,23 @@ public class Flow {
   }
   
   public float getFloatValue() {
-      return floatValue;
+    return floatValue;
   }
 
   public boolean getBoolValue() {
-      return boolValue;
+    return boolValue;
   }
 
   public String getTextValue() {
-      return textValue;
+    return textValue;
   }
 
   public java.util.List<Flow> getListValue() {
-      return listValue;
+    return listValue;
+  }
+  
+  public String getModuleValue() {
+    return moduleValue;
   }
   
   public String valueToString(){
@@ -141,6 +153,10 @@ public class Flow {
     this.listValue = v;
   }
   
+  public void setModuleValue(String v) {
+      this.moduleValue = v;
+  }
+  
   public void setListAtIndex(int i, Flow f) {
     if (i >= 0 && i < this.listValue.size()){
       this.listValue.set(i, f);
@@ -170,14 +186,6 @@ public class Flow {
       return true;
 
     return a == b;
-  }
-  
-  public static void mergeTypes(Flow a, Flow b){
-    if (a.getType() == DataCategory.UNKNOWN){
-      a.setType(b.getType());
-    } else {
-      b.setType(a.getType());
-    }
   }
 
   public void setType(DataCategory newType) {
@@ -222,6 +230,10 @@ public class Flow {
           copyData(source.listValue.get(i), destination.listValue.get(i));
         }
         break;
+        
+        case MODULE:
+        destination.setModuleValue(source.getModuleValue());
+        break;
       }
     } else {
       System.out.println("attempted to copy " + source.getType() + " to " + destination.getType());
@@ -248,6 +260,10 @@ public class Flow {
       for (Flow flow : listValue){
         f.addToList(flow.copyFlow());
       }
+      break;
+      
+      case MODULE:
+      f.setModuleValue(getModuleValue());
       break;
     }
     

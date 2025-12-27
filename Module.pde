@@ -65,6 +65,10 @@ public class Module implements OperatorListener{
     return null;
   }
   
+  String getId(){
+    return id;
+  }
+  
   ModuleUI addUI(ModuleUI ui){
     ui.setParent(this);
     uiBits.add(ui);   
