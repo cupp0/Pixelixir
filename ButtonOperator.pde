@@ -6,11 +6,11 @@ class ButtonOperator extends UIOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.BOOL);
+    addOutPork(DataCategory.BOOL).setTargetFlow(new Flow(DataCategory.BOOL));
   }
   
   void execute(){
-    outs.get(0).data.setBoolValue(uiPayload.getBoolValue());
+   outs.get(0).targetFlow.setBoolValue(uiPayload.getBoolValue());
   }
         
 }

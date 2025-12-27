@@ -4,16 +4,22 @@ public abstract class BinaryOp extends PrimeOperator{
   
   BinaryOp(BinaryOperator<Float> expr_){
     super();
-    expr = expr_;
+    setExecutionSemantics(ExecutionSemantics.MUTATES); expr = expr_;
   }
   
   void initialize(){
-    addInPork(DataCategory.FLOAT); addInPork(DataCategory.FLOAT); addOutPork(DataCategory.FLOAT);
+    addInPork(DataCategory.FLOAT, false, true); 
+    addInPork(DataCategory.FLOAT, false, false); 
+    addOutPork(DataCategory.FLOAT, false, true);
   }
   
   void execute(){    
-    //apply lambda expression
-    outs.get(0).data.setFloatValue(expr.apply(inFlows.get(0).getFloatValue(), inFlows.get(1).getFloatValue()));
+    Flow i1 = ins.get(0).targetFlow;
+    Flow i2 = ins.get(1).targetFlow;
+    Flow o = outs.get(0).targetFlow;
+    if (i1 != null && i2 != null && o != null){
+      o.setFloatValue(expr.apply(i1.getFloatValue(), i2.getFloatValue()));
+    }
   }
   
 }

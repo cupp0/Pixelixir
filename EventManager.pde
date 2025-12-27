@@ -264,25 +264,19 @@ class EventManager {
     case DRAGGING_OPEN_CONNECTION:
       
       //if outport is qd, build connection
-      if (e.input.action == Action.MOUSE_PRESSED){
-        
-        DataStatus ds = null; 
-        if (e.input.mouseButt == LEFT){ ds = DataStatus.CONTINUATION; }
-        if (e.input.mouseButt == RIGHT){ ds = DataStatus.OBSERVATION; }
-        
-        if (ds != null){
-          if (e.hover.modUI instanceof InPortUI){
-            if (((InPortUI)e.hover.modUI).getSource() == null){
-              scope.attemptConnection(cuedPort, ((InPortUI)e.hover.modUI), ds);
-              if(!inputManager.getState().isDown(CONTROL)){
-                scope.removeConnectionLine();
-                cuedPort = null;
-                state = InteractionState.NONE;
-              }
+      if (e.input.action == Action.MOUSE_PRESSED && e.input.mouseButt == LEFT){
+        if (e.hover.modUI instanceof InPortUI){
+          if (((InPortUI)e.hover.modUI).getSource() == null){
+            scope.attemptConnection(cuedPort, ((InPortUI)e.hover.modUI));
+            if(!inputManager.getState().isDown(CONTROL)){
+              scope.removeConnectionLine();
+              cuedPort = null;
+              state = InteractionState.NONE;
             }
           }
         }
       }
+
       
       if (e.input.action == Action.KEY_PRESSED && (e.input.theKeyCode == BACKSPACE)){
         scope.removeConnectionLine();

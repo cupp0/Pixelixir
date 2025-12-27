@@ -4,9 +4,9 @@ abstract class Pork {
   
   final Operator owner;
   int index;
-  Flow data;
-  EnumSet<DataStatus> allowedStatuses;      //determined by Operator
-  DataStatus currentStatus;                 //set on connection
+  Flow targetFlow;
+  DataCategory requiredDataCategory;
+  DataAccess currentAccess;
   boolean speaking = false;
   
   Pork(Operator owner_, int index_){
@@ -17,17 +17,39 @@ abstract class Pork {
     return this.toString().substring(this.toString().indexOf('@'));
   }
   
-  void addAllowedStatus(DataStatus ds){
-    allowedStatuses.add(ds);
+  boolean isMutationPort(){
+    if (owner.getExecutionSemantics() == ExecutionSemantics.MUTATES){
+      if (index == 0){
+        return true;
+      }
+    }
+    return false;
   }
   
-  void allowAllStatuses(){
-    allowedStatuses = EnumSet.of(DataStatus.CONTINUATION, DataStatus.OBSERVATION);
+  void setTargetFlow(Flow f){
+    targetFlow = f;
   }
   
-  boolean allowsStatus(DataStatus ds){
-    return allowedStatuses.contains(ds);
+  void setRequiredDataCategory(DataCategory dc){
+    requiredDataCategory = dc;
+    if (targetFlow != null){
+      targetFlow.setType(dc); 
+    }
   }
+  
+  DataCategory getRequiredDataCategory(){
+    return requiredDataCategory;
+  }
+  
+  void setCurrentAccess(DataAccess da){
+    currentAccess = da; 
+  }
+  
+  DataAccess getCurrentAccess(){
+    return currentAccess; 
+  }
+  
+  abstract ArrayList<Pork> getConnectedPorks();
   
 }
 
@@ -36,8 +58,6 @@ class InPork extends Pork  implements PorkListener{
   
   InPork(Operator owner_, int index_){ 
     super(owner_, index_);
-    
-    allowedStatuses = EnumSet.noneOf(DataStatus.class);
   }
   
   OutPork getSource(){
@@ -51,10 +71,14 @@ class InPork extends Pork  implements PorkListener{
     owner.onSpeaking(this);
   }
   
-  void onConnection(OutPork source){
-    if (owner instanceof DynamicPorts){
-      ((DynamicPorts)owner).onConnectionAdded(this);
+  ArrayList<Pork> getConnectedPorks(){
+    ArrayList<Pork> connectedPorks = new ArrayList<Pork>();
+
+    if (((InPork)this).getSource() != null){
+      connectedPorks.add(((InPork)this).getSource());
     }
+    
+    return connectedPorks;
   }
 
 }
@@ -67,31 +91,40 @@ class OutPork extends Pork {
   
   OutPork(Operator owner_, int index_){
     super(owner_, index_);
-    
-    //outs default to allowing any type of connection
-    allowAllStatuses();
   }
   
   ArrayList<InPork> getDestinations(){
     return owner.parent.graph.getDestinations(this);
   }
   
+  //we are concerned here with propagating expected data category
+  //and, if appropriate, propagating Flow identity
   void onConnection(InPork dest){
-    if (owner instanceof DynamicPorts){
-      ((DynamicPorts)owner).onConnectionAdded(this);
-    }
     
-    DataCategory srcCat = this.data.getType();
-    DataCategory destCat = dest.data.getType();
+    DataCategory srcCat = this.getRequiredDataCategory();
+    DataCategory destCat = dest.getRequiredDataCategory();
     
-    //types need resolved
+    //if types disagree, they need resolved
+    //the only valid way for a type to disagree is if one is UNKNOWN
     if (srcCat != destCat){
       if (srcCat == DataCategory.UNKNOWN ){
-        this.owner.resolvePorkDataType(this, destCat);
+        this.owner.propagaterequiredDataCategory(this, destCat);
       } else {
-        dest.owner.resolvePorkDataType(dest, srcCat);
+        dest.owner.propagaterequiredDataCategory(dest, srcCat);
       }
     } 
+    
+    //if targetFlow is not null, we need to propagate the Flow identity
+    if (targetFlow != null){
+      dest.owner.propagateTargetFlow(dest, this.targetFlow);
+    }
+    
+    if (this.owner instanceof DynamicPorts){
+      ((DynamicPorts)owner).onConnectionAdded(this);
+    }
+    if (dest.owner instanceof DynamicPorts){
+      ((DynamicPorts)dest.owner).onConnectionAdded(dest);
+    }
 
   }
   
@@ -121,7 +154,9 @@ class OutPork extends Pork {
     //if no listeners, we still need to notify the enclosing composite. Otherwise
     //we could have internal patch islands that don't update. bad.
     else {
-      owner.parent.addUpdater(new UpdateObject(this.owner));
+      if (owner != bigbang){
+        owner.parent.addUpdater(new UpdateObject(this.owner));
+      }
     }
   }
   
@@ -131,6 +166,40 @@ class OutPork extends Pork {
   
   boolean getHot(){
     return hotData;
+  }
+  
+  ArrayList<Pork> getConnectedPorks(){
+    ArrayList<Pork> connectedPorks = new ArrayList<Pork>();
+    
+    for (InPork i : ((OutPork)this).getDestinations()){
+      connectedPorks.add(i);
+    }
+    
+    return connectedPorks;
+  }
+  
+  //used to validate an attempted connection before building it
+  DataAccess resolveDataAccess(InPork other){
+    
+    DataAccess outAccess = this.getCurrentAccess();
+    DataAccess inAccess = other.getCurrentAccess();
+    
+    //if both null, that means neither port has a WRITE requirement. return READ.
+    if (outAccess == inAccess && inAccess == null){
+      return DataAccess.READ;
+    }
+    
+    //if one has a requirement and the other doesn't return that requirement.
+    if (outAccess != null && inAccess == null){
+      return outAccess;
+    }
+    if (inAccess != null && outAccess == null){
+      return inAccess;
+    }
+    
+    //if we are here, that means these ports have incompatible access requirements.
+    return null;
+    
   }
 
 }

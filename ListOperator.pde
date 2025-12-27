@@ -9,13 +9,13 @@ class ListOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.FLOAT);addInPork(DataCategory.UNKNOWN);addOutPork(DataCategory.LIST);
+    addInPork(DataCategory.FLOAT);addInPork(DataCategory.UNKNOWN); addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
   }
 
   void execute(){
     
-    if ((int)inFlows.get(0).getFloatValue() != currentSize || inFlows.get(1).getType() != currentDataCategory){
-      instantiateList((int)inFlows.get(0).getFloatValue(), inFlows.get(1).getType());
+    if ((int)ins.get(0).targetFlow.getFloatValue() != currentSize || ins.get(1).getRequiredDataCategory() != currentDataCategory){
+      instantiateList((int)ins.get(0).targetFlow.getFloatValue(), ins.get(1).getRequiredDataCategory());
     }
         
   }
@@ -40,7 +40,7 @@ class ListOperator extends PrimeOperator{
       }
       newList.add(new Flow(listType));
     }
-    outs.get(0).data.setListValue(newList);
+   outs.get(0).targetFlow.setListValue(newList);
     return newList;
   }
         

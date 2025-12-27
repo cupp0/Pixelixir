@@ -1,15 +1,14 @@
-class EqualsOperator extends PrimeOperator{
+class EqualsOperator extends ComparisonOperator{
  
   EqualsOperator(){
     super();name = "equals";expSymbol =  "=";
   }
   
-  void initialize(){
-    addInPork(DataCategory.FLOAT); addInPork(DataCategory.FLOAT); addOutPork(DataCategory.BOOL);
-  }
-  
-  void execute(){                   
-    outs.get(0).data.setBoolValue(inFlows.get(0).getFloatValue() == inFlows.get(1).getFloatValue());
+  void execute(){   
+    float i1 = ins.get(0).targetFlow.getFloatValue();
+    float i2 = ins.get(1).targetFlow.getFloatValue();
+    Flow o = outs.get(0).targetFlow;
+    o.setBoolValue(i1 == i2);
   }
   
 }

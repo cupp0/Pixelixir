@@ -13,9 +13,9 @@ class DisplayUIState extends DBUIState{
   }
   
   void onDataChange(Operator op){
-    int w = (int)op.inFlows.get(0).getFloatValue();
-    int h = (int)op.inFlows.get(1).getFloatValue();    
-    List<Flow> buffer = op.inFlows.get(2).getListValue();
+    int w = (int)op.ins.get(0).targetFlow.getFloatValue();
+    int h = (int)op.ins.get(1).targetFlow.getFloatValue();    
+    List<Flow> buffer = op.ins.get(2).targetFlow.getListValue();
     
     if ((w != img.width || h != img.height) && (w > 0 && h > 0)){
       resizeImg(w, h);

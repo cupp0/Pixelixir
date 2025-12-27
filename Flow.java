@@ -66,6 +66,10 @@ public class Flow {
 
   // ---------- Getters ----------
 
+  String getAddress(){
+    return this.toString().substring(this.toString().indexOf('@'));
+  }
+  
   public float getFloatValue() {
       return floatValue;
   }

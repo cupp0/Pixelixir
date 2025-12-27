@@ -1,9 +1,11 @@
 //~Operator
 enum ExecutionSemantics{
-  MUTATE,
-  GENERATE
+  MUTATES,
+  GENERATES
 }
 
+
+//~Operator
 public abstract class Operator{
   
   protected OperatorListener listener; //module that needs to react to changes to this operator
@@ -17,12 +19,17 @@ public abstract class Operator{
   ArrayList<Operator> kids = new ArrayList<Operator>();               //define this' behavior
   ArrayList<InPork> ins = new ArrayList<InPork>();                    //where we point for input data
   ArrayList<OutPork> outs = new ArrayList<OutPork>();                 //where we put output data
-  ArrayList<Flow> inFlows = new ArrayList<>();                        //data at the inports
+  ArrayList<Pork> typeBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's type
+  ArrayList<Pork> dataBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's targetFlow
+  boolean continuous = false;
+  
   Graph graph = new Graph();                                          //the graph that kids are in, not the one this is in
   ArrayList<Operator> evaluationSequence = new ArrayList<Operator>(); //derived from toposort of graph. 
-  ExecutionSemantics semantics;
+  ExecutionSemantics executionSemantics;
+  Flow sourceData;
   
   Operator(){
+    setExecutionSemantics(ExecutionSemantics.GENERATES);  //generate by default
   }
   
   abstract void initialize();
@@ -33,15 +40,8 @@ public abstract class Operator{
     what.setParent(this);
     kids.add(what);
     
-    if (what instanceof SendOperator){
-      for (InPork i : what.ins){
-        this.addOutPork(i.data.getType());
-      }
-    }
-    if (what instanceof ReceiveOperator){
-      for (OutPork o : what.outs){
-        this.addInPork(o.data.getType());
-      }
+    if (what.continuous){
+      this.continuous = true;
     }
   }
   
@@ -72,10 +72,8 @@ public abstract class Operator{
   abstract void execute();
   
   void evaluate(){
-    populateInFlows();
     if (shouldExecute()){
       execute();
-      //println(frameCount + " " + name);
       postEvaluation(true);
     } else {
       postEvaluation(false);
@@ -89,6 +87,7 @@ public abstract class Operator{
     //at each scope
     for (OutPork o : outs){ o.speaking = false; }
     for (InPork i : ins){ i.speaking = false; }
+
       
     //this updates outs that dynamically affect evaluation
     //at "runtime" (mid evaluation sequence)
@@ -110,18 +109,6 @@ public abstract class Operator{
       }
     }
     
-  }
-  
-  //copy data from upstream porks
-  void populateInFlows(){
-    inFlows.clear();
-    for (InPork i : ins){
-      if (i.getSource() != null){
-        inFlows.add(i.getSource().data);
-      } else {
-        inFlows.add(i.data);
-      }
-    }
   }
        
   void rebuildListeners() {
@@ -150,26 +137,66 @@ public abstract class Operator{
   void setListener(Module m){
     listener = m;
   }
-
+  
+  //most onConnection stuff is handled directly through ports but some Operators need to know as well
+  //ValveOperator, for instance, needs to update its output datacategory
   void onConnection(Pork p){}
-
+  
+  
   InPork addInPork(DataCategory dc){
-    InPork in = new InPork(this, ins.size());
-    in.data = new Flow(dc);
-    ins.add(in);
-    if (listener != null){
-      listener.onPorkAdded(in);
-    }
+    
+    InPork in = new InPork(this, ins.size());        //create the pork
+    ins.add(in);                                     //store it
+    setPorkSemantics(in, dc, false, false);          //store port qualities
+    
+    return in;
+  }
+
+  InPork addInPork(DataCategory dc, boolean typeBound, boolean dataBound){
+    
+    InPork in = new InPork(this, ins.size());        //create the pork
+    ins.add(in);                                     //store it
+    setPorkSemantics(in, dc, typeBound, dataBound);  //store port qualities
+    
     return in;
   }
   
   OutPork addOutPork(DataCategory dc){
-    OutPork out = new OutPork(this, outs.size());
-    out.data = new Flow(dc);
-    outs.add(out);
+   
+    OutPork out = new OutPork(this, outs.size());     //create the pork
+    outs.add(out);                                    //store it
+    setPorkSemantics(out, dc, false, false);  //store port qualities
+    
+    return out;
+  }
+  
+  void setPorkSemantics(Pork p, DataCategory dc, boolean typeBound, boolean dataBound){
+    
+    //what data type does this pork expect
+    p.setRequiredDataCategory(dc);
+    
+    //is this type bound to the type of any other pork
+    if (typeBound){
+      typeBoundPorks.add(p); 
+    }    
+    
+    //is the data here bound to any other pork
+    if (dataBound){
+      dataBoundPorks.add(p);
+    }
+    
+    //does the module representing this op need to know about this pork?
     if (listener != null){
-      listener.onPorkAdded(out);
-    }  
+      listener.onPorkAdded(p);
+    }
+  }
+  
+  OutPork addOutPork(DataCategory dc, boolean typeBound, boolean dataBound){
+   
+    OutPork out = new OutPork(this, outs.size());     //create the pork
+    outs.add(out);                                    //store it
+    setPorkSemantics(out, dc, typeBound, dataBound);  //store port qualities
+    
     return out;
   }
   
@@ -212,11 +239,19 @@ public abstract class Operator{
     parent = o;
   }
   
+  void setExecutionSemantics(ExecutionSemantics es){
+    executionSemantics = es;
+  }
+  
+  ExecutionSemantics getExecutionSemantics(){
+    return executionSemantics;
+  }
+  
   void onKeyPressed(){}
   
   boolean isSpeaker() { return false; }
   boolean isListener() { return false; }
-  
+
   boolean containsSend(){
     for (Operator op : kids){
       if (op.name.equals("send")){
@@ -239,38 +274,83 @@ public abstract class Operator{
     return kids.contains(op);
   }
   
-  //this method assumes that any Primitive Operator with an UNKNOWN data category at a port
-  //will resolve all UNKNOWN ports the same way. It will then propagate that type either 
-  //direction as necessary
-  void resolvePorkDataType(Pork where, DataCategory dc){
-    
-    where.data.setType(dc);
-    //println("resolving from " + name);
-    
+  boolean inPorksFull(){
     for (InPork i : ins){
-      if (i.data.getType() == DataCategory.UNKNOWN){
-        i.data.setType(dc);       
+      if (i.getSource() == null) return false; 
+    }
+    return true;
+  }
+  
+  boolean outPorksFull(){
+    for (OutPork o : outs){
+      if (o.getDestinations().size() == 0) return false; 
+    }
+    return true;
+  }
+  
+  void addTypeBoundPork(Pork p){
+    typeBoundPorks.add(p);
+  }
+  
+  void addDataBoundPork(Pork p){
+    dataBoundPorks.add(p); 
+  }
+  
+  //by default, generators allow READWRITE or READ connections 
+  //MUTATORS require a READWRITE edge at input 1
+  void setDefaultDataAccess(){
+    
+    //first input is the designated continuation port
+    if (getExecutionSemantics() == ExecutionSemantics.MUTATES){
+      if (ins.size() > 0){
+        ins.get(0).setCurrentAccess(DataAccess.READWRITE);
       }
-      
-      //propagate up
-      if (i.getSource() != null){
-        if (i.getSource().data.getType() == DataCategory.UNKNOWN){
-          resolvePorkDataType(i.getSource(), dc);
+    }
+  }
+  
+  //this method resolves expected type for operators with indeterminite data 
+  //for instance, a valve, send/receive, copy, etc..
+  
+  void propagaterequiredDataCategory(Pork where, DataCategory dc){
+    where.setRequiredDataCategory(dc);
+    
+    if (typeBoundPorks.contains(where)){
+      for (Pork p : typeBoundPorks){
+        
+        //ensure we don't get stuck in a loop
+        if (p.getRequiredDataCategory() != dc){
+          
+          p.setRequiredDataCategory(dc);
+          //get all porks connected to any pork we have changd
+          for (Pork po : p.getConnectedPorks()){
+            po.owner.propagaterequiredDataCategory(po, dc);
+          }
         }
       }
     }
     
-    for (OutPork o : outs){
-      if (o.data.getType() == DataCategory.UNKNOWN){
-        o.data.setType(dc);        
-      }
-      //propagate down
-      for (InPork i : o.getDestinations()){
-        if (i.data.getType() == DataCategory.UNKNOWN){
-          i.owner.resolvePorkDataType(i, dc);
+  }
+  
+  //flow should only propagate if we are in an Op that MUTATES
+  void propagateTargetFlow(InPork where, Flow f){
+    where.setTargetFlow(f);
+    
+    if (dataBoundPorks.contains(where)){
+      for (Pork p : dataBoundPorks){
+        
+        //ensure we don't get stuck in a loop
+        if (p.targetFlow != f){
+          
+          p.setTargetFlow(f);
+          //get all porks connected to any pork we have changd
+          //we should only get here for outs.get(0) so we'll cast
+          for (Pork po : p.getConnectedPorks()){
+            po.owner.propagateTargetFlow((InPork)po, f);
+          }
         }
       }
     }
+    
   }
   
   void addUpdater(UpdateObject uo){}

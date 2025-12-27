@@ -37,7 +37,7 @@ class StyleResolver {
       modifiedStyle.stroke = getConnectionColorByPork(carriedData);
       if (ui == currentHover.connection){
         modifiedStyle.strokeWeight++;
-        modifiedStyle.stroke = addColor(modifiedStyle.stroke, color(30));
+        modifiedStyle.stroke = addColor(modifiedStyle.stroke, color(25));
       }
     }
     
@@ -88,19 +88,19 @@ class StyleResolver {
     return color(red(a)+red(b), green(a)+green(b), blue(a)+blue(b));
   }
   
+  color subtractColor(color a, color b){
+    return color(red(a)-red(b), green(a)-green(b), blue(a)-blue(b));
+  }
+  
   color setTransparency(color c, float alpha){
     return color(red(c), green(c), blue(c), alpha);
   }
   
   color getBoolFill(Pork p){
-    if (p instanceof OutPork){
-      return boolCol(p.data.getBoolValue());
-    } else {
-      if (((OutPork)((InPork)p).getSource()) != null){
-        return boolCol(((OutPork)((InPork)p).getSource()).data.getBoolValue());
-      }
+    if (p.targetFlow != null){
+      return boolCol(p.targetFlow.getBoolValue());
     }
-    return color(50);
+    return boolCol(false);
   }
   
   color boolCol(boolean b){
@@ -113,13 +113,12 @@ class StyleResolver {
   
   color getConnectionColorByPork(Pork p){
     color c = 0;
-    switch (p.data.getType()) {
-      case FLOAT : c = color(200, 150, 100); break;
-      case BOOL : c = getBoolFill(p); break;
-      case TEXT : c = color(100, 200, 150); break;
-      case LIST : c = color(100, 150, 200); break;
-      case UNKNOWN : c = getUnknownColor(); break;
-    } 
+    if (p.targetFlow != null){
+      c = getDataTypeColor(p.targetFlow.getType());
+    }
+    else {
+      c = getDataTypeColor(p.getRequiredDataCategory());
+    }
     int framesSinceEval = frameCount - p.owner.lastEval;
     if (framesSinceEval < 10){
       c = addColor(c, color((10-framesSinceEval) * 7));
@@ -132,9 +131,21 @@ class StyleResolver {
       return color(0, 200, 200);
     }
     
-    switch (p.data.getType()) {
-      case FLOAT : return color(200, 150, 100);
+    //if (p.targetFlow != null){
+    //  switch (p.targetFlow.getType()) {
+    //    case BOOL : return getBoolFill(p);
+    //    default : return getDataTypeColor(p.targetFlow.getType());
+    //  } 
+    //}
+    switch (p.getRequiredDataCategory()) {
       case BOOL : return getBoolFill(p);
+      default : return getDataTypeColor(p.getRequiredDataCategory());
+    } 
+  }
+  
+  color getDataTypeColor(DataCategory dc){
+    switch (dc) {
+      case FLOAT : return color(200, 150, 100);
       case TEXT : return color(100, 200, 150);
       case LIST : return color(100, 150, 200);
       case UNKNOWN : return getUnknownColor();
@@ -143,20 +154,13 @@ class StyleResolver {
   }
   
   color getStrokeByPork(Pork p){
-
-    if (p.currentStatus != null){
-      switch (p.currentStatus) {
-        case CONTINUATION: return 0;
-        case OBSERVATION: return getColorByPork(p);
-      } 
-    } else {
-      if (p.allowsStatus(DataStatus.CONTINUATION) && !(p.allowsStatus(DataStatus.OBSERVATION))){
-        return color(0);
-      } else {
-        return addColor(getColorByPork(p), color(30));
-      }
+    if (p.getCurrentAccess() == null){
+      return color(0);
     }
-    
-    return color(0);
+    switch(p.getCurrentAccess()){
+      case READ : return addColor(color(30), getDataTypeColor(p.getRequiredDataCategory()));      
+      case READWRITE : return getDataTypeColor(p.getRequiredDataCategory());      
+      default : return color(0);
+    }
   }
 }

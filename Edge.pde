@@ -1,15 +1,15 @@
 //~Edge
 
-enum DataStatus {CONTINUATION, OBSERVATION}
+enum DataAccess {READWRITE, READ}
 
 class Edge{
   
   OutPork source;
   InPork destination;
-  final DataStatus dataStatus;
+  final DataAccess dataAccess;
   
-  Edge(OutPork from, InPork towards, DataStatus dataStatus_){
-    source = from; destination = towards; dataStatus = dataStatus_; 
+  Edge(OutPork from, InPork towards, DataAccess dataAccess_){
+    source = from; destination = towards; dataAccess = dataAccess_; 
   }
   
   Operator sourceOwner(){return source.owner;}

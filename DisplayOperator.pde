@@ -19,9 +19,9 @@ class DisplayOperator extends UIOperator{
   //wants a list of floats, and floats for width and height
   boolean isInputValid(){
     
-    int w = (int)inFlows.get(0).getFloatValue();
-    int h = (int)inFlows.get(1).getFloatValue();    
-    List<Flow> buffer = inFlows.get(2).getListValue();
+    int w = (int)ins.get(0).targetFlow.getFloatValue();
+    int h = (int)ins.get(1).targetFlow.getFloatValue();    
+    List<Flow> buffer = ins.get(2).targetFlow.getListValue();
     
     for (Flow f : buffer){
       if (f.getType() != DataCategory.FLOAT){

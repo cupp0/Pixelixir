@@ -6,11 +6,11 @@ class TextfieldOperator extends UIOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.TEXT);
+    addOutPork(DataCategory.TEXT).setTargetFlow(new Flow(DataCategory.TEXT));
   }
 
   void execute(){   
-    outs.get(0).data.setTextValue(uiPayload.getTextValue());
+   outs.get(0).targetFlow.setTextValue(uiPayload.getTextValue());
   }
         
 }

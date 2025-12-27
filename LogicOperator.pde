@@ -5,12 +5,14 @@ abstract class LogicOp extends PrimeOperator implements LogicOperator<Boolean>{
   }
   
   void initialize(){
-    addInPork(DataCategory.BOOL); addInPork(DataCategory.BOOL); addOutPork(DataCategory.BOOL);
+    addInPork(DataCategory.BOOL); addInPork(DataCategory.BOOL); addOutPork(DataCategory.BOOL).setTargetFlow(new Flow(DataCategory.BOOL));
   }
   
   void execute(){
-                          //gather input data
-    outs.get(0).data.setBoolValue(apply(inFlows.get(0).getBoolValue(), inFlows.get(1).getBoolValue()));
+    Flow i1 = ins.get(0).targetFlow;
+    Flow i2 = ins.get(1).targetFlow;
+    Flow o = outs.get(0).targetFlow;
+    o.setBoolValue(apply(i1.getBoolValue(), i2.getBoolValue()));
   }
   
   public abstract boolean apply(boolean a, boolean b);
@@ -40,12 +42,14 @@ class XOrOperator extends LogicOp{
 class NotOperator extends LogicOp{
   
  NotOperator(){super();name = "not";expSymbol =  "!";}
+ 
+ @Override
   void initialize(){
-    addInPork(DataCategory.BOOL); addOutPork(DataCategory.BOOL);
+    addInPork(DataCategory.BOOL); addOutPork(DataCategory.BOOL).setTargetFlow(new Flow(DataCategory.BOOL));
   }
   
   void execute(){                  
-    outs.get(0).data.setBoolValue(apply(inFlows.get(0).getBoolValue(), true));
+   outs.get(0).targetFlow.setBoolValue(apply(ins.get(0).targetFlow.getBoolValue(), true));
   }
   
   public boolean apply(boolean a, boolean b) { 

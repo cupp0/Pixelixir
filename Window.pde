@@ -90,38 +90,45 @@ class Window{
     }
   }
   
-  void attemptConnection(OutPortUI src, InPortUI dest, DataStatus ds){
+  void attemptConnection(OutPortUI src, InPortUI dest){
+    
     OutPork srcPork = ((OutPork)portMap.getPork(src));
     InPork destPork = ((InPork)portMap.getPork(dest));
     
-    //are we dealing with a reference or a value
-    boolean compatibleDataStatus = srcPork.allowsStatus(ds) && destPork.allowsStatus(ds);
+    //determine if the ports have compatible access requirements (a read only out can't be plugged into an in that wants to write)
+    DataAccess accessRequirement = srcPork.resolveDataAccess(destPork);
     
-    //are the actual types compatible (float vs text, etc)
-    boolean compatibleDataType = Flow.compatible(srcPork.data.getType(), destPork.data.getType());
-    
-    if (compatibleDataStatus && compatibleDataType){
-      buildConnection(src, dest, ds);
-    } else {
-      println("incompatible ports");
+    if (accessRequirement == null){
+      println("one thing in two places is imaginative but sloppy, until parallel timelines are accessible, copy");
+      println("(these ports have differing data access requirements. try making explicit deep copies of the data with CopyOperator)");
+      return;
     }
-
+    
+    //are the data types compatible (float vs text, etc)
+    boolean compatibleDataType = Flow.compatible(srcPork.getRequiredDataCategory(), destPork.getRequiredDataCategory());
+    
+    if (!compatibleDataType){
+      println("if you try to STRING a LIST to a BOOL's tail, you'll soon FLOAT away to heaven (that connection's a fail)");
+      return;
+    }
+    
+    //if compatible, set both ports to the resolved access requirement, then build the connection
+    srcPork.setCurrentAccess(accessRequirement);
+    destPork.setCurrentAccess(accessRequirement);
+    
+    buildConnection(src, dest, accessRequirement);
   }
 
   //add edge to the graph, visible in this window, update references in porks, update listeners
-  void buildConnection(OutPortUI src, InPortUI dest, DataStatus ds){
+  void buildConnection(OutPortUI src, InPortUI dest, DataAccess da){
     
     //corresponding data ports
     OutPork srcPork = ((OutPork)portMap.getPork(src));
     InPork destPork = ((InPork)portMap.getPork(dest));
     
-    //set data status of each pork
-    srcPork.currentStatus = ds;
-    destPork.currentStatus = ds;
-    
     //add connection, both in UI land and Data land
-    connections.add(new Connection(src, dest, ds));
-    boundary.graph.addEdge(srcPork, destPork, ds); 
+    connections.add(new Connection(src, dest, da));
+    boundary.graph.addEdge(srcPork, destPork, da); 
     
     //update Window state stuff and call the newly connected op to update
     boundary.rebuildListeners();   
@@ -149,7 +156,6 @@ class Window{
         return e;
       }
     }
-    println("edge not found");
     return null;
   }
   
@@ -191,9 +197,7 @@ class Window{
     
     //sets up ports, update graph
     newMod.owner.initialize();
-    if (newMod.owner instanceof PrimeOperator){
-      ((PrimeOperator)newMod.owner).setDefaultDataStatuses();
-    }
+    newMod.owner.setDefaultDataAccess();
     boundary.graph.computeTopoSort();
     
     newMod.organizeUI();

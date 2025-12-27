@@ -21,10 +21,10 @@ class Connection implements Hoverable{
   float damping;                        // slows down motion
   PVector gravity;
 
-  Connection(PortUI source_, PortUI destination_, DataStatus ds){
+  Connection(PortUI source_, PortUI destination_, DataAccess ds){
     source = source_; destination = destination_;
-    if (ds == DataStatus.CONTINUATION){ connectionStyle = ConnectionStyle.CABLE; }
-    if (ds == DataStatus.OBSERVATION){ connectionStyle = ConnectionStyle.DOTS; }
+    if (ds == DataAccess.READWRITE){ connectionStyle = ConnectionStyle.CABLE; }
+    if (ds == DataAccess.READ){ connectionStyle = ConnectionStyle.DOTS; }
 
     PVector sPos = source.getAbsolutePosition().copy().add(4, 8);
     PVector dPos = destination.getAbsolutePosition().copy().add(4, 0);
@@ -79,7 +79,8 @@ class Connection implements Hoverable{
   
   void displayDots(){
     PVector start = source.getAbsolutePosition().copy().add(4, 8);
-    PVector dir = PVector.sub(destination.getAbsolutePosition().copy().add(4, 8), start);
+    PVector finish = destination.getAbsolutePosition().copy().add(4, 0);
+    PVector dir = PVector.sub(finish, start);
     float dist = dir.mag();
     dir.normalize();
     PVector offsetVector = dir.copy().mult(5);
@@ -89,7 +90,7 @@ class Connection implements Hoverable{
     float offset = (frameCount * speed) % spacing;
 
     // draw the flowing lines
-    for (float d = offset; d < dist-spacing; d += spacing) {
+    for (float d = offset; d < dist-spacing/2; d += spacing) {
       PVector pos = PVector.add(start, PVector.mult(dir, d));
       PVector pos2 = PVector.add(pos, offsetVector);
       line(pos.x, pos.y, pos2.x, pos2.y);

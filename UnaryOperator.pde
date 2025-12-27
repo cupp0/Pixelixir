@@ -2,6 +2,7 @@ public abstract class UnaryOp extends PrimeOperator implements UnaryOperator<Flo
   
   UnaryOp(){
     super();
+    setExecutionSemantics(ExecutionSemantics.MUTATES);
   }
   
   void initialize(){
@@ -11,8 +12,7 @@ public abstract class UnaryOp extends PrimeOperator implements UnaryOperator<Flo
   public abstract float apply(float value);
 
   void execute(){    
-                          //gather input data
-    outs.get(0).data.setFloatValue(apply(inFlows.get(0).getFloatValue()));
+   outs.get(0).targetFlow.setFloatValue(apply(ins.get(0).targetFlow.getFloatValue()));
   }  
 }
 

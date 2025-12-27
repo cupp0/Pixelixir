@@ -6,20 +6,22 @@ class SplitOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.LIST); addOutPork(DataCategory.UNKNOWN); addOutPork(DataCategory.UNKNOWN);
+    addInPork(DataCategory.LIST); 
+    addOutPork(DataCategory.UNKNOWN).setTargetFlow(new Flow(DataCategory.UNKNOWN)); 
+    addOutPork(DataCategory.UNKNOWN).setTargetFlow(new Flow(DataCategory.UNKNOWN)); 
   }
 
   void execute(){
  
-    List<Flow> flowList = inFlows.get(0).getListValue();
+    List<Flow> flowList = ins.get(0).targetFlow.getListValue();
     
     while (outs.size() < flowList.size()){
-      addOutPork(DataCategory.UNKNOWN);
+      addOutPork(DataCategory.UNKNOWN).setTargetFlow(new Flow(DataCategory.UNKNOWN)); 
     }
     
     for (int i = 0; i< flowList.size(); i++){
-      outs.get(i).data.setType(flowList.get(i).getType());
-      Flow.copyData(flowList.get(i), outs.get(i).data);
+      outs.get(i).setRequiredDataCategory(flowList.get(i).getType());
+      Flow.copyData(flowList.get(i), outs.get(i).targetFlow);
     }
     
   } 

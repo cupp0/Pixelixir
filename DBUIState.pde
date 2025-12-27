@@ -17,7 +17,7 @@ class DBUIState extends UIState implements DataBender{
     
     if (identityManager.identityGroupExists(newName)){
       if (identityManager.groups.get(newName).getType() != this.getType()){
-        println("that name already taken by a different type");
+        println("that identity is held by " + identityManager.groups.get(newName).getType());
         return;
       } 
     }

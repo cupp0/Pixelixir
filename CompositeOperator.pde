@@ -13,10 +13,27 @@ class CompositeOperator extends Operator implements DynamicPorts{
   }
   
   void initialize(){}
+  
+  void primerContinousUpdaters(){
+    for (Operator op : kids){
+      if (op.continuous){
+        
+        if (op instanceof PrimeOperator){
+          op.outs.get(0).dataNotification();     //assumes continuous prime ops send data to output zero
+        }
+        
+        else {
+          ((CompositeOperator)op).primerContinousUpdaters();
+        }
+        
+      }
+    }
+  }
 
   //filters its topoSort by the combined BFS's of any updating OutPork
   void generateEvaluationSequence(){
     evaluationSequence.clear();     
+    
     if (updaters.size() == 0){return; } //if nothing is updating we can leave operationOrder empty.
 
     else {  
@@ -106,49 +123,5 @@ class CompositeOperator extends Operator implements DynamicPorts{
   }
    
   void onConnectionRemoved(Pork where){}
-  
-  @Override
-  void resolvePorkDataType(Pork where, DataCategory dc){
-    
-    where.data.setType(dc);
-    //println("resolving from comp");
-    
-    if (where instanceof InPork){
-      
-      //propagate up
-      OutPork src = ((InPork)where).getSource();
-      if (src != null){
-        if (src.data.getType() == DataCategory.UNKNOWN){
-          src.owner.resolvePorkDataType(src, dc);
-        }
-      }
-      
-      //propagate down/in
-      ReceiveOperator rec = getReceiver();
-      if (rec != null){
-        if (rec.outs.get(where.index).data.getType() == DataCategory.UNKNOWN){
-          rec.resolvePorkDataType(rec.outs.get(where.index), dc);
-        }
-      }
-    }
-    
-    if (where instanceof OutPork){
-      //propagate down
-      for (InPork i : ((OutPork)where).getDestinations()){
-        if (i.data.getType() == DataCategory.UNKNOWN){
-          i.owner.resolvePorkDataType(i, dc);
-        }
-      }
-      
-      //propagate up/in
-      SendOperator send = getSender();
-      if (send != null){
-        if (send.ins.get(where.index).data.getType() == DataCategory.UNKNOWN){
-          send.resolvePorkDataType(send.ins.get(where.index), dc);
-        }
-      }
-    }
-    
-  }
   
 }

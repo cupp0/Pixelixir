@@ -15,7 +15,7 @@ String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "com
 String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};
 String[] unary = {"UNARY", "sin", "cos", "tan", "abs"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
-String[] utility = {"UTILITY", "mouse", "key", "toFloat", "list", "read", "write", "set", "get", "copy", "valve", "concat", "split", "delay","send", "receive"};
+String[] utility = {"UTILITY", "print", "mouse", "key", "toFloat", "list", "read", "write", "set", "get", "copy", "valve", "concat", "split", "send", "receive"};
 
 String[][] UIText = {UI, binary, unary, logic, utility};
 
@@ -77,7 +77,12 @@ void setup() {
 }
   
 void draw(){
-  bigbang.generateEvaluationSequence();  
-  currentWindow.display();  
-  bigbang.evaluate();
+  
+  //bigbang is outermost view. All updates start here and work inwards as necessary
+  
+  bigbang.primerContinousUpdaters();         // locate and create notifications at any continuous port
+  bigbang.generateEvaluationSequence();      // generate a global evaluation sequence based on who has new data
+  currentWindow.display();                   // display UI before evaluating cause we use info about who is evaluating
+  bigbang.evaluate();                        // evaluate the graph
+  
 }

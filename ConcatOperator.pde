@@ -6,7 +6,7 @@ class ConcatOperator extends PrimeOperator implements DynamicPorts{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN); addInPork(DataCategory.UNKNOWN);addOutPork(DataCategory.LIST);
+    addInPork(DataCategory.UNKNOWN); addInPork(DataCategory.UNKNOWN);addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
   }
 
   
@@ -32,18 +32,19 @@ class ConcatOperator extends PrimeOperator implements DynamicPorts{
 
   //clearing whole list for now. Would be better if list knew where it was updating an just overwrite that
   void execute(){
- 
-    outs.get(0).data.clearList();
+   Flow o = outs.get(0).targetFlow;
+   o.clearList();
     
     for (int i = 0; i< ins.size(); i++){ 
       if (ins.get(i).getSource() != null){
-        outs.get(0).data.addToList(inFlows.get(i).copyFlow());
+        Flow in = ins.get(i).targetFlow.copyFlow();
+        o.addToList(in);
       }    
     }
   }
   
-  void resolvePorkDataType(Pork where, DataCategory dc){   
-    where.data.setType(dc);
-  }
+  //void resolvePorkDataType(Pork where, DataCategory dc){   
+  //  where.setRequiredDataCategory(dc);
+  //}
 
 }

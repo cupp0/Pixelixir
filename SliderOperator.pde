@@ -6,11 +6,11 @@ class SliderOperator extends UIOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.FLOAT);
+    addOutPork(DataCategory.FLOAT).setTargetFlow(new Flow(DataCategory.FLOAT));
   }
   
   void execute(){
-    outs.get(0).data.setFloatValue(uiPayload.getFloatValue());
+   outs.get(0).targetFlow.setFloatValue(uiPayload.getFloatValue());
   }
         
 }

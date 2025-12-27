@@ -7,7 +7,7 @@ class ToFloatOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN); addOutPork(DataCategory.FLOAT);
+    addInPork(DataCategory.UNKNOWN); addOutPork(DataCategory.FLOAT).setTargetFlow(new Flow(DataCategory.FLOAT));
   }
   
   float valueToFloat(Flow f){
@@ -36,6 +36,6 @@ class ToFloatOperator extends PrimeOperator{
   }
     
   void execute(){ 
-    outs.get(0).data.setFloatValue(valueToFloat(inFlows.get(0)));   
+   outs.get(0).targetFlow.setFloatValue(valueToFloat(ins.get(0).targetFlow));   
   } 
 }

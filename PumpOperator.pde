@@ -1,22 +1,26 @@
 class ValveOperator extends PrimeOperator{
-
+  
   ValveOperator(){
     super();
-    name = "valve";  
+    name = "valve"; continuous = true;
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN); addInPork(DataCategory.BOOL); addOutPork(DataCategory.UNKNOWN);
+    addInPork(DataCategory.UNKNOWN, true, false); 
+    addInPork(DataCategory.BOOL); 
+    addOutPork(DataCategory.UNKNOWN, true, false).setTargetFlow(new Flow(DataCategory.UNKNOWN));
   }
   
-  void execute(){
-    outs.get(0).data = inFlows.get(0).copyFlow();
-    outs.get(0).dataNotification();
+  void execute(){    
+    Flow.copyData(ins.get(0).targetFlow, outs.get(0).targetFlow);
   }
 
   @Override
   boolean shouldExecute(){
-    return inFlows.get(1).getBoolValue();
+    if (ins.get(1).targetFlow == null){
+      return false;
+    }
+    return ins.get(1).targetFlow.getBoolValue();
   }
   
   boolean isSpeaker(){ return true; }

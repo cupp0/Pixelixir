@@ -9,7 +9,6 @@ class FlowRegistry{
   
   void writeFlow(String address, Flow f){
     flows.put(address, f);
-    println(flows.size() + " flows in registry");
   }
   
   Flow readFlow(String address){

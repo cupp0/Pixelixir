@@ -8,7 +8,8 @@ class KeyOperator extends RawInputOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.TEXT).data.setTextValue(""); 
+    addOutPork(DataCategory.TEXT).setTargetFlow(new Flow(DataCategory.BOOL));
+    outs.get(0).targetFlow.setTextValue(""); 
   }  
 
   
@@ -17,11 +18,11 @@ class KeyOperator extends RawInputOperator{
   void onGlobalInputEvent(GlobalInputEvent e){
     switch(e.action){
       case KEY_TYPED:
-        outs.get(0).dataNotification();
+       outs.get(0).dataNotification();
         break;
         
       case KEY_RELEASED:
-        outs.get(0).dataNotification();
+       outs.get(0).dataNotification();
         break;
     }
       
@@ -33,10 +34,10 @@ class KeyOperator extends RawInputOperator{
   void execute(){
     if (currentEvent != null){
       if (currentEvent.action == Action.KEY_TYPED){
-        outs.get(0).data.setTextValue(str(currentEvent.theKey));
+       outs.get(0).targetFlow.setTextValue(str(currentEvent.theKey));
       }
       if (currentEvent.action == Action.KEY_RELEASED){
-        outs.get(0).data.setTextValue("");
+       outs.get(0).targetFlow.setTextValue("");
       }
     }
   }

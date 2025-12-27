@@ -9,15 +9,12 @@ class Graph {
   //construct Graph from list of Modules and their edges
   Graph(){}
   
-  void addEdge(OutPork from, InPork towards, DataStatus ds){
-    //if making a connection between different, but compatible ports, collapse type
-    //Flow.mergeTypes(from.data, towards.data);
+  void addEdge(OutPork from, InPork towards, DataAccess ds){
     
-    edges.add(new Edge(from, towards, ds));
-    from.onConnection(towards);
-    towards.onConnection(from);
-        
-    computeTopoSort();     
+    edges.add(new Edge(from, towards, ds));    
+    from.onConnection(towards);        
+    computeTopoSort();   
+    
   }
   
   void removeEdge(Edge e){  

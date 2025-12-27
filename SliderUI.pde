@@ -11,7 +11,12 @@ class SliderUI extends DBUI{
     PVector sliderRange = ((SliderUIState)state).range.copy();
     float knobPos = getAbsolutePosition().x + map(sliderValue, sliderRange.x, sliderRange.y, 0, size.x);
     rect(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y, roundOver);
+    fill(150);
     ellipse(knobPos, getAbsolutePosition().y+size.y/2, size.y+3, size.y+3);
+    
+    //textAlign(CENTER);
+    fill(255);
+    text((int)sliderValue, knobPos-6, getAbsolutePosition().y+size.y/2);
     displayIdentity();
   }
   

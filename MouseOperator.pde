@@ -8,7 +8,7 @@ class MouseOperator extends RawInputOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.FLOAT); addOutPork(DataCategory.FLOAT); //mouse position
+    addOutPork(DataCategory.FLOAT).setTargetFlow(new Flow(DataCategory.FLOAT)); addOutPork(DataCategory.FLOAT); //mouse position
     addOutPork(DataCategory.BOOL); addOutPork(DataCategory.BOOL);   //left/right buttons
     addOutPork(DataCategory.FLOAT);                                 //wheel delta
   }
@@ -18,12 +18,12 @@ class MouseOperator extends RawInputOperator{
   void onGlobalInputEvent(GlobalInputEvent e){
     switch(e.action){
       case MOUSE_MOVED:
-        outs.get(0).dataNotification();
+       outs.get(0).dataNotification();
         outs.get(1).dataNotification();
         break;
       
       case MOUSE_DRAGGED:
-        outs.get(0).dataNotification();
+       outs.get(0).dataNotification();
         outs.get(1).dataNotification();
         break;
       
@@ -65,21 +65,21 @@ class MouseOperator extends RawInputOperator{
   
   void execute(){
     if (currentEvent != null){
-      outs.get(0).data.setFloatValue(currentEvent.xMouse);
-      outs.get(1).data.setFloatValue(currentEvent.yMouse);
+     outs.get(0).targetFlow.setFloatValue(currentEvent.xMouse);
+      outs.get(1).targetFlow.setFloatValue(currentEvent.yMouse);
       if (currentEvent.action == Action.MOUSE_PRESSED || currentEvent.action == Action.MOUSE_DRAGGED){
-        outs.get(2).data.setBoolValue(currentEvent.mouseButt == LEFT);
-        outs.get(3).data.setBoolValue(currentEvent.mouseButt == RIGHT);
+        outs.get(2).targetFlow.setBoolValue(currentEvent.mouseButt == LEFT);
+        outs.get(3).targetFlow.setBoolValue(currentEvent.mouseButt == RIGHT);
       }
       if (currentEvent.action == Action.MOUSE_RELEASED){
-        outs.get(2).data.setBoolValue(false);
-        outs.get(3).data.setBoolValue(false);
+        outs.get(2).targetFlow.setBoolValue(false);
+        outs.get(3).targetFlow.setBoolValue(false);
       }
       if (currentEvent.action == Action.MOUSE_CLICKED){
-        outs.get(2).data.setBoolValue(false);
-        outs.get(3).data.setBoolValue(false);
+        outs.get(2).targetFlow.setBoolValue(false);
+        outs.get(3).targetFlow.setBoolValue(false);
       }
-      outs.get(4).data.setFloatValue(currentEvent.wheelDelta);
+      outs.get(4).targetFlow.setFloatValue(currentEvent.wheelDelta);
     }
   }
   
