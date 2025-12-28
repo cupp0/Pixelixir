@@ -4,25 +4,12 @@ enum ExecutionSemantics{
   GENERATES
 }
 
-
-//~Operator
-//for operators that have ports that resolve to any data category. copy, valve, list, concat, split, etc..
-class TypeBoundIdentity{
-  ArrayList<Pork> boundPorks = new ArrayList<Pork>();
-  DataCategory dataCategory = DataCategory.UNKNOWN;
-  
-  void setIdentityDataCategory(DataCategory dc){
-     dataCategory = dc;
-  }
-}
-
 public abstract class Operator{
   
   protected OperatorListener listener; //module that needs to react to changes to this operator
   
   String name;
   String label;
-  int lastEval = 0;
   
   Operator parent;                                                    //how we communicate with what's outside
   ArrayList<Operator> kids = new ArrayList<Operator>();               //define this' behavior
@@ -57,19 +44,20 @@ public abstract class Operator{
   
   //composites have some edge cases that shouldn't break anything, 
   //but we should eventually override.
+  
+  //@overrides - valve,
   boolean shouldExecute(){
-    
     //don't allow execution if we are missing inputs
-    if (!inPorksFull()){ return false; }
+    if (!inPorksFull()){return false; }
     
-    if (isSpeaker()){ return true; }
+    //if it's a speaker (UI generators, valve
+    if (isSpeaker()){if (this != bigbang){ println(name + " should execute because they are a speaker "); } return true; }
     
     //if any data is hot, we should execute
     for (InPork i : ins){
-      if (i.getSource() != null){
-        if (i.getSource().getHot()){
-          return true;
-        }
+      if (i.getSource().getHot()){
+        if (this != bigbang){println(name + " should execute because they have a hot port ");}
+        return true;
       }
     }
     
@@ -80,11 +68,9 @@ public abstract class Operator{
   abstract void execute();
   
   void evaluate(){
-    if (this instanceof PrimeOperator){
-      //println(name, frameCount);
-    }
     if (shouldExecute()){
-      execute();      
+      execute();  
+      if (this != bigbang){ println(name + " executed, frame " + frameCount); }
       postEvaluation(true);
     } else {
       postEvaluation(false);
@@ -102,7 +88,6 @@ public abstract class Operator{
     //this updates outs that dynamically affect evaluation
     //at "runtime" (mid evaluation sequence)
     if (executed){
-      lastEval = frameCount;
       for (OutPork o : outs){
         o.setHot(true);
       }
@@ -207,24 +192,6 @@ public abstract class Operator{
     return out;
   }
   
-  ReceiveOperator getReceiver(){
-    for (Operator op : kids){
-      if (op.name.equals("receive")){
-        return (ReceiveOperator)op;
-      }
-    }
-    return null;
-  }
-  
-  SendOperator getSender(){
-    for (Operator op : kids){
-      if (op.name.equals("send")){
-        return (SendOperator)op;
-      }
-    }
-    return null;
-  }
-  
   //this is to access the module by the operator
   Module getModule(){
     //the parent of this operator is the boundary in which we can view this operator
@@ -260,6 +227,12 @@ public abstract class Operator{
   
   ExecutionSemantics getExecutionSemantics(){
     return executionSemantics;
+  }
+  
+  void setPortsCold(){
+    for (OutPork o : outs){
+      o.setHot(false); 
+    }
   }
   
   void onKeyPressed(){}

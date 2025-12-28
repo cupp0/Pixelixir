@@ -190,11 +190,46 @@ class SelectionManager{
 
   }
   
+  //have to build connections inside out, since some ops have dynamic ports.
+  //for instance, building a connection on a send or receive inside a composite
+  //can add a port to that composite. 
+  
+  //strategy: If connection is between primitives, send it. If there is a composite
+  //involved, recurse on that composite first.
   void rebuildConnections(WindowData wdata, HashMap<String, Module> newMods){
     
     // Rebuild connections
     for (ConnectionData cdata : wdata.connections) {
       Window where = windows.get(newMods.get(cdata.fromModule).owner.parent);
+      
+      //the two modules we are attempting to connect
+      Module srcMod  = newMods.get(cdata.fromModule);
+      Module destMod  = newMods.get(cdata.toModule);
+      
+      //if either are composite, recurse before building the connection
+      if (srcMod.owner instanceof CompositeOperator){
+        for (ModuleData mdata : wdata.modules){
+          
+          //find the correct module 
+          Module comparison = newMods.get(mdata.id);
+          if (srcMod == comparison){
+            rebuildConnections(mdata.subwindow, newMods);
+          }
+        }
+      }
+      
+      //repeat the process for the desitnation mod
+      if (destMod.owner instanceof CompositeOperator){
+        for (ModuleData mdata : wdata.modules){
+          Module comparison = newMods.get(mdata.id);
+          if (destMod == comparison){
+            rebuildConnections(mdata.subwindow, newMods);
+          }
+        }
+      }
+      
+      //build the connection
+      println(newMods.get(cdata.fromModule).name, newMods.get(cdata.toModule).name);
       OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
       InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);
       where.attemptConnection(src, dest);

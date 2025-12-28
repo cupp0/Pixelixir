@@ -9,10 +9,24 @@ class SendOperator extends PrimeOperator implements DynamicPorts{
   void initialize(){
     addInPork(DataCategory.UNKNOWN, false, true);
   }
+  
+  //send overrides typical shouldExecute(), execute(), postExecution scheme.
+  //instead, we just set the appropriate ports hot at the enclosing outport
+  @Override  
+  void evaluate(){
+    if (parent == bigbang) return;
+    
+    for (InPork i : ins){
+      if (i.getSource() != null){
+        if (i.getSource().getHot()){
+          parent.outs.get(i.index).setHot(true);  
+        }
+      }
+    }
 
-  //send/receive are passthroughs
-  void execute(){
-  } 
+  }
+  
+  void execute(){}
   
   //InPork where is the input of the send that is receiving new data.
   //it calls notify listeners at the appropriate out of the composite we are in

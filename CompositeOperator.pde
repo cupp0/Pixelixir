@@ -14,6 +14,72 @@ class CompositeOperator extends Operator implements DynamicPorts{
   
   void initialize(){}
   
+  //one send / receive per window so that each composite has a clear line of communication
+  ReceiveOperator getReceiver(){
+    for (Operator op : kids){
+      if (op.name.equals("receive")){
+        return (ReceiveOperator)op;
+      }
+    }
+    return null;
+  }
+  
+  SendOperator getSender(){
+    for (Operator op : kids){
+      if (op.name.equals("send")){
+        return (SendOperator)op;
+      }
+    }
+    return null;
+  }
+  
+  //composites shouldExecute returns true if all connections are sourced
+  //and anything coming into it is hot. WE ALSO PIGGYBACK HERE TO SET INTERNAL
+  //RECEIVE PORTS HOT. To keep this method inert, we could let receive handle
+  //that internallyby querying its parent. Avoiding that for now cause it seems 
+  //like unnecessary indirection
+  @Override
+  boolean shouldExecute(){
+    
+    //don't allow execution if we are missing inputs
+    if (!inPorksFull()){println("full porks"); return false; }
+    
+    boolean hotInput = false;
+    //if any data is hot, we should execute
+    for (InPork i : ins){
+      if (i.getSource().getHot()){
+        hotInput = true;
+        getReceiver().outs.get(i.index).setHot(true);
+      }
+    }
+    
+    return hotInput;
+  }
+  
+  //evaluate all ops in order, then set all internal ports cold
+  void execute(){
+    for (Operator op : evaluationSequence){
+      //println(op.name);
+      op.evaluate();       
+    }
+    for (Operator op : evaluationSequence){
+      op.setPortsCold();       
+    }
+  }
+  
+  //internal SendOperator sets all of the enclosing composite ports hot, as necessary
+  //here we just handle the speaking flag, which currently is only used to color ports
+  //should remove
+  @Override
+  void postEvaluation(boolean executed){
+    
+    //this resets ports that coordinate where new data appears
+    //at each scope
+    for (OutPork o : outs){ o.speaking = false; }
+    for (InPork i : ins){ i.speaking = false; }
+      
+  }
+  
   void primerContinousUpdaters(){
     for (Operator op : kids){
       if (op.continuous){
@@ -77,33 +143,6 @@ class CompositeOperator extends Operator implements DynamicPorts{
     updaters.clear();   
   }
   
-  void execute(){
-    for (int i = 0; i < evaluationSequence.size(); i++){
-      evaluationSequence.get(i).evaluate(); 
-      
-      //if nothing downstream relies on the same data, set to upstream to cold
-      for (InPork in : ins){
-        
-        boolean stillHot = false;
-        for (InPork lateralIn : in.getSource().getDestinations()){
-          if (this.evaluatesBefore(lateralIn.owner)){
-            stillHot = true;
-          }
-        }
-        in.getSource().setHot(stillHot);
-
-      }
-    }
-  }
-  
-  boolean evaluatesBefore(Operator other){
-    for (int i = 0; i < evaluationSequence.size(); i++){
-      if (evaluationSequence.get(i) == this) return true;
-      if (evaluationSequence.get(i) == other) return false;
-    }
-    return false;
-  }
-  
   boolean isSpeaker() { return true; }
   boolean isListener() { return true; }
   
@@ -127,7 +166,7 @@ class CompositeOperator extends Operator implements DynamicPorts{
     }
     
     //in the case where the update object is an operator with no specified pork, propagate 
-    //thagt info outward. It means there is a graph island that needs to update
+    //that info outward. It means there is a graph island that needs to update
     if (uo.op != null){
       if (this != bigbang){
         parent.addUpdater(new UpdateObject(this));

@@ -119,24 +119,15 @@ class StyleResolver {
     else {
       c = getDataTypeColor(p.getRequiredDataCategory());
     }
-    int framesSinceEval = frameCount - p.owner.lastEval;
+    int framesSinceEval = frameCount - ((OutPork)p).lastEval;
     if (framesSinceEval < 10){
-      c = addColor(c, color((10-framesSinceEval) * 7));
+      c = addColor(c, color((10-framesSinceEval) * 12));
     }
     return c;
   }
   
   color getColorByPork(Pork p){
-    if (p.speaking){
-      return color(0, 200, 200);
-    }
-    
-    //if (p.targetFlow != null){
-    //  switch (p.targetFlow.getType()) {
-    //    case BOOL : return getBoolFill(p);
-    //    default : return getDataTypeColor(p.targetFlow.getType());
-    //  } 
-    //}
+   
     switch (p.getRequiredDataCategory()) {
       case BOOL : return getBoolFill(p);
       default : return getDataTypeColor(p.getRequiredDataCategory());
@@ -145,10 +136,10 @@ class StyleResolver {
   
   color getDataTypeColor(DataCategory dc){
     switch (dc) {
-      case FLOAT : return color(200, 150, 100);
-      case TEXT : return color(100, 200, 150);
-      case LIST : return color(100, 150, 200);
-      case MODULE : return color(200, 100, 150);
+      case FLOAT : return color(175, 125, 75);
+      case TEXT : return color(75, 175, 125);
+      case LIST : return color(75, 125, 175);
+      case MODULE : return color(175, 75, 125);
       case UNKNOWN : return getUnknownColor();
       default : return color(0);
     } 

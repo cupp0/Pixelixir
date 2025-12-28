@@ -96,6 +96,7 @@ class InPork extends Pork  implements PorkListener{
 class OutPork extends Pork {
   
   boolean hotData;
+  int lastEval = 0;
   List<PorkListener> listeners = new ArrayList<>();  //InPorks that need to know about speaking
   
   OutPork(Operator owner_, int index_){
@@ -183,6 +184,7 @@ class OutPork extends Pork {
   
   void setHot(boolean b){
     hotData = b;
+    if (b){ lastEval = frameCount; }
   }
   
   boolean getHot(){

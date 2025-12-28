@@ -44,20 +44,20 @@ int portGap = 12;
 int roundOver = 10;
 
 public void settings(){
-  size(900, 800, P3D);
+  size(800, 800, P3D);
 }  
 
 void setup() {
   frameRate(24);
   hint(DISABLE_OPTIMIZED_STROKE);
   rectMode(CORNER);
-  textAlign(LEFT, CENTER);
   
   //initialize operator space
   bigbang = ((CompositeOperator)partsFactory.createPart("composite", "Operator"));
   windows.put(bigbang, new Window(bigbang));
   currentWindow = windows.get(bigbang);
 
+  //make type adapters for UIState extensions (so we can serialize abstract UIState)
   RuntimeTypeAdapterFactory<UIState> uiStateAdapter =
     RuntimeTypeAdapterFactory.of(UIState.class, "type")
       .registerSubtype(ButtonUIState.class, "button")
@@ -79,11 +79,10 @@ void setup() {
   
 void draw(){
   
-  //bigbang is outermost view. All updates start here and work inwards as necessary
-  
+  //bigbang is outermost view. All updates start here and work inwards as necessary  
   bigbang.primerContinousUpdaters();         // locate and create notifications at any continuous port
   bigbang.generateEvaluationSequence();      // generate a global evaluation sequence based on who has new data
   currentWindow.display();                   // display UI before evaluating cause we use info about who is evaluating
-  bigbang.evaluate();                        // evaluate the graph
+  bigbang.execute();                         // evaluate the graph
   
 }
