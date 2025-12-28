@@ -25,25 +25,25 @@ public abstract class BinaryOp extends PrimeOperator{
 }
 
 class AddOperator extends BinaryOp{
-  AddOperator(){super((x, y) -> x + y);name = "add";expSymbol =  "+";}
+  AddOperator(){super((x, y) -> x + y);name = "add";label =  "+";}
 }
 
 class SubtractOperator extends BinaryOp{
-  SubtractOperator(){super((x, y) -> x - y);name = "subtract";expSymbol = "-";}
+  SubtractOperator(){super((x, y) -> x - y);name = "subtract";label = "-";}
 }
 
 class MultiplyOperator extends BinaryOp{
-  MultiplyOperator(){super((x, y) -> x * y); name = "multiply";expSymbol = "*";}
+  MultiplyOperator(){super((x, y) -> x * y); name = "multiply";label = "*";}
 }
 
 class DivideOperator extends BinaryOp{
-  DivideOperator(){super((x, y) -> x / y); name = "divide";expSymbol = "/";}
+  DivideOperator(){super((x, y) -> x / y); name = "divide";label = "/";}
 }
 
 class ModulusOperator extends BinaryOp{
-  ModulusOperator(){super((x, y) -> x % y); name = "modulus";expSymbol = "%";}
+  ModulusOperator(){super((x, y) -> x % y); name = "modulus";label = "%";}
 }
 
 class PowerOperator extends BinaryOp{
-  PowerOperator(){super((x, y) -> (float)Math.pow(x.doubleValue(), y.doubleValue())); name = "power";expSymbol = "^";}
+  PowerOperator(){super((x, y) -> (float)Math.pow(x.doubleValue(), y.doubleValue())); name = "power";label = "^";}
 }

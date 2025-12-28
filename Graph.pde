@@ -24,6 +24,8 @@ class Graph {
         break;
       }      
     }
+    
+    e.source.onConnectionRemoved(e.destination);
     computeTopoSort();
   }
   
@@ -92,7 +94,7 @@ class Graph {
   //  int oprndCount = 0;
   //  for (Operator op : topoSort){
   //    if (op instanceof BinaryOp){
-  //      oprtrs += op.expSymbol+",";
+  //      oprtrs += op.label+",";
   //    } else {
   //      oprnds += "x"+str(oprndCount)+","; 
   //      oprndCount++;

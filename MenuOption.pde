@@ -18,7 +18,7 @@ abstract class MenuOption implements Hoverable{
     
     fill(255);
     textSize(12);
-    text(label, p.x+3, p.y+10);
+    text(label, p.x+3, p.y+14);
   }
   
   void applyStyle(Style s){

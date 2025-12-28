@@ -1,7 +1,7 @@
 class EqualsOperator extends ComparisonOperator{
  
   EqualsOperator(){
-    super();name = "equals";expSymbol =  "=";
+    super();name = "equals";label =  "=";
   }
   
   void execute(){   

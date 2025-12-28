@@ -5,7 +5,7 @@ class CompositeOperator extends Operator implements DynamicPorts{
                                                         //keyed by this operator
   CompositeOperator(){
     super();
-    name = "composite";
+    name = "composite"; label = "";
   }
   
   void initializeWindow(){

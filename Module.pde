@@ -16,6 +16,9 @@ public class Module implements OperatorListener{
   
   void setOwner(Operator op){
     owner = op;
+    if (owner.getLabel() != null){ 
+      label = owner.getLabel(); 
+    }
   }
   
   //when the owner of this module adds/removes a pork, we need to add a port
@@ -220,9 +223,9 @@ public class Module implements OperatorListener{
   
   void displayLabel(){
     fill(0);   
-    textSize(10); 
-    
-    text(label, uiBits.get(0).state.pos.x+2, uiBits.get(0).state.pos.y+12); 
+    textSize(12); 
+    textAlign(CENTER);
+    text(label, uiBits.get(0).state.pos.x+14, uiBits.get(0).state.pos.y+18); 
   }
   
   void drag(PVector dragAmount){

@@ -1,7 +1,7 @@
 class GreaterThanOperator extends ComparisonOperator{
  
   GreaterThanOperator(){
-    super();name = "greaterThan";expSymbol =  ">";
+    super();name = "greaterThan";label =  ">";
   }
  
   void execute(){   

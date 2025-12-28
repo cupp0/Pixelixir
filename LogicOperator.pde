@@ -19,21 +19,21 @@ abstract class LogicOp extends PrimeOperator implements LogicOperator<Boolean>{
 }
 
 class AndOperator extends LogicOp{
-  AndOperator(){super();name = "and"; expSymbol =  "&&";}
+  AndOperator(){super();name = "and"; label =  "&&";}
   public boolean apply(boolean a, boolean b) { 
     return a&&b; 
   }
 }
 
 class OrOperator extends LogicOp{
-  OrOperator(){super();name = "or";expSymbol =  "||";}
+  OrOperator(){super();name = "or";label =  "||";}
   public boolean apply(boolean a, boolean b) { 
     return a||b; 
   }
 }
 
 class XOrOperator extends LogicOp{
- XOrOperator(){super();name = "xOr";expSymbol =  "^";}
+ XOrOperator(){super();name = "xOr";label =  "^";}
   public boolean apply(boolean a, boolean b) { 
     return a^b; 
   }
@@ -41,7 +41,7 @@ class XOrOperator extends LogicOp{
 
 class NotOperator extends LogicOp{
   
- NotOperator(){super();name = "not";expSymbol =  "!";}
+ NotOperator(){super();name = "not";label =  "!";}
  
  @Override
   void initialize(){

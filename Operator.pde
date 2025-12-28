@@ -6,13 +6,22 @@ enum ExecutionSemantics{
 
 
 //~Operator
+//for operators that have ports that resolve to any data category. copy, valve, list, concat, split, etc..
+class TypeBoundIdentity{
+  ArrayList<Pork> boundPorks = new ArrayList<Pork>();
+  DataCategory dataCategory = DataCategory.UNKNOWN;
+  
+  void setIdentityDataCategory(DataCategory dc){
+     dataCategory = dc;
+  }
+}
+
 public abstract class Operator{
   
   protected OperatorListener listener; //module that needs to react to changes to this operator
   
   String name;
-  String text = "";
-  String expSymbol;
+  String label;
   int lastEval = 0;
   
   Operator parent;                                                    //how we communicate with what's outside
@@ -20,6 +29,7 @@ public abstract class Operator{
   ArrayList<InPork> ins = new ArrayList<InPork>();                    //where we point for input data
   ArrayList<OutPork> outs = new ArrayList<OutPork>();                 //where we put output data
   ArrayList<Pork> typeBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's type
+  //TypeBoundIdentity tbi = new TypeBoundIdentity();
   ArrayList<Pork> dataBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's targetFlow
   boolean continuous = false;
   
@@ -231,6 +241,14 @@ public abstract class Operator{
   String getAddress(){
     return this.toString().substring(this.toString().indexOf('@'));
   }
+  
+  void setLabel(String s){
+    label = s;
+  }
+  
+  String getLabel(){
+    return label;
+  }
     
   void setParent(Operator o){
     parent = o;
@@ -300,7 +318,8 @@ public abstract class Operator{
     //first input is the designated continuation port
     if (getExecutionSemantics() == ExecutionSemantics.MUTATES){
       if (ins.size() > 0){
-        ins.get(0).setCurrentAccess(DataAccess.READWRITE);
+        ins.get(0).setDefaultAccess(DataAccess.READWRITE);
+        ins.get(0).setCurrentAccess(ins.get(0).getDefaultAccess());
       }
     }
   }
@@ -326,6 +345,24 @@ public abstract class Operator{
       }
     }
     
+  }
+  
+  //when we remove a connection, check if our type requirement can
+  //get reset. I think this requires a more robust system
+  void tryResetTypeBoundPorks(){
+    println(name);
+    //if anything is still connected, leave type requirement.
+    //there are situations where we ~could~ reset the type requirement
+    //even if there are still connections, but that shouldn't
+    //result in "bad" behavior per se.
+    for (Pork p : typeBoundPorks){
+      if (p.getConnectedPorks().size() > 0){ return; }
+    }
+    
+    //if none of the typeBound Porks have a connection, reset.
+    for (Pork p : typeBoundPorks){
+      p.setRequiredDataCategory(DataCategory.UNKNOWN);
+    }
   }
   
   //flow should only propagate if we are in an Op that MUTATES

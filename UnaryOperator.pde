@@ -17,28 +17,28 @@ public abstract class UnaryOp extends PrimeOperator implements UnaryOperator<Flo
 }
 
 class SinOperator extends UnaryOp{
-  SinOperator(){super();name = "sin";expSymbol =  "sin";}
+  SinOperator(){super();name = "sin";label =  "sin";}
   public float apply(float x) { 
     return sin(x); 
   }
 }
 
 class CosOperator extends UnaryOp{
-  CosOperator(){super();name = "cos";expSymbol =  "cos";}
+  CosOperator(){super();name = "cos";label =  "cos";}
   public float apply(float x) { 
     return cos(x); 
   }
 }
 
 class TanOperator extends UnaryOp{
-  TanOperator(){super();name = "tan";expSymbol =  "tan";}
+  TanOperator(){super();name = "tan";label =  "tan";}
   public float apply(float x) { 
     return tan(x); 
   }
 }
 
 class AbsOperator extends UnaryOp{
-  AbsOperator(){super();name = "abs";expSymbol =  "abs";}
+  AbsOperator(){super();name = "abs";label =  "abs";}
   public float apply(float x) { 
     return abs(x); 
   }

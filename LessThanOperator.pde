@@ -1,7 +1,7 @@
 class LessThanOperator extends ComparisonOperator{
  
   LessThanOperator(){
-    super();name = "lessThan";expSymbol =  "<";
+    super();name = "lessThan";label =  "<";
   }
   
   void execute(){   

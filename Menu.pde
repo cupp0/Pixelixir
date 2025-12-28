@@ -22,6 +22,7 @@ abstract class Menu<T>{
     fill(0);
     stroke(0);
     strokeWeight(2);
+    textAlign(LEFT);
     rect(pos.x, pos.y, optionSize.x, options.size()*optionSize.y, 4);
 
     // Options

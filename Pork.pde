@@ -6,6 +6,7 @@ abstract class Pork {
   int index;
   Flow targetFlow;
   DataCategory requiredDataCategory;
+  DataAccess defaultAccess;
   DataAccess currentAccess;
   boolean speaking = false;
   
@@ -47,6 +48,14 @@ abstract class Pork {
   
   DataAccess getCurrentAccess(){
     return currentAccess; 
+  }
+  
+  void setDefaultAccess(DataAccess da){
+    defaultAccess = da; 
+  }
+  
+  DataAccess getDefaultAccess(){
+    return defaultAccess; 
   }
   
   abstract ArrayList<Pork> getConnectedPorks();
@@ -125,6 +134,18 @@ class OutPork extends Pork {
     if (dest.owner instanceof DynamicPorts){
       ((DynamicPorts)dest.owner).onConnectionAdded(dest);
     }
+
+  }
+  
+  void onConnectionRemoved(InPork dest){
+    
+    dest.owner.propagateTargetFlow(dest, null);
+    
+    owner.tryResetTypeBoundPorks();
+    dest.owner.tryResetTypeBoundPorks();
+    
+    this.setCurrentAccess(this.getDefaultAccess());
+    dest.setCurrentAccess(dest.getDefaultAccess());
 
   }
   
