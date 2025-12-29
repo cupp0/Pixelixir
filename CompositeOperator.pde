@@ -42,7 +42,7 @@ class CompositeOperator extends Operator implements DynamicPorts{
   boolean shouldExecute(){
     
     //don't allow execution if we are missing inputs
-    if (!inPorksFull()){println("full porks"); return false; }
+    if (!inPorksFull()){ return false; }
     
     boolean hotInput = false;
     //if any data is hot, we should execute
@@ -177,11 +177,80 @@ class CompositeOperator extends Operator implements DynamicPorts{
   boolean isUpdater(OutPork out){
     return updaters.contains(out);
   }
-  
+
   void onConnectionAdded(Pork where){
     //resolveType(where); 
   }
+  
+  //used by a composite to access its corresponding send/receive pork
+  //argument should be a pork on this compositeOperator
+  Pork getInteriorPair(Pork p){
+    if (p instanceof InPork){
+      ReceiveOperator rec = getReceiver();
+      return rec.outs.get(p.index);
+    }
+    
+    if (p instanceof OutPork){
+      SendOperator send = getSender();
+      return send.ins.get(p.index);
+    }
+    
+    println("no interior pair found");
+    return null;
+  }
    
   void onConnectionRemoved(Pork where){}
+  
+  //jank. have to build a bridge from composite to internal send/receive.
+  //typebound and databound pattern binds ports on a single module in a hackish way.
+  //Likely should make a more robust data identity manager that ports subscribe to?
+  @Override
+  void propagateRequiredDataCategory(Pork where, DataCategory dc){
+    where.setRequiredDataCategory(dc);
+    
+    //find corresponding port on send/receive
+    Pork p = getInteriorPair(where);
+    
+    if (p != null){
+      p.setRequiredDataCategory(dc);
+      
+      //propagate not on the send/receive, but what it connects to
+      for (Pork po : p.getConnectedPorks()){
+       po.owner.propagateRequiredDataCategory(po, dc);  
+      }
+    }
+    
+  }
+  
+  @Override
+  void propagateTargetFlow(InPork where, Flow f){
+    where.setTargetFlow(f);
+    
+    //find corresponding port on send/receive
+    OutPork p = (OutPork)getInteriorPair(where);
+    
+    p.setTargetFlow(f);
+    
+    //propagate not on the send/receive, but what it connects to
+    for (InPork po : p.getDestinations()){
+      po.owner.propagateTargetFlow(po, f);  
+    }
+  }
+  
+  @Override
+  void propagateNullFlow(InPork where){
+    where.setTargetFlow(null);
+    
+    //find corresponding port on send/receive
+    OutPork p = (OutPork)getInteriorPair(where);
+    
+    p.setTargetFlow(null);
+    
+    //propagate not on the send/receive, but what it connects to
+    for (InPork po : p.getDestinations()){
+      po.owner.propagateNullFlow(po);  
+    }
+    
+  }
   
 }

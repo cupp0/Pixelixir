@@ -162,9 +162,21 @@ class Connection implements Hoverable{
   //check if any segment between each anchors is hovered
   boolean isHovered(float x, float y) {
     
-    for (int i = 0; i < pos.length-1; i++){
-      if (isInside(new PVector(x, y), pos[i], pos[i+1])){
-        if (distToSegment(x, y, pos[i].x, pos[i].y, pos[i+1].x, pos[i+1].y) < 4) {
+    if (connectionStyle == ConnectionStyle.CABLE){
+      for (int i = 0; i < pos.length-1; i++){
+        if (isInside(new PVector(x, y), pos[i], pos[i+1])){
+          if (distToSegment(x, y, pos[i].x, pos[i].y, pos[i+1].x, pos[i+1].y) < 4) {
+            return true;
+          }
+        }
+      }
+    }
+    
+    if (connectionStyle == ConnectionStyle.DOTS){
+      PVector p1 = source.getAbsolutePosition().copy();
+      PVector p2 = destination.getAbsolutePosition().copy();
+      if (isInside(new PVector(x, y), p1, p2)){
+        if (distToSegment(x, y, p1.x, p1.y, p2.x, p2.y) < 4) {
           return true;
         }
       }

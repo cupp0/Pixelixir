@@ -227,9 +227,8 @@ class SelectionManager{
           }
         }
       }
-      
+
       //build the connection
-      println(newMods.get(cdata.fromModule).name, newMods.get(cdata.toModule).name);
       OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
       InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);
       where.attemptConnection(src, dest);

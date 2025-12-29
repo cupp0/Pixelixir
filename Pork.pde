@@ -118,9 +118,9 @@ class OutPork extends Pork {
     //the only valid way for a type to disagree is if one is UNKNOWN
     if (srcCat != destCat){
       if (srcCat == DataCategory.UNKNOWN ){
-        this.owner.propagaterequiredDataCategory(this, destCat);
+        this.owner.propagateRequiredDataCategory(this, destCat);
       } else {
-        dest.owner.propagaterequiredDataCategory(dest, srcCat);
+        dest.owner.propagateRequiredDataCategory(dest, srcCat);
       }
     } 
     
@@ -140,7 +140,7 @@ class OutPork extends Pork {
   
   void onConnectionRemoved(InPork dest){
     
-    dest.owner.propagateTargetFlow(dest, null);
+    dest.owner.propagateNullFlow(dest);
     
     owner.tryResetTypeBoundPorks();
     dest.owner.tryResetTypeBoundPorks();

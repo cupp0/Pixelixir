@@ -42,25 +42,66 @@ class SendOperator extends PrimeOperator implements DynamicPorts{
         
     //if we just made a connection that the parent doesn't have, we need to make one
     if (parent.outs.size() <= where.index){
-      OutPork pOut = parent.addOutPork(where.getRequiredDataCategory(), false, true);
-     
-      //include send pork in corresponding composite pork data identity group
-      //and vice versa
-      parent.addDataBoundPork(where);
-      addDataBoundPork(pOut);
-      
-    }
-    
-    //propagate flow if necessary
-    if (where.targetFlow != null && parent != bigbang){
-      propagateTargetFlow((InPork)where, where.targetFlow);
+      OutPork pOut = parent.addOutPork(where.getRequiredDataCategory());
     }
     
     //if all ins are full, add a new in
     if (inPorksFull()){
-      addInPork(DataCategory.UNKNOWN, false, true);      
+      addInPork(DataCategory.UNKNOWN);      
     }
     
+  }
+  
+  //more jank see compositeOperator.propagateRequiredDataCategory for explanation
+  @Override
+  void propagateRequiredDataCategory(Pork where, DataCategory dc){
+    where.setRequiredDataCategory(dc);
+    
+    if (parent == bigbang) return;
+     
+    //find corresponding port on the enclosing composite
+    Pork p = parent.outs.get(where.index);      
+    p.setRequiredDataCategory(dc);
+    
+    //propagate not on the composite, but what it connects to
+    for (Pork po : p.getConnectedPorks()){
+     po.owner.propagateRequiredDataCategory(po, dc);  
+    }
+   
+  }
+  
+  @Override
+  void propagateTargetFlow(InPork where, Flow f){
+    where.setTargetFlow(f);
+    
+    if (parent == bigbang) return;
+    
+    //find corresponding port on enclosing composite
+    OutPork p = parent.outs.get(where.index);
+    
+    p.setTargetFlow(f);
+    
+    //propagate not on the send/receive, but what it connects to
+    for (InPork po : p.getDestinations()){
+      po.owner.propagateTargetFlow(po, f);  
+    }
+  }
+  
+  @Override
+  void propagateNullFlow(InPork where){
+    where.setTargetFlow(null);
+    
+    if (parent == bigbang) return;
+    
+    //find corresponding port on enclosing composite
+    OutPork p = parent.outs.get(where.index);
+    
+    p.setTargetFlow(null);
+    
+    //propagate not on the send/receive, but what it connects to
+    for (InPork po : p.getDestinations()){
+      po.owner.propagateNullFlow(po);  
+    }
   }
   
   void onConnectionRemoved(Pork where){

@@ -51,12 +51,12 @@ public abstract class Operator{
     if (!inPorksFull()){return false; }
     
     //if it's a speaker (UI generators, valve
-    if (isSpeaker()){if (this != bigbang){ println(name + " should execute because they are a speaker "); } return true; }
+    if (isSpeaker()){if (this != bigbang){ } return true; }
     
     //if any data is hot, we should execute
     for (InPork i : ins){
       if (i.getSource().getHot()){
-        if (this != bigbang){println(name + " should execute because they have a hot port ");}
+        if (this != bigbang){;}
         return true;
       }
     }
@@ -143,7 +143,7 @@ public abstract class Operator{
     
     return in;
   }
-
+  
   InPork addInPork(DataCategory dc, boolean typeBound, boolean dataBound){
     
     InPork in = new InPork(this, ins.size());        //create the pork
@@ -172,8 +172,9 @@ public abstract class Operator{
       typeBoundPorks.add(p); 
     }    
     
-    //is the data here bound to any other pork
+    //is the data here bound to any other pork. If so, we can include it in both lists
     if (dataBound){
+      typeBoundPorks.add(p);
       dataBoundPorks.add(p);
     }
     
@@ -300,9 +301,8 @@ public abstract class Operator{
   //this method resolves expected type for operators with indeterminite data 
   //for instance, a valve, send/receive, copy, etc..
   
-  void propagaterequiredDataCategory(Pork where, DataCategory dc){
+  void propagateRequiredDataCategory(Pork where, DataCategory dc){
     where.setRequiredDataCategory(dc);
-    
     if (typeBoundPorks.contains(where)){
       for (Pork p : typeBoundPorks){
         
@@ -312,7 +312,7 @@ public abstract class Operator{
           p.setRequiredDataCategory(dc);
           //get all porks connected to any pork we have changd
           for (Pork po : p.getConnectedPorks()){
-            po.owner.propagaterequiredDataCategory(po, dc);
+            po.owner.propagateRequiredDataCategory(po, dc);
           }
         }
       }
@@ -323,7 +323,6 @@ public abstract class Operator{
   //when we remove a connection, check if our type requirement can
   //get reset. I think this requires a more robust system
   void tryResetTypeBoundPorks(){
-    println(name);
     //if anything is still connected, leave type requirement.
     //there are situations where we ~could~ reset the type requirement
     //even if there are still connections, but that shouldn't
@@ -348,11 +347,37 @@ public abstract class Operator{
         //ensure we don't get stuck in a loop
         if (p.targetFlow != f){
           
+          //ensure required data type is the same before setting
+          if (p.getRequiredDataCategory() != f.getType()){
+            p.setRequiredDataCategory(f.getType());
+          }
+          
           p.setTargetFlow(f);
           //get all porks connected to any pork we have changd
           //we should only get here for outs.get(0) so we'll cast
           for (Pork po : p.getConnectedPorks()){
             po.owner.propagateTargetFlow((InPork)po, f);
+          }
+        }
+      }
+    }    
+  }
+  
+  void propagateNullFlow(InPork where){
+    where.setTargetFlow(null);
+    
+    if (dataBoundPorks.contains(where)){
+      for (Pork p : dataBoundPorks){
+        
+        //ensure we don't get stuck in a loop
+        if (p.targetFlow != null){
+          
+          p.setTargetFlow(null);
+          
+          //get all porks connected to any pork we have changd
+          //we should only get here for outs so we'll cast
+          for (Pork po : p.getConnectedPorks()){
+            po.owner.propagateNullFlow((InPork)po);
           }
         }
       }

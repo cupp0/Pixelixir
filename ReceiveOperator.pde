@@ -17,29 +17,40 @@ class ReceiveOperator extends PrimeOperator implements DynamicPorts{
   //send/receive are just pass through mutators, routing handled on connection
   void execute(){} 
   
-  //index_ tells us which Sender Pork just built a new connection
+  //receive just built a connection. Do we need to make a port on the enclosing composite?
+  //do we need to make a port on the receive?
   void onConnectionAdded(Pork where){
         
     //if we just made a connection that the parent doesn't have, we need to make one
     if (parent.ins.size() <= where.index && parent != bigbang){
-      InPork pIn = parent.addInPork(where.getRequiredDataCategory(), false, true);
-     
-      //include rec pork in corresponding composite pork data identity group
-      //and vice versa
-      parent.addDataBoundPork(where);
-      addDataBoundPork(pIn);      
+      InPork pIn = parent.addInPork(where.getRequiredDataCategory());
+      pIn.setDefaultAccess(DataAccess.READWRITE);
+      pIn.setCurrentAccess(pIn.getDefaultAccess());
     }
-    
-    //propagate Flow if necessary
-    if (where.targetFlow != null && parent != bigbang){
-      propagateTargetFlow((InPork)where, where.targetFlow);
-    }
-    
+
     //if all ins are full, add a new in
     if (outPorksFull()){
-      addOutPork(DataCategory.UNKNOWN, false, true);      
-    }
+      addOutPork(DataCategory.UNKNOWN);      
+    }    
+  }
+  
+  //more jank see compositeOperator.propagateRequiredDataCategory for explanation
+  @Override
+  void propagateRequiredDataCategory(Pork where, DataCategory dc){
+    where.setRequiredDataCategory(dc);
     
+    if (parent != bigbang){
+     
+      //find corresponding port on the enclosing composite
+      Pork p = parent.ins.get(where.index);      
+      p.setRequiredDataCategory(dc);
+      
+      //propagate not on the composite, but what it connects to
+      for (Pork po : p.getConnectedPorks()){
+       po.owner.propagateRequiredDataCategory(po, dc);  
+      }
+      
+    }    
   }
   
   void onConnectionRemoved(Pork where){
