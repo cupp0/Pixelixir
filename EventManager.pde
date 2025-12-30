@@ -193,10 +193,8 @@ class EventManager {
 
       if (e.input.action == Action.MOUSE_RELEASED) {
         if (hoveringEye() != null){
-          Window target = windows.get(hoveringEye().parent.owner);  
-          selectionManager.copyModules(selectionManager.modules);
-          selectionManager.onBackSpace();
-          selectionManager.pasteModules(selectionManager.clipboard, target, new PVector(0, 0));
+          Window target = windows.get(hoveringEye().parent);  
+          selectionManager.moveSelection(selectionManager.modules, currentWindow, target);
         }
         focusedUI = null;
         state = InteractionState.NONE;
@@ -292,7 +290,7 @@ class EventManager {
         break;
       }
       if (e.input.action == Action.KEY_PRESSED && (e.input.theKeyCode == BACKSPACE)){
-        scope.removeConnection(scope.getEdgeByConnection(focusedConnection));
+        scope.removeConnection(focusedConnection);
         focusedConnection = null;
         state = InteractionState.NONE;
         break;
@@ -331,7 +329,7 @@ class EventManager {
     if (e.hover.modUI instanceof CompositeUI){           
       //if hovering an eye and zooming in, transition to new window
       if (e.input.wheelDelta > 0 && scope.cam.scl > scope.cam.maxScl){
-        currentWindow.setWindow(e.hover.modUI.parent.parent, true);
+        currentWindow.setWindow(e.hover.modUI.parent, true);
       }         
     }
     

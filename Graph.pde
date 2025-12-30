@@ -211,6 +211,15 @@ Graph(){}
     return connectingEdges;
   }
   
+  Edge getEdge(Window w, Connection c){
+    for (Edge e : edges){
+      if (c.source == w.portMap.getPort(e.source) && c.destination == w.portMap.getPort(e.destination)){
+        return e;
+      }
+    }
+    return null;
+  }
+  
   boolean isConnected(OutPork start, InPork target){
     if (reachablePorks(start).contains(target)){
       return true;

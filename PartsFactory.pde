@@ -19,7 +19,6 @@ class PartsFactory{
     //create the operator that will own this module
     else { 
       Operator newOp = (Operator)createPart(name, "Operator"); 
-      graph.allOps.add(newOp);
       newOp.setListener(newMod);
       newMod.setOwner(newOp);
     }    

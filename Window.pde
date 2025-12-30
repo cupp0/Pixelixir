@@ -134,25 +134,9 @@ class Window {
   }
   
   //remove edge from graph, update pork reference, remove edge UI
-  void removeConnection(Edge e){
-    graph.removeEdge(e);
-
-    //find and remove connection
-    for (Connection c : connections){
-      if (c.source == portMap.getPort(e.source) && c.destination == portMap.getPort(e.destination)){
-        connections.remove(c);
-        break;
-      }      
-    }   
-  }
-  
-  Edge getEdgeByConnection(Connection c){
-    for (Edge e : graph.edges){
-      if (c.source == portMap.getPort(e.source) && c.destination == portMap.getPort(e.destination)){
-        return e;
-      }
-    }
-    return null;
+  void removeConnection(Connection c){
+    connections.remove(c);
+    graph.removeEdge(graph.getEdge(this, c));    
   }
   
   //display cables
@@ -180,6 +164,10 @@ class Window {
     selectionRectangle = null;
   }
   
+  //registering module with window includes
+  //setting the parent, 
+  //registering ports with portMap
+  //appending to modules
   Module addModule(String what){
    
     //create the module, operator, and default UI
@@ -188,10 +176,6 @@ class Window {
     //sets pos of BodyUIState
     setDefaultPosition(newMod);
     
-    //store the object at the window level
-    modules.add(newMod);
-    newMod.setParent(this.boundary);
-    
     //sets up ports, update graph
     if (!newMod.isComposite()){
       newMod.owner.initialize();
@@ -199,12 +183,43 @@ class Window {
       graph.addOperator(newMod.owner);
     }
     
+    //arranges module UI
     newMod.organizeUI();
     
-    //update next spawn position
-    spawnCursor = PVector.add(newMod.getBodyPosition(), new PVector(0, newMod.uiBits.get(0).size.y+16));
+    updateSpawnPosition(newMod);
     
+    registerModule(newMod);
+  
     return newMod;
+  }
+  
+  void registerModule(Module m){
+    //store the object at the window level
+    modules.add(m);
+    m.setParent(this.boundary);
+    for (InPortUI i : m.ins){
+      this.portMap.put(i, i.pair);
+    }
+    for (OutPortUI o : m.outs){
+      this.portMap.put(o, o.pair);
+    }   
+  }
+  
+  void deregisterModule(Module m){
+    //store the object at the window level
+    modules.remove(m);
+    m.setParent(null);
+    for (InPortUI i : m.ins){
+      this.portMap.removeUI(i);
+    }
+    for (OutPortUI o : m.outs){
+      this.portMap.removeUI(o);
+    }   
+  }
+  
+  //sets to spawn below the argument module
+  void updateSpawnPosition(Module m){
+    spawnCursor = PVector.add(m.getBodyPosition(), new PVector(0, m.uiBits.get(0).size.y+16));
   }
   
   //just stores objects, doesn't build any UI or position anything

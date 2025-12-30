@@ -100,11 +100,12 @@ class SelectionManager{
     for (ModuleData mdata : wdata.modules) { 
       
       //build, position module, and update module map
+      println(where);
       Module newMod = where.addModule(mdata.name); 
       newMod.drag(mdata.position);
       oldIdstoNewMods.put(mdata.id, newMod);
 
-      if (newMod.name.equals("composite")){
+      if (newMod.isComposite()){
         //here, we recurse, adding all modules to the subwindow and appending the results to our id->module map.
         oldIdstoNewMods.putAll(addModules(mdata.subwindow, windows.get(newMod.owner), new PVector(0, 0)));
       }
@@ -254,6 +255,48 @@ class SelectionManager{
       }
     }
   }
+  
+  void moveSelection(ArrayList<Module> mods, Window origin, Window destination){
+    
+    //collected associated connections
+    ArrayList<Connection> cons = new ArrayList<Connection>();
+    for (Connection c : origin.connections){
+      
+      //if source and destination ar in mods, cue connection for the move
+      if (mods.contains(c.source.parent) && mods.contains(c.destination.parent)){
+        cons.add(c);
+      }  else {   
+        //if one or the other, remove the connection from the graph
+        if (mods.contains(c.source.parent)){
+          origin.removeConnection(c);
+        }
+        if (mods.contains(c.destination.parent)){
+          origin.removeConnection(c);
+        }
+      }
+      
+    }
+    
+    //remove UI elements from origin 
+    for (int i = origin.modules.size()-1; i >= 0; i--){
+      if (mods.contains(origin.modules.get(i))){
+        origin.deregisterModule(origin.modules.get(i)); 
+      }
+    }
+    for (int i = origin.connections.size()-1; i >= 0; i--){
+      if (cons.contains(origin.connections.get(i))){
+        origin.connections.remove(origin.connections.get(i)); 
+      }
+    }
+    
+    //add UI to new Window
+    for (Module m : mods){
+      destination.registerModule(m);  
+    }
+    for (Connection c : cons){
+      destination.connections.add(c);  
+    }
+  }
 
   //clear stored selection 
   void clearSelection(){
@@ -272,27 +315,22 @@ class SelectionManager{
     }
   }
   
-  //Deleting stuff way simpler with centralized graph and Ports/Porks not knowing eachother 
+  //remove connections, remove modules, remove windows
   void onBackSpace(){
     
-    Window w = currentWindow;    
-    //delete any connections associated with modules we are deleting
-    for (int i = modules.size()-1; i >= 0; i--){
-      for (int j = graph.edges.size()-1; j >= 0; j--){
-        if (graph.edges.get(j).isConnectedToModule(modules.get(i))){
-          w.removeConnection(graph.edges.get(j));
-        }
-      }
-      
-      //remove the operator and remove the module
-      //w.boundary.kids.remove(modules.get(i).owner);
-      w.modules.remove(modules.get(i));
-      
-      //remove window
-      if (modules.get(i).isComposite()){
-        windows.remove(modules.get(i));
-      }
+    Window w = currentWindow;   
+    for (Connection c : w.connections){    
+      if (this.modules.contains(c.source.parent) || this.modules.contains(c.destination.parent)){
+        w.removeConnection(c);
+      }    
     } 
+    
+    for (int i = this.modules.size()-1; i >= 0; i--){
+      w.modules.remove(this.modules.get(i));
+      if (this.modules.get(i).isComposite()){
+        windows.remove(this.modules.get(i));
+      }
+    }
     
     modules.clear();
   }

@@ -80,7 +80,7 @@ void setup() {
 }
   
 void draw(){
-  
+  println(graph.allOps.size()+" operators, " + graph.edges.size() + " edges");
   graph.primerContinousUpdaters();         // locate and create notifications at any continuous port
   graph.generateEvaluationSequence();      // generate a global evaluation sequence based on who has new data
   currentWindow.display();                 // display UI before evaluating cause we use info about who is evaluating

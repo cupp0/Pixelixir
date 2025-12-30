@@ -41,8 +41,7 @@ public class Module implements OperatorListener{
       addInPort(p);
     } else {
       addOutPort(p);
-    }
-    
+    }  
     organizeUI();
   }
   
@@ -52,15 +51,15 @@ public class Module implements OperatorListener{
   void addInPort(Pork p){
     InPortUI in = (InPortUI)partsFactory.createUI("inPort");
     in.setIndex(ins.size());
-    addUI(in);        
-    getWindow().addPortToMap(in);
+    in.setPorkPair(p);
+    addUI(in);          
   }
   
   void addOutPort(Pork p){
     OutPortUI out = (OutPortUI)partsFactory.createUI("outPort");
     out.setIndex(outs.size());
+    out.setPorkPair(p);
     addUI(out);        
-    getWindow().addPortToMap(out);
   }
   
   //the window this module is visible in

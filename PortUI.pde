@@ -2,7 +2,8 @@
 //PortUI is responsible for managing and displaying connections between modules
 //Pork is responsible for routing data between Operators
 public abstract class PortUI extends ModuleUI<PortUIState>{
-   
+  
+  Pork pair;
   int[] radii = new int[4];     //tells us which corners get rounded based on position of PortUI within the module
   int index;                    //for convenience
   
@@ -13,6 +14,10 @@ public abstract class PortUI extends ModuleUI<PortUIState>{
   
   Pork getPorkPair(){
     return getWindow().portMap.getPork(this);
+  }
+  
+  void setPorkPair(Pork p){
+    pair = p;
   }
   
   void setIndex(int ind){
