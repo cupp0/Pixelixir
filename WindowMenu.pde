@@ -25,14 +25,14 @@ class WindowMenu extends Menu<Window>{
     if (selectionManager.clipboard != null){
       options.add(new MenuOption(this, "paste", 2) {
         void execute() {
-          selectionManager.pasteModules(selectionManager.clipboard, (Window)target, parent.pos);
+          selectionManager.pasteModules(selectionManager.clipboard, (Window)target, currentWindow.cam.toWorld(parent.pos.copy()));
           listener.onMenuExecution(parent);
         }
       });
       
       options.add(new MenuOption(this, "paste with new id", 3) {
         void execute() {
-          HashMap<String, Module> newMods = selectionManager.pasteModules(selectionManager.clipboard, (Window)target, parent.pos);       
+          HashMap<String, Module> newMods = selectionManager.pasteModules(selectionManager.clipboard, (Window)target, currentWindow.cam.toWorld(parent.pos.copy()));       
           HashMap<String, String> newIds = new HashMap<String, String>();
           
           for (Module m : newMods.values()){

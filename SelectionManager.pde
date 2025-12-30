@@ -34,7 +34,7 @@ class SelectionManager{
             
       // If this module has a subwindow (composite), recurse:      
       if (mdata.name.equals("composite")) {
-        Window subWin = windows.get(m.owner); 
+        Window subWin = windows.get(m); 
         if (subWin != null){
           mdata.subwindow = copyModules(subWin.modules);
         }
@@ -106,7 +106,7 @@ class SelectionManager{
 
       if (newMod.isComposite()){
         //here, we recurse, adding all modules to the subwindow and appending the results to our id->module map.
-        oldIdstoNewMods.putAll(addModules(mdata.subwindow, windows.get(newMod.owner), new PVector(0, 0)));
+        oldIdstoNewMods.putAll(addModules(mdata.subwindow, windows.get(newMod), new PVector(0, 0)));
       }
     }
     

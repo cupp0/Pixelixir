@@ -21,7 +21,7 @@ class SavedMenu extends Menu<Window>{
             String[] data = loadStrings(file);
             String appendedData = "";
             for (String s : data){ appendedData += s; }
-            selectionManager.pasteModules(appendedData, currentWindow, new PVector(0, 0));
+            selectionManager.pasteModules(appendedData, currentWindow, currentWindow.cam.toWorld(getRootMenu().pos.copy()));
           } else {
             println("no such file");
           }
