@@ -6,7 +6,7 @@
     if (name != null && !name.isEmpty()) {
   
       // Save the input to a file
-      String[] data = {gson.toJson(selectionManager.copyModules(windows.get(bigbang).modules))};
+      String[] data = {gson.toJson(selectionManager.copyModules(bigbang.modules))};
       saveStrings(sketchPath()+"/data/patches/"+name+".txt", data);
     } 
   }

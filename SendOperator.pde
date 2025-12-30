@@ -1,5 +1,5 @@
 //send and receive are the linkage between scopes
-class SendOperator extends IOOperator implements DynamicPorts{  
+class SendOperator extends IOOperator{  
   
   SendOperator(){
     super();
@@ -24,7 +24,6 @@ class SendOperator extends IOOperator implements DynamicPorts{
     tryExposingHiddenPorts();
     
   }
-
   
   void onConnectionRemoved(Pork where){
   }

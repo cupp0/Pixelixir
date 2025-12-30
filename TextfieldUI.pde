@@ -16,6 +16,7 @@ class TextfieldUI extends DBUI{
     
     String currentText = getUIPayload().getTextValue();
     int index = max(currentText.length()-3, 0);
+    textAlign(LEFT, CENTER);
     text(currentText.substring(index), getAbsolutePosition().x+5, getAbsolutePosition().y+size.y/2);
 
     if (isFocus) {

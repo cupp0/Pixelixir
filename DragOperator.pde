@@ -17,8 +17,8 @@ class DragOperator extends PrimeOperator {
       
       if (m != null){
         //limit max drag, if we put a too big number in, we break the tessellator!
-        float x = min(1000, ins.get(1).targetFlow.getFloatValue());
-        float y = min(1000, ins.get(2).targetFlow.getFloatValue());
+        float x = constrain(ins.get(1).targetFlow.getFloatValue(), -50, 50);
+        float y = constrain(ins.get(2).targetFlow.getFloatValue(), -50, 50);
         m.drag(new PVector(x, y));
       }
     }

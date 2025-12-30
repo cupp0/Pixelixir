@@ -14,9 +14,9 @@ class SliderUI extends DBUI{
     fill(150);
     ellipse(knobPos, getAbsolutePosition().y+size.y/2, size.y+3, size.y+3);
     
-    //textAlign(CENTER);
+    textAlign(CENTER, CENTER);
     fill(255);
-    text((int)sliderValue, knobPos-6, getAbsolutePosition().y+size.y/2);
+    text((int)sliderValue, knobPos, getAbsolutePosition().y+size.y/2);
     displayIdentity();
   }
   

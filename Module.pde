@@ -213,10 +213,6 @@ public class Module implements OperatorListener{
     return composition == Composition.MANY;
   }
   
-  boolean isEnclosed(){
-    return !(windows.get(parent) == bigbang);
-  }
-  
   //argument is a pork owned by send/receive. check to see if any ports on this module
   //(always a Composition.MANY module) expose the Pork 
   boolean isExposing(Pork p){

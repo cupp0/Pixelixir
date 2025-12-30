@@ -24,7 +24,7 @@ class ReceiveOperator extends IOOperator{
     
     tryExposingHiddenPorts();
   }
-
+  
   void onConnectionRemoved(Pork where){
   }
   

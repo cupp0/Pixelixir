@@ -1,0 +1,38 @@
+{
+  "modules": [
+    {
+      "name": "slider",
+      "id": "34caf7be-873e-43cd-8779-b70368ecd92c",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 223.0,
+        "y": 254.0,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "range": {
+            "x": -100.0,
+            "y": 100.0,
+            "z": 0.0
+          },
+          "identityToken": "748ede6c-dd16-4737-886d-51a0859b91b8",
+          "data": {
+            "type": "FLOAT",
+            "floatValue": 0.0,
+            "boolValue": false
+          },
+          "id": "76d385cd-1543-4bf5-bd4c-6ae775fbe348",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "slider"
+        }
+      ]
+    }
+  ],
+  "connections": []
+}

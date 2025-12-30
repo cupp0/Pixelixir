@@ -100,7 +100,6 @@ class SelectionManager{
     for (ModuleData mdata : wdata.modules) { 
       
       //build, position module, and update module map
-      println(where);
       Module newMod = where.addModule(mdata.name); 
       newMod.drag(mdata.position);
       oldIdstoNewMods.put(mdata.id, newMod);
