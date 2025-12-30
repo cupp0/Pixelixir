@@ -5,10 +5,10 @@ abstract class Pork {
   final Operator owner;
   int index;
   Flow targetFlow;
-  DataCategory requiredDataCategory;
+  DataCategory defaultDataCategory;
+  DataCategory currentDataCategory;
   DataAccess defaultAccess;
   DataAccess currentAccess;
-  boolean speaking = false;
   
   Pork(Operator owner_, int index_){
     owner = owner_;index = index_;
@@ -31,15 +31,23 @@ abstract class Pork {
     targetFlow = f;
   }
   
-  void setRequiredDataCategory(DataCategory dc){
-    requiredDataCategory = dc;
+  void setCurrentDataCategory(DataCategory dc){
+    currentDataCategory = dc;
     if (targetFlow != null){
       targetFlow.setType(dc); 
     }
   }
   
-  DataCategory getRequiredDataCategory(){
-    return requiredDataCategory;
+  DataCategory getCurrentDataCategory(){
+    return currentDataCategory;
+  }
+  
+  void setDefaultDataCategory(DataCategory dc){
+    defaultDataCategory = dc;
+  }
+  
+  DataCategory getDefaultDataCategory(){
+    return defaultDataCategory;
   }
   
   void setCurrentAccess(DataAccess da){
@@ -63,22 +71,16 @@ abstract class Pork {
 }
 
 //~InPork
-class InPork extends Pork  implements PorkListener{
+class InPork extends Pork {
   
   InPork(Operator owner_, int index_){ 
     super(owner_, index_);
   }
   
   OutPork getSource(){
-    if (owner.parent != null){
-      return owner.parent.graph.getSource(this);
-    } else { return null; }
+    return graph.getSource(this);
   }
-  
-  void onSpeaking(){
-    speaking = true;
-    owner.onSpeaking(this);
-  }
+
   
   ArrayList<Pork> getConnectedPorks(){
     ArrayList<Pork> connectedPorks = new ArrayList<Pork>();
@@ -96,31 +98,30 @@ class InPork extends Pork  implements PorkListener{
 class OutPork extends Pork {
   
   boolean hotData;
+  boolean speaking = false;
   int lastEval = 0;
-  List<PorkListener> listeners = new ArrayList<>();  //InPorks that need to know about speaking
   
   OutPork(Operator owner_, int index_){
     super(owner_, index_);
   }
   
   ArrayList<InPork> getDestinations(){
-    return owner.parent.graph.getDestinations(this);
+    return graph.getDestinations(this);
   }
   
   //we are concerned here with propagating expected data category
   //and, if appropriate, propagating Flow identity
   void onConnection(InPork dest){
-    
-    DataCategory srcCat = this.getRequiredDataCategory();
-    DataCategory destCat = dest.getRequiredDataCategory();
+    DataCategory srcCat = this.getCurrentDataCategory();
+    DataCategory destCat = dest.getCurrentDataCategory();
     
     //if types disagree, they need resolved
     //the only valid way for a type to disagree is if one is UNKNOWN
     if (srcCat != destCat){
       if (srcCat == DataCategory.UNKNOWN ){
-        this.owner.propagateRequiredDataCategory(this, destCat);
+        this.owner.propagateCurrentDataCategory(this, destCat);
       } else {
-        dest.owner.propagateRequiredDataCategory(dest, srcCat);
+        dest.owner.propagateCurrentDataCategory(dest, srcCat);
       }
     } 
     
@@ -140,7 +141,7 @@ class OutPork extends Pork {
   
   void onConnectionRemoved(InPork dest){
     
-    dest.owner.propagateNullFlow(dest);
+    dest.owner.propagateTargetFlow(dest, null);
     
     owner.tryResetTypeBoundPorks();
     dest.owner.tryResetTypeBoundPorks();
@@ -150,36 +151,12 @@ class OutPork extends Pork {
 
   }
   
-  void addListener(PorkListener listener) {
-    listeners.add(listener);
-  }
-
-  void clearListeners() {
-    listeners.clear();
-  }
 
   //these listeners are InPorks that have the capactity to provide new data to a 
   //different window (Composite ins, sends).
   void dataNotification() {    
-    speaking = true;
-    
-    if (owner != bigbang){
-      owner.parent.addUpdater(new UpdateObject(this));
-    }
-    
-    if (listeners.size() > 0){
-      for (PorkListener listener : listeners) {
-        listener.onSpeaking();
-      }
-    } 
-    
-    //if no listeners, we still need to notify the enclosing composite. Otherwise
-    //we could have internal patch islands that don't update. bad.
-    else {
-      if (owner != bigbang){
-        owner.parent.addUpdater(new UpdateObject(this.owner));
-      }
-    }
+    speaking = true;    
+    graph.addUpdater(this);
   }
   
   void setHot(boolean b){

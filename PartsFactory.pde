@@ -11,15 +11,18 @@ class PartsFactory{
     //create Module
     Module newMod = new Module(name);
     
-    //create the operator that will own this module
-    Operator newOp = (Operator)createPart(name, "Operator"); 
-    if (newOp instanceof CompositeOperator){
-      ((CompositeOperator)newOp).initializeWindow();
+    //create the the window that this module will key
+    if (newMod.isComposite()){
+      newMod.initializeWindow();
     }
     
-    //establish module/op relationship
-    newOp.setListener(newMod);
-    newMod.setOwner(newOp);
+    //create the operator that will own this module
+    else { 
+      Operator newOp = (Operator)createPart(name, "Operator"); 
+      graph.allOps.add(newOp);
+      newOp.setListener(newMod);
+      newMod.setOwner(newOp);
+    }    
     
     //add default UI element, if needed. This just checks the module names in our button menu. 
     //Anything in the UI sublist has default UI we need to add
@@ -35,10 +38,6 @@ class PartsFactory{
     
     //set body (and eye) color
     newMod.uiBits.get(0).setColor(newMod.getColor());
-    if (newMod.owner instanceof CompositeOperator){
-      newMod.uiBits.get(0).setColor(windows.get(newMod.owner).getColor());
-      newMod.uiBits.get(1).setColor(windows.get(newMod.owner).getColor());
-    }
 
     return newMod;    
   }

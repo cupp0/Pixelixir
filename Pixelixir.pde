@@ -27,8 +27,9 @@ color logicCol = color(175);
 color comparisonCol = color(125, 175, 125);
 color utlityCol = color(75);
 
-CompositeOperator bigbang;
+Window bigbang;
 Window currentWindow;
+Graph graph = new Graph();
 GlobalInputManager globalInputManager = new GlobalInputManager();
 SelectionManager selectionManager = new SelectionManager();
 IdentityManager identityManager = new IdentityManager();
@@ -37,7 +38,7 @@ FlowRegistry flowRegistry = new FlowRegistry();
 NoiseGenerator noiseGen = new NoiseGenerator();
 Gson gson; 
   
-HashMap<Operator, Window> windows = new HashMap<Operator, Window>(); //composite operator, window that ops kids display in
+HashMap<Module, Window> windows = new HashMap<Module, Window>(); //composite module, window that ops kids display in
 
 int portSize = 8;
 int portGap = 12;
@@ -52,10 +53,11 @@ void setup() {
   hint(DISABLE_OPTIMIZED_STROKE);
   rectMode(CORNER);
   
-  //initialize operator space
-  bigbang = ((CompositeOperator)partsFactory.createPart("composite", "Operator"));
-  windows.put(bigbang, new Window(bigbang));
-  currentWindow = windows.get(bigbang);
+  //initialize module space
+  Module m = partsFactory.createModule("composite");
+  bigbang = new Window(m);
+  windows.put(m, bigbang);
+  currentWindow = bigbang;
 
   //make type adapters for UIState extensions (so we can serialize abstract UIState)
   RuntimeTypeAdapterFactory<UIState> uiStateAdapter =
@@ -79,10 +81,9 @@ void setup() {
   
 void draw(){
   
-  //bigbang is outermost view. All updates start here and work inwards as necessary  
-  bigbang.primerContinousUpdaters();         // locate and create notifications at any continuous port
-  bigbang.generateEvaluationSequence();      // generate a global evaluation sequence based on who has new data
-  currentWindow.display();                   // display UI before evaluating cause we use info about who is evaluating
-  bigbang.execute();                         // evaluate the graph
+  graph.primerContinousUpdaters();         // locate and create notifications at any continuous port
+  graph.generateEvaluationSequence();      // generate a global evaluation sequence based on who has new data
+  currentWindow.display();                 // display UI before evaluating cause we use info about who is evaluating
+  graph.evaluate();                        // evaluate the graph
   
 }

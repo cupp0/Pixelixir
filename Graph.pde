@@ -2,19 +2,20 @@
 
 class Graph {
   
-  Window view;                                                      
-  ArrayList<Edge> edges = new ArrayList<>();                        //stores connections between porks    
-  ArrayList<Operator> topoSort = new ArrayList<Operator>();         //graph maintains a sort
-                                                              
-  //construct Graph from list of Modules and their edges
-  Graph(){}
+  ArrayList<Edge> edges = new ArrayList<>();                          //stores connections between porks    
+  ArrayList<Operator> allOps = new ArrayList<Operator>();             //unordered list
+  ArrayList<Operator> topoSort = new ArrayList<Operator>();           //updated when we add/remove a module/connection
+  ArrayList<Operator> evaluationSequence = new ArrayList<Operator>(); //recalculated each frame                                            
+  ArrayList<OutPork> updaters = new ArrayList<>();                    //ports that are providing new data
   
-  void addEdge(OutPork from, InPork towards, DataAccess ds){
-    
+Graph(){}
+  
+  
+  //graph should probably handle all that onConnection stuff currently in Pork
+  void addEdge(OutPork from, InPork towards, DataAccess ds){    
     edges.add(new Edge(from, towards, ds));    
     from.onConnection(towards);        
-    computeTopoSort();   
-    
+    computeTopoSort();       
   }
   
   void removeEdge(Edge e){  
@@ -29,16 +30,19 @@ class Graph {
     computeTopoSort();
   }
   
+  void addOperator(Operator op){
+    allOps.add(op);
+    computeTopoSort();
+  }  
+  
+  void removeOperator(Operator op){
+    allOps.remove(op);
+    computeTopoSort();
+  }
+  
   //kahns algorithm.
   private void computeTopoSort(){
-    
     topoSort.clear();
-    
-    //create list of all operators
-    Set<Operator> allOps = new HashSet<>();
-    for (Module m : view.modules) {
-      allOps.add(m.owner);
-    }
     
     //we need all in degrees of all operators in the graph
     HashMap<Operator, Integer> inDegrees = new HashMap<>();  //in degree of every module in the graph 
@@ -75,6 +79,55 @@ class Graph {
           }
         }
       }
+    }
+  }
+  
+  void addUpdater(OutPork o){    
+    updaters.add(o);
+  }
+  
+  //before generating eval sequence, primer all outputs that are continuous (valve
+  void primerContinousUpdaters(){
+    for (Operator op : topoSort){
+      if (op.continuous){        
+        op.outs.get(0).dataNotification(); //assumes all continuous ops send continuous data to output 0        
+      }
+    }
+  }
+  
+  //filters its topoSort by the combined BFS's of any updating OutPork
+  void generateEvaluationSequence(){
+    evaluationSequence.clear();     
+    
+    if (updaters.size() == 0){return; } //if nothing is updating we can leave operationOrder empty.
+ 
+    //create an unordered list of all ops that need to operate
+    Set<Operator> neededOps = new HashSet<>(); 
+    
+    //collects BFS from all updaters
+    for (OutPork o : updaters){      
+      neededOps.add(o.owner);
+      for (Operator op : graph.reachableOps(o)){
+        neededOps.add(op);
+      }
+    }
+        
+    //filter topoSort by this list.
+    for (Operator op : topoSort){
+      if (neededOps.contains(op)){
+        evaluationSequence.add(op);
+      }
+    }
+    
+    updaters.clear();   
+  }
+  
+  void evaluate(){
+    for (Operator op : evaluationSequence){
+      op.evaluate();       
+    }
+    for (Operator op : evaluationSequence){
+      op.setPortsCold();       
     }
   }
   

@@ -17,13 +17,6 @@ interface OperatorListener {
   void onPorkRemoved(Pork p);
 }
 
-//implemented by InPorks of modules that provide data to a different window (composites, sends). 
-//They listen to Outporks that can provide new data to the Window they are in so they can notify
-//the other window
-interface PorkListener {
-  void onSpeaking();
-}
-
 //implemented by ModuleUI, listens to states for changes to data (UIPayloads) and UI (exposure changes)
 interface UIStateListener{
   void onUIPayloadChange(DBUIState s);

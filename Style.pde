@@ -117,7 +117,7 @@ class StyleResolver {
       c = getDataTypeColor(p.targetFlow.getType());
     }
     else {
-      c = getDataTypeColor(p.getRequiredDataCategory());
+      c = getDataTypeColor(p.getCurrentDataCategory());
     }
     int framesSinceEval = frameCount - ((OutPork)p).lastEval;
     if (framesSinceEval < 10){
@@ -128,9 +128,9 @@ class StyleResolver {
   
   color getColorByPork(Pork p){
    
-    switch (p.getRequiredDataCategory()) {
+    switch (p.getCurrentDataCategory()) {
       case BOOL : return getBoolFill(p);
-      default : return getDataTypeColor(p.getRequiredDataCategory());
+      default : return getDataTypeColor(p.getCurrentDataCategory());
     } 
   }
   
@@ -150,8 +150,8 @@ class StyleResolver {
       return color(0);
     }
     switch(p.getCurrentAccess()){
-      case READ : return addColor(color(30), getDataTypeColor(p.getRequiredDataCategory()));      
-      case READWRITE : return getDataTypeColor(p.getRequiredDataCategory());      
+      case READ : return addColor(color(30), getDataTypeColor(p.getCurrentDataCategory()));      
+      case READWRITE : return getDataTypeColor(p.getCurrentDataCategory());      
       default : return color(0);
     }
   }

@@ -20,7 +20,7 @@ class SplitOperator extends PrimeOperator{
     }
     
     for (int i = 0; i< flowList.size(); i++){
-      outs.get(i).setRequiredDataCategory(flowList.get(i).getType());
+      outs.get(i).setCurrentDataCategory(flowList.get(i).getType());
       Flow.copyData(flowList.get(i), outs.get(i).targetFlow);
     }
     

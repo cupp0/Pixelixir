@@ -42,9 +42,4 @@ class ConcatOperator extends PrimeOperator implements DynamicPorts{
       }    
     }
   }
-  
-  //void resolvePorkDataType(Pork where, DataCategory dc){   
-  //  where.setRequiredDataCategory(dc);
-  //}
-
 }

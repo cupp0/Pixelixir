@@ -14,8 +14,8 @@ class ListOperator extends PrimeOperator{
 
   void execute(){
     
-    if ((int)ins.get(0).targetFlow.getFloatValue() != currentSize || ins.get(1).getRequiredDataCategory() != currentDataCategory){
-      instantiateList((int)ins.get(0).targetFlow.getFloatValue(), ins.get(1).getRequiredDataCategory());
+    if ((int)ins.get(0).targetFlow.getFloatValue() != currentSize || ins.get(1).getCurrentDataCategory() != currentDataCategory){
+      instantiateList((int)ins.get(0).targetFlow.getFloatValue(), ins.get(1).getCurrentDataCategory());
     }
         
   }

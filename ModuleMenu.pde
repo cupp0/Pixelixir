@@ -14,7 +14,7 @@ class ModuleMenu extends Menu<Module>{
       }
     });
     
-    if (((Module)target).owner instanceof CompositeOperator){
+    if (((Module)target).composition == Composition.MANY){
       options.add(new MenuOption(this, "add ui", 1) {
         void execute() {
           addSubmenu(new CompositeUIMenu(listener, (Module)target), this.index);

@@ -21,7 +21,7 @@ class CopyOperator extends PrimeOperator implements DynamicPorts{
   void onConnectionAdded(Pork where){
 
     if (outPorksFull()){
-      DataCategory dc = ins.get(0).getRequiredDataCategory();
+      DataCategory dc = ins.get(0).getCurrentDataCategory();
       addOutPork(dc, true, false).setTargetFlow(new Flow(dc));
     }
     

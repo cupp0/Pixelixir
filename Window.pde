@@ -1,12 +1,12 @@
 //~Window
-class Window{
+class Window {
   
   // ~ ~ ~ MANAGERS ~ ~ ~ //
   WindowManager windowManager;
   EventManager eventManager;
   
   // ~ ~ ~ DATA/ROUTING ~ ~ ~ //
-  CompositeOperator boundary;                                //the delicious operator we are peering inside of
+  Module boundary;                                           //the module we are looking inside of
   ArrayList<Module> modules = new ArrayList<>();             //the UI that represents our operator's juicy innards
   ArrayList<Connection> connections = new ArrayList<>();     //ui class for edges
   BiMap portMap = new BiMap();                               //Port / pork bimap 
@@ -20,9 +20,8 @@ class Window{
   SelectionRectangle selectionRectangle;                                                  
   PVector spawnCursor = new PVector(200, 200);              //where we spawn the next module underdefault conditions                                          
   
-  Window(CompositeOperator from){
+  Window(Module from){
     boundary = from;
-    boundary.graph.view = this;
     windowManager = new WindowManager(this);
     eventManager = new EventManager(this);
     cam = new Camera(this);
@@ -81,7 +80,7 @@ class Window{
     
   //need to set the new window's offset wherever the mouse is so we are always zooming in/out on/from
   //the center of the window
-  void setWindow(Operator whichOne, boolean isZoomingIn){
+  void setWindow(Module whichOne, boolean isZoomingIn){
     selectionManager.clearSelection();
     
     currentWindow = windows.get(whichOne);
@@ -105,7 +104,7 @@ class Window{
     }
     
     //are the data types compatible (float vs text, etc)
-    boolean compatibleDataType = Flow.compatible(srcPork.getRequiredDataCategory(), destPork.getRequiredDataCategory());
+    boolean compatibleDataType = Flow.compatible(srcPork.getCurrentDataCategory(), destPork.getCurrentDataCategory());
     
     if (!compatibleDataType){
       println("if you try to STRING a LIST to a BOOL's tail, you'll soon FLOAT away to heaven (that connection's a fail)");
@@ -128,19 +127,16 @@ class Window{
     
     //add connection, both in UI land and Data land
     connections.add(new Connection(src, dest, da));
-    boundary.graph.addEdge(srcPork, destPork, da); 
+    graph.addEdge(srcPork, destPork, da); 
     
     //update Window state stuff and call the newly connected op to update
-    boundary.rebuildListeners();   
     ((OutPork)portMap.getPork(src)).dataNotification();
   }
   
   //remove edge from graph, update pork reference, remove edge UI
   void removeConnection(Edge e){
-    boundary.graph.removeEdge(e);
-    boundary.rebuildListeners();
-    //e.destination.data = Flow.ofFloat(0);
-    
+    graph.removeEdge(e);
+
     //find and remove connection
     for (Connection c : connections){
       if (c.source == portMap.getPort(e.source) && c.destination == portMap.getPort(e.destination)){
@@ -151,7 +147,7 @@ class Window{
   }
   
   Edge getEdgeByConnection(Connection c){
-    for (Edge e : boundary.graph.edges){
+    for (Edge e : graph.edges){
       if (c.source == portMap.getPort(e.source) && c.destination == portMap.getPort(e.destination)){
         return e;
       }
@@ -193,12 +189,15 @@ class Window{
     setDefaultPosition(newMod);
     
     //store the object at the window level
-    storeModule(newMod);
+    modules.add(newMod);
+    newMod.setParent(this.boundary);
     
     //sets up ports, update graph
-    newMod.owner.initialize();
-    newMod.owner.setDefaultDataAccess();
-    boundary.graph.computeTopoSort();
+    if (!newMod.isComposite()){
+      newMod.owner.initialize();
+      newMod.owner.setDefaultDataAccess();
+      graph.addOperator(newMod.owner);
+    }
     
     newMod.organizeUI();
     
@@ -212,7 +211,7 @@ class Window{
   Module storeModule(Module mod){
     
     //add Operator to the boundary of this window
-    boundary.addKid(mod.owner);
+    //boundary.addKid(mod.owner);
     
     //store module
     modules.add(mod);

@@ -55,18 +55,6 @@ class WindowMenu extends Menu<Window>{
         }
       });
     }
-    
-    if (currentWindow.boundary != bigbang){
-      options.add(new MenuOption(this, "zoom out", 4) {
-        void execute() {
-          Operator oneOpOut = ((Window)target).windowManager.scope.boundary.parent;
-          if (oneOpOut != null){
-            currentWindow.setWindow(oneOpOut, false);
-          }
-          listener.onMenuExecution(parent);
-        }
-      });
-    }
   }
   
   Window getWindow(){

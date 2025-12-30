@@ -44,7 +44,7 @@ class SelectionManager{
     
     //store connection info
     if (mods.size() > 0){  //could copy an empty composite
-      Window where = windows.get(mods.get(0).owner.parent);
+      Window where = mods.get(0).getWindow();
       for (Connection c : where.connections) {      
         if (mods.contains(c.source.parent) && mods.contains(c.destination.parent)) {
           ConnectionData cdata = new ConnectionData();
@@ -58,7 +58,7 @@ class SelectionManager{
     }
     
     clipboard = gson.toJson(wdata);
-    println(clipboard);
+    //println(clipboard);
     return wdata;
   }
   
@@ -84,7 +84,7 @@ class SelectionManager{
     rebuildConnections(wdata, newMods); 
 
     //update the graph that manages operation order
-    where.boundary.graph.computeTopoSort();
+    graph.computeTopoSort();
     
     //tell every primitive data provider to update
     primer(newMods);
@@ -183,7 +183,7 @@ class SelectionManager{
       newMods.get(mdata.id).uiBits.get(0).setPosition(mdata.position);
       newMods.get(mdata.id).uiBits.get(0).drag(PVector.sub(offset,tl));
       
-      if (newMods.get(mdata.id).owner instanceof CompositeOperator && mdata.subwindow != null){
+      if (newMods.get(mdata.id).isComposite() && mdata.subwindow != null){
         positionMods(mdata.subwindow, newMods, new PVector(0, 0));
       }
     }
@@ -200,14 +200,14 @@ class SelectionManager{
     
     // Rebuild connections
     for (ConnectionData cdata : wdata.connections) {
-      Window where = windows.get(newMods.get(cdata.fromModule).owner.parent);
+      Window where = windows.get(newMods.get(cdata.fromModule).parent);
       
       //the two modules we are attempting to connect
       Module srcMod  = newMods.get(cdata.fromModule);
       Module destMod  = newMods.get(cdata.toModule);
       
       //if either are composite, recurse before building the connection
-      if (srcMod.owner instanceof CompositeOperator){
+      if (srcMod.isComposite()){
         for (ModuleData mdata : wdata.modules){
           
           //find the correct module 
@@ -219,7 +219,7 @@ class SelectionManager{
       }
       
       //repeat the process for the desitnation mod
-      if (destMod.owner instanceof CompositeOperator){
+      if (destMod.isComposite()){
         for (ModuleData mdata : wdata.modules){
           Module comparison = newMods.get(mdata.id);
           if (destMod == comparison){
@@ -242,6 +242,7 @@ class SelectionManager{
     }
   }
   
+  //push an update to any newly created data sources
   void primer(HashMap<String, Module> newMods){
     for (String s : newMods.keySet()){
       if (newMods.get(s).owner instanceof UIOperator){
@@ -277,19 +278,19 @@ class SelectionManager{
     Window w = currentWindow;    
     //delete any connections associated with modules we are deleting
     for (int i = modules.size()-1; i >= 0; i--){
-      for (int j = w.boundary.graph.edges.size()-1; j >= 0; j--){
-        if (w.boundary.graph.edges.get(j).isConnectedToModule(modules.get(i))){
-          w.removeConnection(w.boundary.graph.edges.get(j));
+      for (int j = graph.edges.size()-1; j >= 0; j--){
+        if (graph.edges.get(j).isConnectedToModule(modules.get(i))){
+          w.removeConnection(graph.edges.get(j));
         }
       }
       
       //remove the operator and remove the module
-      w.boundary.kids.remove(modules.get(i).owner);
+      //w.boundary.kids.remove(modules.get(i).owner);
       w.modules.remove(modules.get(i));
       
       //remove window
-      if (modules.get(i).owner instanceof CompositeOperator){
-        windows.remove(modules.get(i).owner);
+      if (modules.get(i).isComposite()){
+        windows.remove(modules.get(i));
       }
     } 
     

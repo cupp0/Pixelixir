@@ -331,7 +331,7 @@ class EventManager {
     if (e.hover.modUI instanceof CompositeUI){           
       //if hovering an eye and zooming in, transition to new window
       if (e.input.wheelDelta > 0 && scope.cam.scl > scope.cam.maxScl){
-        currentWindow.setWindow(e.hover.modUI.parent.owner, true);
+        currentWindow.setWindow(e.hover.modUI.parent.parent, true);
       }         
     }
     

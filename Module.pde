@@ -1,17 +1,27 @@
+enum Composition { MANY, ONE }
+
 public class Module implements OperatorListener{
   
   String id = UUID.randomUUID().toString();
   String name, label; 
-  Operator owner;
-  ArrayList<ModuleUI> uiBits = new ArrayList<>();     //holds all every display element
   
-  ArrayList<InPortUI> ins = new ArrayList<>();        //keeping these as well for cleanliness
+  Composition composition;
+  Operator owner;                                  //null if composition = MANY, in which case we care about internal send/receive
+  Module parent;                                   //a Module instance is visibile inside windows.get(parent)       
+
+  ArrayList<ModuleUI> uiBits = new ArrayList<>();  //holds all every display element  
+  ArrayList<InPortUI> ins = new ArrayList<>();     //keeping these as well for cleanliness
   ArrayList<OutPortUI> outs = new ArrayList<>();  
-  
-  boolean isFocus;
-  
+    
   Module(String name_){ 
-    name = name_; label = name; initializeUI();
+    name = name_; label = name;
+    if (name.equals("composite")){ composition = Composition.MANY; }
+    else {                         composition = Composition.ONE; }
+    initializeUI();
+  }
+  
+  void initializeWindow(){
+    windows.put(this, new Window(this));
   }
   
   void setOwner(Operator op){
@@ -19,6 +29,10 @@ public class Module implements OperatorListener{
     if (owner.getLabel() != null){ 
       label = owner.getLabel(); 
     }
+  }
+  
+  void setParent(Module m){
+    parent = m; 
   }
   
   //when the owner of this module adds/removes a pork, we need to add a port
@@ -51,21 +65,7 @@ public class Module implements OperatorListener{
   
   //the window this module is visible in
   Window getWindow(){
-    return windows.get(this.owner.parent);
-  }
-  
-  Window getParentWindow(){
-    if (this.owner.parent.parent != null){
-      return windows.get(this.owner.parent.parent);
-    }
-    else{ return null; }
-  }
-  
-  Module getParentModule(){
-    if (this.owner.parent != null){
-      return ((Module)this.owner.parent.listener);
-    }
-    return null;
+    return windows.get(this.parent);
   }
   
   String getId(){
@@ -206,7 +206,11 @@ public class Module implements OperatorListener{
   }
 
   boolean isEvaluating(){
-    return owner.parent.evaluationSequence.contains(owner);
+    return graph.evaluationSequence.contains(owner);
+  }
+  
+  boolean isComposite(){
+    return composition == Composition.MANY;
   }
   
   void display(){
