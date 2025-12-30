@@ -14,7 +14,6 @@ public abstract class Operator{
   ArrayList<InPork> ins = new ArrayList<InPork>();                    //where we point for input data
   ArrayList<OutPork> outs = new ArrayList<OutPork>();                 //where we put output data
   ArrayList<Pork> typeBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's type
-  ArrayList<Pork> dataBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's targetFlow
   
   boolean continuous = false;  
   ExecutionSemantics executionSemantics;
@@ -101,25 +100,23 @@ public abstract class Operator{
     return addOutPork(dc, false, false); 
   }
   
-  InPork addInPork(DataCategory dc, boolean typeBound, boolean dataBound){
-
-    InPork in = new InPork(this, ins.size());        //create the pork
-    ins.add(in);                                     //store it
-    setPorkSemantics(in, dc, typeBound, dataBound);  //store port qualities
-    
+  InPork addInPork(DataCategory dc, boolean typeBound, boolean hidden){
+    InPork in = new InPork(this, ins.size());                //create the pork
+    setPorkSemantics(in, dc, typeBound, hidden);  //store port qualities
+    ins.add(in);                                             //store it
+    listener.onPorkAdded(in);                                //tell module about changes
     return in;
   }
   
-  OutPork addOutPork(DataCategory dc, boolean typeBound, boolean dataBound){
-   
-    OutPork out = new OutPork(this, outs.size());     //create the pork
-    outs.add(out);                                    //store it
-    setPorkSemantics(out, dc, typeBound, dataBound);  //store port qualities
-    
+  OutPork addOutPork(DataCategory dc, boolean typeBound, boolean hidden){   
+    OutPork out = new OutPork(this, outs.size());             //create the pork
+    setPorkSemantics(out, dc, typeBound, hidden);  //store port qualities
+    outs.add(out);                                            //store it
+    listener.onPorkAdded(out);                                //tell module about changes
     return out;
   }
   
-  void setPorkSemantics(Pork p, DataCategory dc, boolean typeBound, boolean dataBound){
+  void setPorkSemantics(Pork p, DataCategory dc, boolean typeBound, boolean hidden){
     
     //what data type does this pork expect
     p.setDefaultDataCategory(dc);
@@ -127,22 +124,13 @@ public abstract class Operator{
     
     //is this type bound to the type of any other pork
     if (typeBound){
-      r();
       typeBoundPorks.add(p); 
     }    
-    
-    //is the data here bound to any other pork. If so, we can include it in both lists
-    if (dataBound){
-      typeBoundPorks.add(p);
-      dataBoundPorks.add(p);
-    }
-    
-    //does the module representing this op need to know about this pork?
-    if (listener != null){
-      listener.onPorkAdded(p);
-    }
+   
+    p.setHidden(hidden);
+
   }
-  
+
   //always returns a module with Composition.ONE
   Module getModule(){
     return (Module)listener;
@@ -195,10 +183,6 @@ public abstract class Operator{
   
   void addTypeBoundPork(Pork p){
     typeBoundPorks.add(p);
-  }
-  
-  void addDataBoundPork(Pork p){
-    dataBoundPorks.add(p); 
   }
   
   //by default, generators allow READWRITE or READ connections 
@@ -268,6 +252,36 @@ public abstract class Operator{
       p.owner.propagateTargetFlow(p, f);
     }
   
+  }
+  
+  //send and receive hide porks in their UI. use this method to expose
+  //any hidden porks in the enclosing module
+  void tryExposingHiddenPorts(){
+    
+    Module encloser = ((Module)listener).parent;
+    if (encloser == mama) return; //make sure we are in a composite
+    
+    for (InPork i : ins){
+      if (i.hidden){
+        if (!encloser.isExposing(i)){
+          i.owner.setDefaultDataAccess();
+          encloser.addInPort(i);
+          encloser.getWindow().registerPorts(encloser);
+          encloser.organizeUI();
+        }
+      }
+    }
+    
+    for (OutPork o : outs){
+      if (o.hidden){
+        if (!encloser.isExposing(o)){
+          o.owner.setDefaultDataAccess();
+          encloser.addOutPort(o);
+          encloser.getWindow().registerPorts(encloser);
+          encloser.organizeUI();
+        }
+      }
+    }
   }
   
   void addUpdater(UpdateObject uo){}

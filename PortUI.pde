@@ -34,7 +34,7 @@ public abstract class PortUI extends ModuleUI<PortUIState>{
       if (index == 0){
         radii[0] = roundOver;
         radii[2] = roundOver;
-      } else if (index == parent.owner.ins.size()-1){
+      } else if (index == parent.ins.size()-1){
         radii[1] = roundOver;
         radii[3] = roundOver;
       } else {
@@ -45,7 +45,7 @@ public abstract class PortUI extends ModuleUI<PortUIState>{
       if (index == 0){
         radii[1] = roundOver;
         radii[3] = roundOver;
-      } else if (index == parent.owner.outs.size()-1){
+      } else if (index == parent.outs.size()-1){
         radii[0] = roundOver;
         radii[2] = roundOver;
       } else {

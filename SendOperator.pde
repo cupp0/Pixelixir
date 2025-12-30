@@ -1,5 +1,5 @@
 //send and receive are the linkage between scopes
-class SendOperator extends PrimeOperator implements DynamicPorts{  
+class SendOperator extends IOOperator implements DynamicPorts{  
   
   SendOperator(){
     super();
@@ -7,26 +7,24 @@ class SendOperator extends PrimeOperator implements DynamicPorts{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN, false, true);
+    addInPork(DataCategory.UNKNOWN, false, false);
+    addOutPork(DataCategory.UNKNOWN, false, true);  
   }
-  
-  void execute(){}
-
   
   //index_ tells us which Sender Pork just built a new connection
+  @Override
   void onConnectionAdded(Pork where){
-        
-    //if we just made a connection that the parent doesn't have, we need to make one
-    //if (parent.outs.size() <= where.index){
-    //  OutPork pOut = parent.addOutPork(where.getCurrentDataCategory());
-    //}
-    
-    //if all ins are full, add a new in
+
     if (inPorksFull()){
-      addInPork(DataCategory.UNKNOWN);      
+      addInPork(DataCategory.UNKNOWN, false, false);
+      addOutPork(DataCategory.UNKNOWN, false, true);   
+      ((Module)listener).getWindow().registerPorts((Module)listener);
     }
     
+    tryExposingHiddenPorts();
+    
   }
+
   
   void onConnectionRemoved(Pork where){
   }

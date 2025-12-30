@@ -127,7 +127,6 @@ class StyleResolver {
   }
   
   color getColorByPork(Pork p){
-   
     switch (p.getCurrentDataCategory()) {
       case BOOL : return getBoolFill(p);
       default : return getDataTypeColor(p.getCurrentDataCategory());

@@ -319,14 +319,14 @@ class SelectionManager{
   void onBackSpace(){
     
     Window w = currentWindow;   
-    for (Connection c : w.connections){    
-      if (this.modules.contains(c.source.parent) || this.modules.contains(c.destination.parent)){
-        w.removeConnection(c);
+    for (int i = w.connections.size()-1; i >= 0; i--){    
+      if (this.modules.contains(w.connections.get(i).source.parent) || this.modules.contains(w.connections.get(i).destination.parent)){
+        w.removeConnection(w.connections.get(i));
       }    
     } 
     
     for (int i = this.modules.size()-1; i >= 0; i--){
-      w.modules.remove(this.modules.get(i));
+      w.deregisterModule(this.modules.get(i));
       if (this.modules.get(i).isComposite()){
         windows.remove(this.modules.get(i));
       }

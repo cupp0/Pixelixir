@@ -9,6 +9,7 @@ abstract class Pork {
   DataCategory currentDataCategory;
   DataAccess defaultAccess;
   DataAccess currentAccess;
+  boolean hidden; 
   
   Pork(Operator owner_, int index_){
     owner = owner_;index = index_;
@@ -64,6 +65,10 @@ abstract class Pork {
   
   DataAccess getDefaultAccess(){
     return defaultAccess; 
+  }
+  
+  void setHidden(boolean b){
+    hidden = b;
   }
   
   abstract ArrayList<Pork> getConnectedPorks();

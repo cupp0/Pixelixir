@@ -124,7 +124,7 @@ Graph(){}
   
   void evaluate(){
     for (Operator op : evaluationSequence){
-      op.evaluate();       
+      op.evaluate(); 
     }
     for (Operator op : evaluationSequence){
       op.setPortsCold();       

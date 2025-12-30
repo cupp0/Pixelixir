@@ -37,6 +37,7 @@ public class Module implements OperatorListener{
   
   //when the owner of this module adds/removes a pork, we need to add a port
   void onPorkAdded(Pork p){
+    if (p.hidden) return;
     if (p instanceof InPork){
       addInPort(p);
     } else {
@@ -50,14 +51,14 @@ public class Module implements OperatorListener{
   
   void addInPort(Pork p){
     InPortUI in = (InPortUI)partsFactory.createUI("inPort");
-    in.setIndex(ins.size());
+    in.setIndex(p.index);
     in.setPorkPair(p);
     addUI(in);          
   }
   
   void addOutPort(Pork p){
     OutPortUI out = (OutPortUI)partsFactory.createUI("outPort");
-    out.setIndex(outs.size());
+    out.setIndex(p.index);
     out.setPorkPair(p);
     addUI(out);        
   }
@@ -210,6 +211,23 @@ public class Module implements OperatorListener{
   
   boolean isComposite(){
     return composition == Composition.MANY;
+  }
+  
+  boolean isEnclosed(){
+    return !(windows.get(parent) == bigbang);
+  }
+  
+  //argument is a pork owned by send/receive. check to see if any ports on this module
+  //(always a Composition.MANY module) expose the Pork 
+  boolean isExposing(Pork p){
+    for (InPortUI i : ins){ 
+      if (getWindow().portMap.getPork(i) == p) return true; 
+    }
+    for (OutPortUI o : outs){ 
+      if (getWindow().portMap.getPork(o) == p) return true; 
+    }
+    
+    return false;
   }
   
   void display(){

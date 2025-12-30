@@ -1,4 +1,4 @@
-class ReceiveOperator extends PrimeOperator implements DynamicPorts{  
+class ReceiveOperator extends IOOperator{  
   
   ReceiveOperator(){
     super();
@@ -6,32 +6,26 @@ class ReceiveOperator extends PrimeOperator implements DynamicPorts{
   }
   
   void initialize(){
-    addOutPork(DataCategory.UNKNOWN, false, true);
+    addInPork(DataCategory.UNKNOWN, false, true);
+    addOutPork(DataCategory.UNKNOWN, false, false);  
   }
 
-  //send/receive are just pass through mutators, routing handled on connection
-  void execute(){} 
-  
   //receive just built a connection. Do we need to make a port on the enclosing composite?
   //do we need to make a port on the receive?
+  @Override
   void onConnectionAdded(Pork where){
         
-    ////if we just made a connection that the parent doesn't have, we need to make one
-    //if (parent.ins.size() <= where.index && parent != bigbang){
-    //  InPork pIn = parent.addInPork(where.getCurrentDataCategory());
-    //  pIn.setDefaultAccess(DataAccess.READWRITE);
-    //  pIn.setCurrentAccess(pIn.getDefaultAccess());
-    //}
-
-    //if all ins are full, add a new in
+    //if all outs are full, add a new one
     if (outPorksFull()){
-      addOutPork(DataCategory.UNKNOWN);      
+      addInPork(DataCategory.UNKNOWN, false, true);
+      addOutPork(DataCategory.UNKNOWN, false, false);  
+      ((Module)listener).getWindow().registerPorts((Module)listener);
     }    
+    
+    tryExposingHiddenPorts();
   }
-  
+
   void onConnectionRemoved(Pork where){
   }
-
-  boolean isSpeaker() { return true; }
   
 }

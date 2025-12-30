@@ -27,6 +27,7 @@ color logicCol = color(175);
 color comparisonCol = color(125, 175, 125);
 color utlityCol = color(75);
 
+Module mama;
 Window bigbang;
 Window currentWindow;
 Graph graph = new Graph();
@@ -54,9 +55,9 @@ void setup() {
   rectMode(CORNER);
   
   //initialize module space
-  Module m = partsFactory.createModule("composite");
-  bigbang = new Window(m);
-  windows.put(m, bigbang);
+  mama = partsFactory.createModule("composite");
+  bigbang = new Window(mama);
+  windows.put(mama, bigbang);
   currentWindow = bigbang;
 
   //make type adapters for UIState extensions (so we can serialize abstract UIState)
@@ -80,7 +81,7 @@ void setup() {
 }
   
 void draw(){
-  println(graph.allOps.size()+" operators, " + graph.edges.size() + " edges");
+  //println(graph.allOps.size()+" operators, " + graph.edges.size() + " edges");
   graph.primerContinousUpdaters();         // locate and create notifications at any continuous port
   graph.generateEvaluationSequence();      // generate a global evaluation sequence based on who has new data
   currentWindow.display();                 // display UI before evaluating cause we use info about who is evaluating

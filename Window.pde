@@ -197,18 +197,29 @@ class Window {
     //store the object at the window level
     modules.add(m);
     m.setParent(this.boundary);
+    registerPorts(m);
+    if (m.owner instanceof ReceiveOperator || m.owner instanceof SendOperator){
+      m.owner.tryExposingHiddenPorts();
+    }
+  }
+  
+  void registerPorts(Module m){
     for (InPortUI i : m.ins){
       this.portMap.put(i, i.pair);
     }
     for (OutPortUI o : m.outs){
       this.portMap.put(o, o.pair);
-    }   
+    } 
   }
   
   void deregisterModule(Module m){
     //store the object at the window level
     modules.remove(m);
     m.setParent(null);
+    deregisterPorts(m);
+  }
+  
+  void deregisterPorts(Module m){
     for (InPortUI i : m.ins){
       this.portMap.removeUI(i);
     }
