@@ -11,7 +11,7 @@ class SavedMenu extends Menu<Window>{
   }
 
   void build() {
-    File folder = new File(dataPath("patches/")); // Replace with your path
+    File folder = new File(dataPath("patches/")); 
     File[] listOfFiles = folder.listFiles();
     for (int i = 0; i < listOfFiles.length; i++){
       options.add(new MenuOption(this, listOfFiles[i].getName(), i) {

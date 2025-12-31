@@ -58,7 +58,7 @@ class StyleResolver {
       }
       
       if (selectionManager.modules.contains(((ModuleUI)ui).parent)){
-        modifiedStyle.fill = addColor(modifiedStyle.fill, color(50));
+        modifiedStyle.fill = addColor(modifiedStyle.fill, color(70));
         modifiedStyle.stroke = addColor(modifiedStyle.stroke, color(75));
         modifiedStyle.strokeWeight = (modifiedStyle.strokeWeight+1); 
         if (eventManager.is(InteractionState.DRAGGING_MODULES)){
@@ -66,9 +66,9 @@ class StyleResolver {
           modifiedStyle.stroke = setTransparency(modifiedStyle.stroke, 127);
         }
       }
-      if (ui == eventManager.focusedUI){
-        modifiedStyle.strokeWeight++;
-      }
+      //if (ui == eventManager.focusedUI){
+      //  modifiedStyle.strokeWeight++;
+      //}
 
     }
     
@@ -142,6 +142,15 @@ class StyleResolver {
       case UNKNOWN : return getUnknownColor();
       default : return color(0);
     } 
+  }
+  
+  color getDataColorByOperator(Operator op){
+    if (op == null) return color(0);
+    Flow f = op.getTargetFlow();
+    if (op.executionSemantics == ExecutionSemantics.MUTATES){
+      return getDataTypeColor(op.ins.get(0).getCurrentDataCategory());
+    }
+    return color(0);
   }
   
   color getStrokeByPork(Pork p){

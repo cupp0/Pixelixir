@@ -113,22 +113,22 @@ class SelectionManager{
     return oldIdstoNewMods;
   }
   
-  //before building connections, we have to initialize ports. Some mods/ops can change PortUI count dynamically,
-  //so we store PortUI count and create ports here (since we can't rely on default PortUI settings per mod/op
+  //typical operators already have their porks built, but some (copy, concat, split, send, receive)
+  //can have any number of porks. Here we add porks to these until we have the right number
   void rebuildPorts(WindowData wdata, HashMap<String, Module> newMods){
     for (ModuleData mdata : wdata.modules){
       
-      //let internal sends/receives build composite ports
-      if (!mdata.name.equals("composite")){
+      if (newMods.get(mdata.id) instanceof DynamicPorks){
         while(newMods.get(mdata.id).ins.size() < mdata.ins){
-          newMods.get(mdata.id).owner.addInPork(DataCategory.UNKNOWN);
+          ((DynamicPorks)newMods.get(mdata.id)).addCanonicalPork();
         }
         while(newMods.get(mdata.id).outs.size() < mdata.outs){
-          newMods.get(mdata.id).owner.addOutPork(DataCategory.UNKNOWN);
+          ((DynamicPorks)newMods.get(mdata.id)).addCanonicalPork();
         }
-      } else {
-        
-        //if composite, recurse
+      } 
+      
+      //if composite, recurse.
+      if (newMods.get(mdata.id).isComposite()){        
         rebuildPorts(mdata.subwindow, newMods);
       }      
     }    
@@ -142,7 +142,7 @@ class SelectionManager{
     for (ModuleData mdata : wdata.modules){
         
       //create UI on composites
-      if (mdata.name.equals("composite")){
+      if (newMods.get(mdata.id).isComposite()){
         for (UIState uis : mdata.uiElements){           
           ModuleUI newUI = (ModuleUI)partsFactory.createUI(uis.getType());
           ((DBUIState)newUI.state).copyData((DBUIState)uis);
@@ -236,7 +236,7 @@ class SelectionManager{
     
     //find any composite and rebuild those connections too
     for (ModuleData mdata : wdata.modules){
-      if (mdata.name.equals("composite")){
+      if (newMods.get(mdata.id).isComposite()){
         rebuildConnections(mdata.subwindow, newMods);
       }
     }

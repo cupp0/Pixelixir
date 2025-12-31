@@ -1,4 +1,4 @@
-class CopyOperator extends PrimeOperator implements DynamicPorts{  
+class CopyOperator extends PrimeOperator implements DynamicPorks{  
   
   CopyOperator(){
     super();
@@ -18,16 +18,16 @@ class CopyOperator extends PrimeOperator implements DynamicPorts{
     }
   } 
   
-  void onConnectionAdded(Pork where){
-
+  void onConnectionAdded(OutPork where){
     if (outPorksFull()){
-      DataCategory dc = ins.get(0).getCurrentDataCategory();
-      addOutPork(dc, true, false).setTargetFlow(new Flow(dc));
-    }
-    
+      addCanonicalPork();
+    }    
   }
   
-  void onConnectionRemoved(Pork where){
+  void addCanonicalPork(){
+    DataCategory dc = ins.get(0).getCurrentDataCategory();
+    addOutPork(dc, true, false).setTargetFlow(new Flow(dc));
+    ((Module)listener).getWindow().registerPorts((Module)listener);
   }
 
 }

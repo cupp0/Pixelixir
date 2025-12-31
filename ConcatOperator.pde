@@ -1,4 +1,4 @@
-class ConcatOperator extends PrimeOperator implements DynamicPorts{  
+class ConcatOperator extends PrimeOperator implements DynamicPorks{  
   
   ConcatOperator(){
     super();
@@ -8,38 +8,42 @@ class ConcatOperator extends PrimeOperator implements DynamicPorts{
   void initialize(){
     addInPork(DataCategory.UNKNOWN); addInPork(DataCategory.UNKNOWN);addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
   }
-
   
-  //index_ tells us which Sender Pork just built a new connection
-  void onConnectionAdded(Pork where){ 
-    //if all ins are full, add a new in
-    boolean full = true;
+  @Override
+  boolean shouldExecute(){
+    //if any data is hot, we should execute
     for (InPork i : ins){
-      if (i.getSource() == null){
-        full = false;
+      if (i.getSource() != null){
+        if (i.getSource().getHot()){
+          return true;
+        }
       }
     }
     
-    if (full){
-      addInPork(DataCategory.UNKNOWN);      
-    }
-    
+    //if there are no hot ins, don't execute
+    return false;
   }
   
-  void onConnectionRemoved(Pork where){
-  }
-
-
-  //clearing whole list for now. Would be better if list knew where it was updating an just overwrite that
   void execute(){
-   Flow o = outs.get(0).targetFlow;
-   o.clearList();
+    outs.get(0).targetFlow.clearList();
     
     for (int i = 0; i< ins.size(); i++){ 
       if (ins.get(i).getSource() != null){
         Flow in = ins.get(i).targetFlow.copyFlow();
-        o.addToList(in);
+        outs.get(0).targetFlow.addToList(in);
       }    
     }
   }
+  
+  //index_ tells us which Sender Pork just built a new connection
+  void onConnectionAdded(InPork where){ 
+    if (inPorksFull()){
+      addCanonicalPork();
+    }    
+  }
+  
+  void addCanonicalPork(){
+    addInPork(DataCategory.UNKNOWN);
+    ((Module)listener).getWindow().registerPorts((Module)listener);
+  } 
 }

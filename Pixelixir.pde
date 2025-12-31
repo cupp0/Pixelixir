@@ -11,6 +11,8 @@ import com.google.gson.*;
 //add "filter" here and some class FilterOperator extends PrimeOperator and it will show up in add module
 //options
 
+//copy, concat, split, send, receive
+
 String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "composite"};
 String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};
 String[] unary = {"UNARY", "sin", "cos", "tan", "abs"};

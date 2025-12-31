@@ -30,6 +30,7 @@ abstract class Pork {
   
   void setTargetFlow(Flow f){
     targetFlow = f;
+    owner.setTargetFlow(f);
   }
   
   void setCurrentDataCategory(DataCategory dc){
@@ -135,13 +136,9 @@ class OutPork extends Pork {
       dest.owner.propagateTargetFlow(dest, this.targetFlow);
     }
     
-    if (this.owner instanceof DynamicPorts){
-      ((DynamicPorts)owner).onConnectionAdded(this);
-    }
-    if (dest.owner instanceof DynamicPorts){
-      ((DynamicPorts)dest.owner).onConnectionAdded(dest);
-    }
-
+    owner.onConnectionAdded(this);
+    dest.owner.onConnectionAdded(dest);
+    
   }
   
   void onConnectionRemoved(InPork dest){
@@ -185,7 +182,6 @@ class OutPork extends Pork {
   
   //used to validate an attempted connection before building it
   DataAccess resolveDataAccess(InPork other){
-    
     DataAccess outAccess = this.getCurrentAccess();
     DataAccess inAccess = other.getCurrentAccess();
     

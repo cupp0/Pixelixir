@@ -1,4 +1,4 @@
-class IOOperator extends PrimeOperator implements DynamicPorts{
+class IOOperator extends PrimeOperator{
   
   void initialize(){}
   
@@ -89,11 +89,5 @@ class IOOperator extends PrimeOperator implements DynamicPorts{
     }
   
   }
-  
-  //override in send/receive
-  void onConnectionAdded(Pork where){}
-  
-  void onConnectionRemoved(Pork where){
-  }
-  
+
 }

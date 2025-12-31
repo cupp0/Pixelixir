@@ -1,5 +1,5 @@
 //send and receive are the linkage between scopes
-class SendOperator extends IOOperator{  
+class SendOperator extends IOOperator implements DynamicPorks{  
   
   SendOperator(){
     super();
@@ -13,19 +13,17 @@ class SendOperator extends IOOperator{
   
   //index_ tells us which Sender Pork just built a new connection
   @Override
-  void onConnectionAdded(Pork where){
-
+  void onConnectionAdded(InPork where){
     if (inPorksFull()){
-      addInPork(DataCategory.UNKNOWN, false, false);
-      addOutPork(DataCategory.UNKNOWN, false, true);   
-      ((Module)listener).getWindow().registerPorts((Module)listener);
-    }
-    
-    tryExposingHiddenPorts();
-    
+      addCanonicalPork();
+    }    
+    tryExposingHiddenPorts();  
   }
   
-  void onConnectionRemoved(Pork where){
+  void addCanonicalPork(){
+    addInPork(DataCategory.UNKNOWN, false, false);
+    addOutPork(DataCategory.UNKNOWN, false, true);   
+    ((Module)listener).getWindow().registerPorts((Module)listener);
   }
 
 }

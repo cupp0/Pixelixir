@@ -51,9 +51,8 @@ interface DataBender{
   String getType();
 }
 
-interface DynamicPorts{
-  void onConnectionAdded(Pork where);
-  void onConnectionRemoved(Pork where);
+interface DynamicPorks{
+  void addCanonicalPork();
 }
 
 //implemented by Window, whose eventManager handles any user interaction

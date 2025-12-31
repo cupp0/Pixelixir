@@ -11,10 +11,7 @@ class SetOperator extends PrimeOperator{
   }
     
   void execute(){ 
-    
-    //copy data from first input to output
-    outs.get(0).targetFlow = ins.get(0).targetFlow.copyFlow();
-   
+ 
     //get target index from second input
     int index = (int)ins.get(1).targetFlow.getFloatValue();
     

@@ -16,21 +16,21 @@ class HumanEvent {
   }
 }
 
+//mess
 class EventManager {
   
   //this is who we are managing for
   final Window scope;
   
-  //stores window level event (dragging UI, making selection, etc..)
+  //stores window level event (dragging UI, making selection, etc..), we need some kind of multi state system
   InteractionState state = InteractionState.NONE;
   
-  StyleResolver styleResolver;
+  StyleResolver styleResolver;                          //this should be static
   InputManager inputManager = new InputManager();
   ModuleUI focusedUI;
   Connection focusedConnection;
   MenuOption hoveredOption;
   OutPortUI cuedPort;
-  int grabbedCorner;
 
   EventManager(Window scope_){
     scope = scope_;

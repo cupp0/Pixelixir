@@ -89,7 +89,6 @@ class Connection implements Hoverable{
     float speed = 1;      // animation speed
     float offset = (frameCount * speed) % spacing;
 
-    // draw the flowing lines
     for (float d = offset; d < dist-spacing/2; d += spacing) {
       PVector pos = PVector.add(start, PVector.mult(dir, d));
       PVector pos2 = PVector.add(pos, offsetVector);

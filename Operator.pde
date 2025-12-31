@@ -15,7 +15,7 @@ public abstract class Operator{
   ArrayList<OutPork> outs = new ArrayList<OutPork>();                 //where we put output data
   ArrayList<Pork> typeBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's type
   
-  boolean continuous = false;  
+  Flow targetFlow;
   ExecutionSemantics executionSemantics;
   
   Operator(){
@@ -26,6 +26,14 @@ public abstract class Operator{
   
   //composites have some edge cases that shouldn't break anything, 
   //but we should eventually override.
+  
+  void setTargetFlow(Flow f){
+    targetFlow = f;
+  }
+  
+  Flow getTargetFlow(){
+    return targetFlow;
+  }
   
   //@overrides - valve,
   boolean shouldExecute(){
@@ -162,11 +170,14 @@ public abstract class Operator{
     }
   }
   
+  void onConnectionAdded(InPork where){}
+  void onConnectionAdded(OutPork where){}
+  
   void onKeyPressed(){}
   
   boolean isSpeaker() { return false; }
   boolean isListener() { return false; }
-  
+  boolean isContinuous() { return false; }
   boolean inPorksFull(){
     for (InPork i : ins){
       if (i.getSource() == null) return false; 

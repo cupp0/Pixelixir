@@ -89,7 +89,7 @@ Graph(){}
   //before generating eval sequence, primer all outputs that are continuous (valve
   void primerContinousUpdaters(){
     for (Operator op : topoSort){
-      if (op.continuous){        
+      if (op.isContinuous()){        
         op.outs.get(0).dataNotification(); //assumes all continuous ops send continuous data to output 0        
       }
     }

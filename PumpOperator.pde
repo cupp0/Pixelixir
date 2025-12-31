@@ -2,7 +2,7 @@ class ValveOperator extends PrimeOperator{
   
   ValveOperator(){
     super();
-    name = "valve"; continuous = true;
+    name = "valve";
   }
   
   void initialize(){
@@ -24,5 +24,7 @@ class ValveOperator extends PrimeOperator{
   }
   
   boolean isSpeaker(){ return true; }
+  
+  boolean isContinuous(){ return true; }
   
 }
