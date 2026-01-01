@@ -7,7 +7,7 @@ abstract class Pork {
   Flow targetFlow;
   DataCategory defaultDataCategory;
   DataCategory currentDataCategory;
-  DataAccess defaultAccess;
+  EnumSet<DataAccess> allowedAccess;
   DataAccess currentAccess;
   boolean hidden; 
   
@@ -46,6 +46,7 @@ abstract class Pork {
   
   void setDefaultDataCategory(DataCategory dc){
     defaultDataCategory = dc;
+    setCurrentDataCategory(dc);
   }
   
   DataCategory getDefaultDataCategory(){
@@ -60,12 +61,12 @@ abstract class Pork {
     return currentAccess; 
   }
   
-  void setDefaultAccess(DataAccess da){
-    defaultAccess = da; 
+  void setAllowedAccess(EnumSet<DataAccess> da){
+    allowedAccess = da; 
   }
   
-  DataAccess getDefaultAccess(){
-    return defaultAccess; 
+  EnumSet<DataAccess> getAllowedAccess(){
+    return allowedAccess; 
   }
   
   void setHidden(boolean b){
@@ -156,8 +157,8 @@ class OutPork extends Pork {
     owner.tryResetTypeBoundPorks();
     dest.owner.tryResetTypeBoundPorks();
     
-    this.setCurrentAccess(this.getDefaultAccess());
-    dest.setCurrentAccess(dest.getDefaultAccess());
+    this.setCurrentAccess(DataAccess.NONE);
+    dest.setCurrentAccess(DataAccess.NONE);
 
   }
   
@@ -179,13 +180,14 @@ class OutPork extends Pork {
   }
   
   boolean elligibleForConnection(){
-    if (currentAccess == DataAccess.READ) return true;
+    
+    if (currentAccess == DataAccess.READONLY) return true;
     
     if (currentAccess == DataAccess.READWRITE){
       return getDestinations().size() == 0;
     }
     
-    if (currentAccess == null) return true;
+    if (currentAccess == DataAccess.NONE) return true;
     
     return false;
   }
@@ -201,25 +203,16 @@ class OutPork extends Pork {
   }
   
   //used to validate an attempted connection before building it
-  DataAccess resolveDataAccess(InPork other){
-    DataAccess outAccess = this.getCurrentAccess();
-    DataAccess inAccess = other.getCurrentAccess();
+  DataAccess resolveDataAccess(InPork other, DataAccess attemptedAccess){
+    EnumSet<DataAccess> outAccess = this.getAllowedAccess();
+    EnumSet<DataAccess> inAccess = other.getAllowedAccess();
     
-    //if both null, that means neither port has a WRITE requirement. return READ.
-    if (outAccess == inAccess && inAccess == null){
-      return DataAccess.READ;
+    println(this.owner.name, other.owner.name);
+    if (outAccess.contains(attemptedAccess) && inAccess.contains(attemptedAccess)){
+      return attemptedAccess;
     }
     
-    //if one has a requirement and the other doesn't return that requirement.
-    if (outAccess != null && inAccess == null){
-      return outAccess;
-    }
-    if (inAccess != null && outAccess == null){
-      return inAccess;
-    }
-    
-    //if we are here, that means these ports have incompatible access requirements.
-    return null;
+    return DataAccess.NONE;
     
   }
 

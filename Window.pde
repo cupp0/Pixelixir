@@ -89,17 +89,18 @@ class Window {
     }
   }
   
-  void attemptConnection(OutPortUI src, InPortUI dest){
+  void attemptConnection(OutPortUI src, InPortUI dest, DataAccess da){
     
     OutPork srcPork = ((OutPork)portMap.getPork(src));
     InPork destPork = ((InPork)portMap.getPork(dest));
     
     //determine if the ports have compatible access requirements (a read only out can't be plugged into an in that wants to write)
-    DataAccess accessRequirement = srcPork.resolveDataAccess(destPork);
+    //access resolution could be static
+    DataAccess accessRequirement = srcPork.resolveDataAccess(destPork, da);
     
-    if (accessRequirement == null){
-      //println("one thing in two places is imaginative but sloppy, until parallel timelines are accessible, copy");
-      //println("(these ports have differing data access requirements. try making explicit deep copies of the data with CopyOperator)");
+    if (accessRequirement == DataAccess.NONE){
+      println("one wants to read, one wants to write. One thing's for sure, they don't want to fight");
+      println("The port access requirements are incompatible with the edge type you attempted. try a READONLY edge (left click)");
       return;
     }
     

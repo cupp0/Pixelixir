@@ -156,7 +156,7 @@ class StyleResolver {
       return color(0);
     }
     switch(p.getCurrentAccess()){
-      case READ : return addColor(color(30), getDataTypeColor(p.getCurrentDataCategory()));      
+      case READONLY : return addColor(color(30), getDataTypeColor(p.getCurrentDataCategory()));      
       case READWRITE : return getDataTypeColor(p.getCurrentDataCategory());      
       default : return color(0);
     }

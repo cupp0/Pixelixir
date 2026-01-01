@@ -6,9 +6,20 @@ class ValveOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNDETERMINED, true, false); 
+    addInPork(DataCategory.UNDETERMINED); 
     addInPork(DataCategory.BOOL); 
-    addOutPork(DataCategory.UNDETERMINED, true, false).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
+    addOutPork(DataCategory.UNDETERMINED);
+    setPorkSemantics(ins.get(0));
+    setPorkSemantics(outs.get(0));
+    outs.get(0).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
+  }
+  
+  void setPorkSemantics(Pork p){
+    if (p instanceof InPork){
+      typeBindings.add(new DataTypeBinder(p));
+      return;
+    }    
+    typeBindings.get(0).addPork(p);
   }
   
   void execute(){    

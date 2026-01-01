@@ -25,7 +25,7 @@ class Connection implements Hoverable{
   Connection(PortUI source_, PortUI destination_, DataAccess ds){
     source = source_; destination = destination_;
     if (ds == DataAccess.READWRITE){ connectionStyle = ConnectionStyle.CABLE; }
-    if (ds == DataAccess.READ){ connectionStyle = ConnectionStyle.DOTS; }
+    if (ds == DataAccess.READONLY){ connectionStyle = ConnectionStyle.DOTS; }
 
     PVector sPos = source.getAbsolutePosition().copy().add(4, 8);
     PVector dPos = destination.getAbsolutePosition().copy().add(4, 0);

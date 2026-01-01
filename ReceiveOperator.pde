@@ -6,9 +6,18 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNDETERMINED, false, true);
-    addOutPork(DataCategory.UNDETERMINED, false, false);  
+    addBoundPair();  
   }
+  
+  void addBoundPair(){
+    InPork i = addInPork(DataCategory.UNDETERMINED);
+    setPorkSemantics(i);  
+    i.setHidden(true);
+    
+    setPorkSemantics(addOutPork(DataCategory.UNDETERMINED));
+  }
+  
+  
 
   //receive just built a connection. Do we need to make a port on the enclosing composite?
   //do we need to make a port on the receive?
@@ -21,9 +30,10 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
     tryExposingHiddenPorts();
   }
 
+  //for any ports w need to add after op initialization. Has to do with when we register 
+  //ports with their window. Perhaps we just keep a global portMap? Why not
   void addCanonicalPork(){
-    addInPork(DataCategory.UNDETERMINED, false, true);
-    addOutPork(DataCategory.UNDETERMINED, false, false);  
+    addBoundPair();  
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
   

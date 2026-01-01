@@ -1,6 +1,6 @@
 //~Edge
 
-enum DataAccess {READWRITE, READ}
+enum DataAccess {READWRITE, READONLY, NONE}
 
 class Edge{
   

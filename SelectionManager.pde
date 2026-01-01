@@ -231,7 +231,7 @@ class SelectionManager{
       //build the connection
       OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
       InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);
-      where.attemptConnection(src, dest);
+      where.attemptConnection(src, dest, DataAccess.READONLY);
     }
     
     //find any composite and rebuild those connections too

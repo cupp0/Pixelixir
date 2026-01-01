@@ -6,9 +6,8 @@ class SplitOperator extends PrimeOperator implements DynamicPorks{
   }
   
   void initialize(){
-    addInPork(DataCategory.LIST); 
-    addOutPork(DataCategory.UNDETERMINED).setTargetFlow(new Flow(DataCategory.UNDETERMINED)); 
-    addOutPork(DataCategory.UNDETERMINED).setTargetFlow(new Flow(DataCategory.UNDETERMINED)); 
+    addInPork(DataCategory.LIST);
+    addOutPork(DataCategory.UNDETERMINED).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
   }
 
   void execute(){
@@ -26,7 +25,11 @@ class SplitOperator extends PrimeOperator implements DynamicPorks{
   } 
   
   void addCanonicalPork(){
-    addOutPork(DataCategory.UNDETERMINED).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
+    EnumSet<DataAccess> readOrWrite = EnumSet.of(DataAccess.READONLY, DataAccess.READWRITE);
+    OutPork o = addOutPork(DataCategory.UNDETERMINED);
+    o.setTargetFlow(new Flow(DataCategory.UNDETERMINED));
+    o.setAllowedAccess(readOrWrite);
+    o.setCurrentAccess(DataAccess.NONE);
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
 }

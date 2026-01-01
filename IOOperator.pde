@@ -2,6 +2,14 @@ class IOOperator extends PrimeOperator{
   
   void initialize(){}
   
+  void setPorkSemantics(Pork p){
+    if (p instanceof InPork){
+      typeBindings.add(new DataTypeBinder(p));
+      return;
+    }    
+    typeBindings.get(p.index).addPork(p);
+  }
+  
   @Override
   boolean shouldExecute(){
     //if any data is hot, we should execute
@@ -30,49 +38,22 @@ class IOOperator extends PrimeOperator{
           outs.get(i.index).setDataStatus(i.getSource().getDataStatus());
         }
       }
+    }    
+  }
+
+  @Override
+  void setDefaultDataAccess(){   
+    
+    EnumSet<DataAccess> readOrWrite = EnumSet.of(DataAccess.READONLY, DataAccess.READWRITE);
+    
+    for (InPork i : ins){
+      i.setAllowedAccess(readOrWrite);
+      i.setCurrentAccess(DataAccess.NONE);
     }
     
-  }
-
-
-  @Override
-  void setDefaultDataAccess(){    
-    for (InPork i : ins){
-      if (i.getDefaultAccess() == null){
-        i.setDefaultAccess(DataAccess.READWRITE);
-        i.setCurrentAccess(i.getDefaultAccess());
-      }
-    }
-  }
-
-  @Override
-  void propagateCurrentDataCategory(Pork where, DataCategory dc){
-    where.setCurrentDataCategory(dc);
-    if (where instanceof InPork){
-      outs.get(where.index).setCurrentDataCategory(dc);
-      for (Pork p : outs.get(where.index).getConnectedPorks()){
-        p.owner.propagateCurrentDataCategory(p, dc);
-      }
-    }
-    if (where instanceof OutPork){
-      ins.get(where.index).setCurrentDataCategory(dc);
-      for (Pork p : ins.get(where.index).getConnectedPorks()){
-        p.owner.propagateCurrentDataCategory(p, dc);
-      }
-    }
-  }
-  
-  //when we remove a connection, check if our type requirement can
-  //get reset. I think this requires a more robust system
-  @Override
-  void tryResetTypeBoundPorks(){
-    for (InPork i : ins){
-      if (i.getConnectedPorks().size() == 0 && outs.get(i.index).getConnectedPorks().size() == 0){
-        i.setCurrentDataCategory(DataCategory.UNDETERMINED);
-        outs.get(i.index).setCurrentDataCategory(DataCategory.UNDETERMINED);
-        i.setCurrentAccess(i.getDefaultAccess());
-        outs.get(i.index).setCurrentAccess(outs.get(i.index).getDefaultAccess());
-      }
+    for (OutPork o : outs){
+      o.setAllowedAccess(readOrWrite);
+      o.setCurrentAccess(DataAccess.NONE);
     }
   }
   

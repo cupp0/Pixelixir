@@ -265,10 +265,11 @@ class EventManager {
     case DRAGGING_OPEN_CONNECTION:
       
       //if outport is qd, build connection
-      if (e.input.action == Action.MOUSE_PRESSED && e.input.mouseButt == LEFT){
+      if (e.input.action == Action.MOUSE_PRESSED){
+        DataAccess da = (e.input.mouseButt == LEFT)? DataAccess.READONLY : DataAccess.READWRITE;
         if (e.hover.modUI instanceof InPortUI){
           if (((InPortUI)e.hover.modUI).getSource() == null){
-            scope.attemptConnection(cuedPort, ((InPortUI)e.hover.modUI));
+            scope.attemptConnection(cuedPort, ((InPortUI)e.hover.modUI), da);
             if(!inputManager.getState().isDown(CONTROL)){
               scope.removeConnectionLine();
               cuedPort = null;

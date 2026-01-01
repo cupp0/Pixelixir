@@ -30,7 +30,7 @@ class ConnectOperator extends PrimeOperator {
     OutPortUI ui = (OutPortUI)src.p;
     if (!((OutPork)ui.getPorkPair()).elligibleForConnection()){return; }
     
-    src.w.attemptConnection(((OutPortUI)src.p), ((InPortUI)dest.p));
+    src.w.attemptConnection(((OutPortUI)src.p), ((InPortUI)dest.p), DataAccess.READONLY);
 
   }
   

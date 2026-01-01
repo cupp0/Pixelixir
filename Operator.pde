@@ -4,6 +4,31 @@ enum ExecutionSemantics{
   GENERATES
 }
 
+//helper class for resolving ports that accept multiple data types
+class DataTypeBinder {
+  
+  DataCategory dc;
+  ArrayList<Pork> boundPorks = new ArrayList<Pork>();
+
+  DataTypeBinder(Pork p){
+    addPork(p);  
+  }
+  
+  void addPork(Pork p){ boundPorks.add(p); }
+  
+  ArrayList<Pork> getBoundPorks(){ return boundPorks; }
+  
+  void setDC(DataCategory dc_){ 
+    dc = dc_;
+    for (Pork p : boundPorks){
+      p.setCurrentDataCategory(dc);
+    }
+  }
+  
+  DataCategory getDC(){ return dc; }
+  
+}
+
 public abstract class Operator{
   
   protected OperatorListener listener; //module that needs to react to changes to this operator
@@ -11,9 +36,9 @@ public abstract class Operator{
   String name;
   String label;
   
-  ArrayList<InPork> ins = new ArrayList<InPork>();                    //where we point for input data
-  ArrayList<OutPork> outs = new ArrayList<OutPork>();                 //where we put output data
-  ArrayList<Pork> typeBoundPorks = new ArrayList<Pork>();             //ports that resolve eachother's type
+  ArrayList<InPork> ins = new ArrayList<InPork>();                           //where we point for input data
+  ArrayList<OutPork> outs = new ArrayList<OutPork>();                        //where we put output data
+  ArrayList<DataTypeBinder> typeBindings = new ArrayList<DataTypeBinder>(); //ports that resolve eachother's type
   
   Flow targetFlow;
   ExecutionSemantics executionSemantics;
@@ -101,43 +126,25 @@ public abstract class Operator{
   
   //defaults. may refactor ports entirely
   InPork addInPork(DataCategory dc){                             
-    return addInPork(dc, false, false);        
-  }
-  
-  OutPork addOutPork(DataCategory dc){                             
-    return addOutPork(dc, false, false); 
-  }
-  
-  InPork addInPork(DataCategory dc, boolean typeBound, boolean hidden){
     InPork in = new InPork(this, ins.size());                //create the pork
-    setPorkSemantics(in, dc, typeBound, hidden);  //store port qualities
+    in.setDefaultDataCategory(dc);
     ins.add(in);                                             //store it
     listener.onPorkAdded(in);                                //tell module about changes
     return in;
   }
   
-  OutPork addOutPork(DataCategory dc, boolean typeBound, boolean hidden){   
+  OutPork addOutPork(DataCategory dc){                             
     OutPork out = new OutPork(this, outs.size());             //create the pork
-    setPorkSemantics(out, dc, typeBound, hidden);  //store port qualities
+    out.setDefaultDataCategory(dc);
     outs.add(out);                                            //store it
     listener.onPorkAdded(out);                                //tell module about changes
     return out;
   }
   
-  void setPorkSemantics(Pork p, DataCategory dc, boolean typeBound, boolean hidden){
-    
-    //what data type does this pork expect
-    p.setDefaultDataCategory(dc);
-    p.setCurrentDataCategory(p.getDefaultDataCategory());
-    
-    //is this type bound to the type of any other pork
-    if (typeBound){
-      typeBoundPorks.add(p); 
-    }    
-   
-    p.setHidden(hidden);
-
-  }
+  //default data category is local, so we set that in AddPork methods above
+  //type bindings are concerned with other porks at the operator level so
+  //we have to override in relevant operator classes (valve, copy, I/O).
+  void setPorkSemantics(Pork p){ }
 
   //always returns a module with Composition.ONE
   Module getModule(){
@@ -192,60 +199,99 @@ public abstract class Operator{
     return true;
   }
   
-  void addTypeBoundPork(Pork p){
-    typeBoundPorks.add(p);
-  }
-  
-  //by default, generators allow READWRITE or READ connections 
-  //MUTATORS require a READWRITE edge at input 1
-  void setDefaultDataAccess(){
-    
-    //first input is the designated continuation port
-    if (getExecutionSemantics() == ExecutionSemantics.MUTATES){
-      if (ins.size() > 0){
-        ins.get(0).setDefaultAccess(DataAccess.READWRITE);
-        ins.get(0).setCurrentAccess(ins.get(0).getDefaultAccess());
+  //this method returns the typeBinder helper if the supplied pork is part of a binding
+  DataTypeBinder isBound(Pork p){
+    for (DataTypeBinder dtb : this.typeBindings){
+      if (dtb.boundPorks.contains(p)){
+        return dtb;
       }
     }
+    
+    return null;
+  }
+  
+  void setDefaultTypeBindings(){    
+  }
+  
+  //data access is per port
+  void setDefaultDataAccess(){
+    
+    EnumSet<DataAccess> read = EnumSet.of(DataAccess.READONLY);
+    EnumSet<DataAccess> readOrWrite = EnumSet.of(DataAccess.READONLY, DataAccess.READWRITE);
+    EnumSet<DataAccess> none = EnumSet.of(DataAccess.NONE);
+    
+    //first input is the designated mutation port   
+    if (getExecutionSemantics() == ExecutionSemantics.MUTATES){
+      
+      //input 1 is the designated mutation port
+      ins.get(0).setAllowedAccess(readOrWrite);
+      ins.get(0).setCurrentAccess(DataAccess.NONE);
+      
+      for (int i = 1; i < ins.size(); i++){
+        ins.get(i).setAllowedAccess(read);
+        ins.get(i).setCurrentAccess(DataAccess.NONE);
+      }     
+    }
+    
+    else {
+      for (InPork i : ins){
+        i.setAllowedAccess(read);
+        i.setCurrentAccess(DataAccess.NONE);
+      }     
+    }
+    
+    //out edges can always be either read or readwrite. user has to specify readonly
+    for (OutPork o : outs){
+      o.setAllowedAccess(readOrWrite);
+      o.setCurrentAccess(DataAccess.NONE);
+    }     
+
   }
   
   //this method resolves expected type for operators with indeterminite data 
-  //for instance, a valve, send/receive, copy, etc..
-  
+  //for instance, a valve, send/receive, copy, etc.. It also propagates that
+  //change down/up stream in the case of chained unresolved types
   void propagateCurrentDataCategory(Pork where, DataCategory dc){
     where.setCurrentDataCategory(dc);
-    if (typeBoundPorks.contains(where)){
-      for (Pork p : typeBoundPorks){
+    for (DataTypeBinder dtb : typeBindings){
+      if (dtb.getBoundPorks().contains(where)){ 
         
         //ensure we don't get stuck in a loop
-        if (p.getCurrentDataCategory() != dc){
+        if (dtb.getDC() != dc){
+          dtb.setDC(dc);
           
-          p.setCurrentDataCategory(dc);
-          //get all porks connected to any pork we have changd
-          for (Pork po : p.getConnectedPorks()){
-            po.owner.propagateCurrentDataCategory(po, dc);
+          //propagate to all porks connected to any pork we have changed
+          for (Pork p : dtb.getBoundPorks()){
+            p.owner.propagateCurrentDataCategory(p, dc);
           }
         }
       }
-    }
-    
+    }    
   }
   
   //when we remove a connection, check if our type requirement can
   //get reset. I think this requires a more robust system
+  
   void tryResetTypeBoundPorks(){
+    
     //if anything is still connected, leave type requirement.
     //there are situations where we ~could~ reset the type requirement
     //even if there are still connections, but that shouldn't
     //result in "bad" behavior per se.
-    for (Pork p : typeBoundPorks){
-      if (p.getConnectedPorks().size() > 0){ return; }
+    for (DataTypeBinder dtb : typeBindings){
+      boolean reset = true;
+      for (Pork p : dtb.getBoundPorks()){
+        if (p.getConnectedPorks().size() > 0) reset = false; 
+      }
+      //if none of the typeBound Porks have a connection, reset.
+      if (reset){
+        for (Pork p : dtb.getBoundPorks()){
+          p.setCurrentDataCategory(p.getDefaultDataCategory());
+        }
+      }
     }
     
-    //if none of the typeBound Porks have a connection, reset.
-    for (Pork p : typeBoundPorks){
-      p.setCurrentDataCategory(p.getDefaultDataCategory());
-    }
+    
   }
   
   //this should only ever set targetFlow of in1 and out1 to f,
