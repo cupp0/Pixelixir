@@ -8,7 +8,7 @@ class ReadOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.TEXT); addOutPork(DataCategory.UNKNOWN).setTargetFlow(new Flow(DataCategory.UNKNOWN));
+    addInPork(DataCategory.TEXT); addOutPork(DataCategory.UNDETERMINED).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
   }
   
   void execute(){

@@ -1,17 +1,6 @@
 {
   "modules": [
-    {
-      "name": "toModule",
-      "id": "8aa3d2f0-238e-45d2-b1ac-ffdc17d46e41",
-      "ins": 1,
-      "outs": 1,
-      "position": {
-        "x": 63.33332,
-        "y": 38.666664,
-        "z": 0.0
-      },
-      "uiElements": []
-    },
+
     {
       "name": "drag",
       "id": "12515145-9b78-4144-abbe-026cb744078d",
@@ -232,12 +221,6 @@
   ],
   "connections": [
     {
-      "fromModule": "8aa3d2f0-238e-45d2-b1ac-ffdc17d46e41",
-      "fromPortIndex": 0,
-      "toModule": "c1215062-1764-4a7e-bb9b-9b0d46a3c660",
-      "toPortIndex": 0
-    },
-    {
       "fromModule": "b918c7d3-3e5f-4fdc-b46d-27cc04389cbc",
       "fromPortIndex": 0,
       "toModule": "076d2faa-9551-4fcf-8dd5-cc6d8fe17f25",
@@ -308,12 +291,6 @@
       "fromPortIndex": 0,
       "toModule": "c1215062-1764-4a7e-bb9b-9b0d46a3c660",
       "toPortIndex": 1
-    },
-    {
-      "fromModule": "6ff615cf-7952-4a66-8d94-a1366a9e898e",
-      "fromPortIndex": 0,
-      "toModule": "8aa3d2f0-238e-45d2-b1ac-ffdc17d46e41",
-      "toPortIndex": 0
     },
     {
       "fromModule": "076d2faa-9551-4fcf-8dd5-cc6d8fe17f25",

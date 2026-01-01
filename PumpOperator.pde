@@ -6,9 +6,9 @@ class ValveOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN, true, false); 
+    addInPork(DataCategory.UNDETERMINED, true, false); 
     addInPork(DataCategory.BOOL); 
-    addOutPork(DataCategory.UNKNOWN, true, false).setTargetFlow(new Flow(DataCategory.UNKNOWN));
+    addOutPork(DataCategory.UNDETERMINED, true, false).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
   }
   
   void execute(){    
@@ -17,7 +17,7 @@ class ValveOperator extends PrimeOperator{
 
   @Override
   boolean shouldExecute(){
-    if (ins.get(1).targetFlow == null){
+    if (!inPorksFull()){
       return false;
     }
     return ins.get(1).targetFlow.getBoolValue();

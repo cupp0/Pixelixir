@@ -3,13 +3,14 @@ import  java.util.*;
 
 enum DataCategory {
   INT,
-  FLOAT,
+  NUMERIC,
   BOOL,
   TEXT,
   LIST,
   IMAGE, 
   MODULE,
-  UNKNOWN
+  WINDOW,
+  UNDETERMINED
 }
 
 public class Flow {
@@ -22,23 +23,18 @@ public class Flow {
   private String textValue;
   private List<Flow> listValue;
   private String moduleValue;        //module id
+  private String windowValue;        //module key id
   //private ImageBuffer imageValue;
- 
-
-  // ---------- Constructors are private: use factories ----------
-  //private Flow(Category type) {
-  //    this.type = type;
-  //}
   
   public Flow(DataCategory type) {
-    this.type = type;       // empty, uninitialized
+    this.type = type;       
     if (type == DataCategory.LIST){
       listValue = new ArrayList<Flow>();
     }
   }
 
   public static Flow ofFloat(float value) {
-      Flow f = new Flow(DataCategory.FLOAT);
+      Flow f = new Flow(DataCategory.NUMERIC);
       f.floatValue = value;
       return f;
   }
@@ -64,6 +60,12 @@ public class Flow {
   public static Flow ofModule(String value) {
       Flow f = new Flow(DataCategory.MODULE);
       f.moduleValue = value;
+      return f;
+  }
+  
+  public static Flow ofWindow(String value) {
+      Flow f = new Flow(DataCategory.WINDOW);
+      f.windowValue = value;
       return f;
   }
 
@@ -98,10 +100,14 @@ public class Flow {
     return moduleValue;
   }
   
+  public String getWindowValue() {
+    return windowValue;
+  }
+  
   public String valueToString(){
     switch(type){
 
-      case FLOAT:
+      case NUMERIC:
       return Float.toString(getFloatValue());
       
       case BOOL:
@@ -121,21 +127,21 @@ public class Flow {
 
   // ---------- Setters ----------
 
-  public void toFloat() {
-    setType(DataCategory.FLOAT);
-  }
+  //public void toFloat() {
+  //  setType(DataCategory.NUMERIC);
+  //}
 
-  public void toBool() {
-    setType(DataCategory.BOOL);
-  }
+  //public void toBool() {
+  //  setType(DataCategory.BOOL);
+  //}
 
-  public void toText() {
-    setType(DataCategory.TEXT);
-  }
+  //public void toText() {
+  //  setType(DataCategory.TEXT);
+  //}
 
-  public void toList() {
-    setType(DataCategory.LIST);
-  }
+  //public void toList() {
+  //  setType(DataCategory.LIST);
+  //}
 
   public void setFloatValue(float v) {
     this.floatValue = v;
@@ -157,6 +163,10 @@ public class Flow {
       this.moduleValue = v;
   }
   
+  public void setWindowValue(String v) {
+      this.windowValue = v;
+  }
+   
   public void setListAtIndex(int i, Flow f) {
     if (i >= 0 && i < this.listValue.size()){
       this.listValue.set(i, f);
@@ -181,8 +191,7 @@ public class Flow {
   // ---------- type enforcement ----------
   
   public static boolean compatible(DataCategory a, DataCategory b) {
-    // Unknown types always match
-    if (a == DataCategory.UNKNOWN || b == DataCategory.UNKNOWN)
+    if (a == DataCategory.UNDETERMINED || b == DataCategory.UNDETERMINED)
       return true;
 
     return a == b;
@@ -211,7 +220,7 @@ public class Flow {
   static void copyData(Flow source, Flow destination){
     if (source.type == destination.type){
       switch(source.type){
-        case FLOAT:
+        case NUMERIC:
         destination.setFloatValue(source.getFloatValue());
         break;
         
@@ -234,6 +243,10 @@ public class Flow {
         case MODULE:
         destination.setModuleValue(source.getModuleValue());
         break;
+        
+        case WINDOW:
+        destination.setWindowValue(source.getWindowValue());
+        break;
       }
     } else {
       System.out.println("attempted to copy " + source.getType() + " to " + destination.getType());
@@ -244,7 +257,7 @@ public class Flow {
     Flow f = new Flow(type);
     switch(type){
       
-      case FLOAT:
+      case NUMERIC:
       f.setFloatValue(getFloatValue());
       break;
       
@@ -264,6 +277,10 @@ public class Flow {
       
       case MODULE:
       f.setModuleValue(getModuleValue());
+      break;
+      
+      case WINDOW:
+      f.setWindowValue(getWindowValue());
       break;
     }
     

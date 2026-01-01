@@ -106,10 +106,12 @@ class InPork extends Pork {
 
 }
 
+enum DataStatus {HOT, COLD, BAD}
+
 //~OutPork
 class OutPork extends Pork {
   
-  boolean hotData;
+  DataStatus dataStatus;
   boolean speaking = false;
   int lastEval = 0;
   
@@ -128,9 +130,9 @@ class OutPork extends Pork {
     DataCategory destCat = dest.getCurrentDataCategory();
     
     //if types disagree, they need resolved
-    //the only valid way for a type to disagree is if one is UNKNOWN
+    //the only valid way for a type to disagree is if one is UNDETERMINED
     if (srcCat != destCat){
-      if (srcCat == DataCategory.UNKNOWN ){
+      if (srcCat == DataCategory.UNDETERMINED ){
         this.owner.propagateCurrentDataCategory(this, destCat);
       } else {
         dest.owner.propagateCurrentDataCategory(dest, srcCat);
@@ -167,13 +169,13 @@ class OutPork extends Pork {
     graph.addUpdater(this);
   }
   
-  void setHot(boolean b){
-    hotData = b;
-    if (b){ lastEval = frameCount; }
+  void setDataStatus(DataStatus ds){
+    dataStatus = ds;
+    if (dataStatus == DataStatus.HOT) lastEval = frameCount;
   }
   
-  boolean getHot(){
-    return hotData;
+  DataStatus getDataStatus(){
+    return dataStatus;
   }
   
   boolean elligibleForConnection(){

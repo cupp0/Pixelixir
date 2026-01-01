@@ -45,7 +45,7 @@ public abstract class Operator{
     
     //if any data is hot, we should execute
     for (InPork i : ins){
-      if (i.getSource().getHot()){
+      if (i.getSource().getDataStatus() == DataStatus.HOT){
         return true;
       }
     }
@@ -76,11 +76,11 @@ public abstract class Operator{
     //at "runtime" (mid evaluation sequence)
     if (executed){
       for (OutPork o : outs){
-        o.setHot(true);
+        o.setDataStatus(DataStatus.HOT);
       }
     } else {
       for (OutPork o : outs){
-        o.setHot(false);
+        o.setDataStatus(DataStatus.COLD);
       }
     }
     
@@ -166,7 +166,7 @@ public abstract class Operator{
   
   void setPortsCold(){
     for (OutPork o : outs){
-      o.setHot(false); 
+      o.setDataStatus(DataStatus.COLD); 
     }
   }
   

@@ -8,7 +8,7 @@ class MouseWheelOperator extends RawInputOperator{
   }
   
   void initialize(){    
-    addOutPork(DataCategory.FLOAT).setTargetFlow(new Flow(DataCategory.FLOAT));
+    addOutPork(DataCategory.NUMERIC).setTargetFlow(new Flow(DataCategory.NUMERIC));
   }
   
   //should compare with previous event and trigger data notification on

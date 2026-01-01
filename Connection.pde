@@ -16,6 +16,7 @@ class Connection implements Hoverable{
     
   Style style;  
     
+  float dotOffset = 0;  
   float restLength;               
   float stiffness;                      // spring strength
   float damping;                        // slows down motion
@@ -85,11 +86,12 @@ class Connection implements Hoverable{
     dir.normalize();
     PVector offsetVector = dir.copy().mult(5);
     
+    float framesSinceEval = min(10, frameCount - ((OutPork)source.getPorkPair()).lastEval);
     float spacing = 10;   // distance between dots
-    float speed = 1;      // animation speed
-    float offset = (frameCount * speed) % spacing;
+    float speed = 1-(framesSinceEval*.06);      // animation speed
+    dotOffset = (dotOffset+speed)%spacing;
 
-    for (float d = offset; d < dist-spacing/2; d += spacing) {
+    for (float d = dotOffset; d < dist-spacing/2; d += spacing) {
       PVector pos = PVector.add(start, PVector.mult(dir, d));
       PVector pos2 = PVector.add(pos, offsetVector);
       line(pos.x, pos.y, pos2.x, pos2.y);

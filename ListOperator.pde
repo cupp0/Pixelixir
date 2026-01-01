@@ -9,7 +9,7 @@ class ListOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.FLOAT);addInPork(DataCategory.UNKNOWN); addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
+    addInPork(DataCategory.NUMERIC);addInPork(DataCategory.UNDETERMINED); addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
   }
 
   void execute(){
@@ -25,7 +25,7 @@ class ListOperator extends PrimeOperator{
     for (int i = 0; i < listSize; i++){
       Flow f = new Flow(listType);
       switch(listType){      
-        case FLOAT:
+        case NUMERIC:
         f.setFloatValue(0);
         break;
         

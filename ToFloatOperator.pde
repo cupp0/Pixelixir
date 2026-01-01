@@ -7,13 +7,13 @@ class ToFloatOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN); addOutPork(DataCategory.FLOAT).setTargetFlow(new Flow(DataCategory.FLOAT));
+    addInPork(DataCategory.UNDETERMINED); addOutPork(DataCategory.NUMERIC).setTargetFlow(new Flow(DataCategory.NUMERIC));
   }
   
   float valueToFloat(Flow f){
     switch(f.getType()){
 
-      case FLOAT:
+      case NUMERIC:
       return f.getFloatValue();
       
       case BOOL:

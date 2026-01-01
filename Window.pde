@@ -107,7 +107,7 @@ class Window {
     boolean compatibleDataType = Flow.compatible(srcPork.getCurrentDataCategory(), destPork.getCurrentDataCategory());
     
     if (!compatibleDataType){
-      println("if you try to STRING a LIST to a BOOL's tail, you'll soon FLOAT away to heaven (that connection's a fail)");
+      println("if you try to STRING a LIST to a BOOL's tail, you'll soon NUMERIC away to heaven (that connection's a fail)");
       return;
     }
     
@@ -129,8 +129,10 @@ class Window {
     connections.add(new Connection(src, dest, da));
     graph.addEdge(srcPork, destPork, da); 
     
-    //update Window state stuff and call the newly connected op to update
-    ((OutPork)portMap.getPork(src)).dataNotification();
+    //if the newly connected outport has data
+    if (srcPork.targetFlow != null){
+      ((OutPork)portMap.getPork(src)).dataNotification();
+    }
   }
   
   //remove edge from graph, update pork reference, remove edge UI

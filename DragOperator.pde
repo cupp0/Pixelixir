@@ -7,8 +7,8 @@ class DragOperator extends PrimeOperator {
   
   void initialize(){    
     addInPork(DataCategory.MODULE);
-    addInPork(DataCategory.FLOAT);
-    addInPork(DataCategory.FLOAT);
+    addInPork(DataCategory.NUMERIC);
+    addInPork(DataCategory.NUMERIC);
   }
   
   void execute(){

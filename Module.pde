@@ -21,7 +21,9 @@ public class Module implements OperatorListener{
   }
   
   void initializeWindow(){
-    windows.put(this, new Window(this));
+    Window newWin = new Window(this);
+    windows.put(this, newWin);
+    windowByBoundaryID.put(this.id, newWin);
   }
   
   void setOwner(Operator op){

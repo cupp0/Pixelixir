@@ -7,7 +7,7 @@ class ModuleXOperator extends PrimeOperator {
   
   void initialize(){    
     addInPork(DataCategory.MODULE);
-    addOutPork(DataCategory.FLOAT).setTargetFlow(new Flow(DataCategory.FLOAT));
+    addOutPork(DataCategory.NUMERIC).setTargetFlow(new Flow(DataCategory.NUMERIC));
   }
   
   void execute(){

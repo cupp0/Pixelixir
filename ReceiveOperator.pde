@@ -6,8 +6,8 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN, false, true);
-    addOutPork(DataCategory.UNKNOWN, false, false);  
+    addInPork(DataCategory.UNDETERMINED, false, true);
+    addOutPork(DataCategory.UNDETERMINED, false, false);  
   }
 
   //receive just built a connection. Do we need to make a port on the enclosing composite?
@@ -22,8 +22,8 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
   }
 
   void addCanonicalPork(){
-    addInPork(DataCategory.UNKNOWN, false, true);
-    addOutPork(DataCategory.UNKNOWN, false, false);  
+    addInPork(DataCategory.UNDETERMINED, false, true);
+    addOutPork(DataCategory.UNDETERMINED, false, false);  
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
   

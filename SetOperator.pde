@@ -6,7 +6,7 @@ class SetOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.LIST); addInPork(DataCategory.FLOAT); addInPork(DataCategory.UNKNOWN); 
+    addInPork(DataCategory.LIST); addInPork(DataCategory.NUMERIC); addInPork(DataCategory.UNDETERMINED); 
     addOutPork(DataCategory.LIST);
   }
     

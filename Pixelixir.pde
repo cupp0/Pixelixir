@@ -11,12 +11,14 @@ import com.google.gson.*;
 //making a corresonding Operator class. For instance, add "filter" here and some class FilterOperator 
 //extends PrimeOperator and it will show up in add module options
 
+//split, get
+
 String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "composite"};
 String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};
 String[] unary = {"UNARY", "sin", "cos", "tan", "abs"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
 String[] utility = {"UTILITY", "print", "toFloat", "list", "read", "write", "set", "get", "copy", "valve", "concat", "split", "send", "receive"};
-String[] meta = {"META", "mouseX", "mouseY", "leftMouse", "rightMouse", "mouseWheel", "key", "toModule", "drag", "moduleX", "moduleY"};
+String[] meta = {"META", "time", "mouseX", "mouseY", "leftMouse", "rightMouse", "mouseWheel", "key", "toModule", "drag", "moduleX", "moduleY", "window", "moduleList"};
 
 String[][] UIText = {UI, binary, unary, logic, utility, meta};
 
@@ -38,8 +40,9 @@ PartsFactory partsFactory = new PartsFactory();
 FlowRegistry flowRegistry = new FlowRegistry(); 
 NoiseGenerator noiseGen = new NoiseGenerator();
 Gson gson; 
-  
+
 HashMap<Module, Window> windows = new HashMap<Module, Window>(); //composite module, window that ops kids display in
+HashMap<String, Window> windowByBoundaryID = new HashMap<String, Window>(); //t ops kids display in
 
 int portSize = 8;
 int portGap = 12;
@@ -58,6 +61,7 @@ void setup() {
   mama = partsFactory.createModule("composite");
   bigbang = new Window(mama);
   windows.put(mama, bigbang);
+  windowByBoundaryID.put(mama.id, bigbang);
   currentWindow = bigbang;
 
   //make type adapters for UIState extensions (so we can serialize abstract UIState)

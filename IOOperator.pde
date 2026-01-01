@@ -7,7 +7,7 @@ class IOOperator extends PrimeOperator{
     //if any data is hot, we should execute
     for (InPork i : ins){
       if (i.getSource() != null){
-        if (i.getSource().getHot()){
+        if (i.getSource().getDataStatus() == DataStatus.HOT){
           return true;
         }
       }
@@ -27,7 +27,7 @@ class IOOperator extends PrimeOperator{
     if (executed){
       for (InPork i : ins){
         if (i.getSource() != null){
-          outs.get(i.index).setHot(i.getSource().getHot());
+          outs.get(i.index).setDataStatus(i.getSource().getDataStatus());
         }
       }
     }
@@ -68,8 +68,8 @@ class IOOperator extends PrimeOperator{
   void tryResetTypeBoundPorks(){
     for (InPork i : ins){
       if (i.getConnectedPorks().size() == 0 && outs.get(i.index).getConnectedPorks().size() == 0){
-        i.setCurrentDataCategory(DataCategory.UNKNOWN);
-        outs.get(i.index).setCurrentDataCategory(DataCategory.UNKNOWN);
+        i.setCurrentDataCategory(DataCategory.UNDETERMINED);
+        outs.get(i.index).setCurrentDataCategory(DataCategory.UNDETERMINED);
         i.setCurrentAccess(i.getDefaultAccess());
         outs.get(i.index).setCurrentAccess(outs.get(i.index).getDefaultAccess());
       }

@@ -6,18 +6,19 @@ class GetOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.LIST); addInPork(DataCategory.FLOAT); addOutPork(DataCategory.UNKNOWN).setTargetFlow(new Flow(DataCategory.UNKNOWN));
+    addInPork(DataCategory.LIST); addInPork(DataCategory.NUMERIC); addOutPork(DataCategory.UNDETERMINED).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
   }
     
   void execute(){ 
 
+    List<Flow> flowList = ins.get(0).targetFlow.getListValue();
+    
     //get target index from second input
     int index = (int)ins.get(1).targetFlow.getFloatValue();
+    if (index < 0 || index >= flowList.size()) return;
     
-    //get Flow at target index
-    if (index >= 0 && ins.get(0).targetFlow.getListValue().size() > index){      
-     outs.get(0).targetFlow = ins.get(0).targetFlow.getListValue().get(index).copyFlow();
-    }
+    outs.get(0).setCurrentDataCategory(flowList.get(index).getType());
+    Flow.copyData(flowList.get(index), outs.get(0).targetFlow);
     
   } 
 

@@ -6,7 +6,7 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN); addInPork(DataCategory.UNKNOWN);addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
+    addInPork(DataCategory.UNDETERMINED); addInPork(DataCategory.UNDETERMINED);addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
   }
   
   @Override
@@ -14,7 +14,7 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
     //if any data is hot, we should execute
     for (InPork i : ins){
       if (i.getSource() != null){
-        if (i.getSource().getHot()){
+        if (i.getSource().getDataStatus() == DataStatus.HOT){
           return true;
         }
       }
@@ -43,7 +43,7 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
   }
   
   void addCanonicalPork(){
-    addInPork(DataCategory.UNKNOWN);
+    addInPork(DataCategory.UNDETERMINED);
     ((Module)listener).getWindow().registerPorts((Module)listener);
   } 
 }

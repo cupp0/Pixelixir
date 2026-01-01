@@ -6,8 +6,8 @@ class CopyOperator extends PrimeOperator implements DynamicPorks{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN, true, false);
-    addOutPork(DataCategory.UNKNOWN, true, false).setTargetFlow(new Flow(DataCategory.UNKNOWN));
+    addInPork(DataCategory.UNDETERMINED, true, false);
+    addOutPork(DataCategory.UNDETERMINED, true, false).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
   }
 
   void execute(){   

@@ -328,6 +328,7 @@ class SelectionManager{
       w.deregisterModule(this.modules.get(i));
       if (this.modules.get(i).isComposite()){
         windows.remove(this.modules.get(i));
+        windowByBoundaryID.remove(this.modules.get(i).id);
       }
     }
     

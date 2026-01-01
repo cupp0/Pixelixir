@@ -12,7 +12,7 @@ class Style {
   }
 }
 
-//Who should own styleresolver?
+//should b static
 
 //~StyleResolver
 class StyleResolver {
@@ -66,10 +66,6 @@ class StyleResolver {
           modifiedStyle.stroke = setTransparency(modifiedStyle.stroke, 127);
         }
       }
-      //if (ui == eventManager.focusedUI){
-      //  modifiedStyle.strokeWeight++;
-      //}
-
     }
     
     if (ui instanceof BodyUI){
@@ -135,11 +131,12 @@ class StyleResolver {
   
   color getDataTypeColor(DataCategory dc){
     switch (dc) {
-      case FLOAT : return color(175, 125, 75);
+      case NUMERIC : return color(175, 125, 75);
       case TEXT : return color(75, 175, 125);
       case LIST : return color(75, 125, 175);
       case MODULE : return color(175, 75, 125);
-      case UNKNOWN : return getUnknownColor();
+      case WINDOW : return color(50, 75, 150);
+      case UNDETERMINED : return getUnknownColor();
       default : return color(0);
     } 
   }

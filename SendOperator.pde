@@ -7,8 +7,8 @@ class SendOperator extends IOOperator implements DynamicPorks{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNKNOWN, false, false);
-    addOutPork(DataCategory.UNKNOWN, false, true);  
+    addInPork(DataCategory.UNDETERMINED, false, false);
+    addOutPork(DataCategory.UNDETERMINED, false, true);  
   }
   
   //index_ tells us which Sender Pork just built a new connection
@@ -21,8 +21,8 @@ class SendOperator extends IOOperator implements DynamicPorks{
   }
   
   void addCanonicalPork(){
-    addInPork(DataCategory.UNKNOWN, false, false);
-    addOutPork(DataCategory.UNKNOWN, false, true);   
+    addInPork(DataCategory.UNDETERMINED, false, false);
+    addOutPork(DataCategory.UNDETERMINED, false, true);   
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
 

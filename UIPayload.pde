@@ -1,6 +1,6 @@
 //~Payload
 enum PayloadType {
-  FLOAT,
+  NUMERIC,
   BOOL,
   TEXT,
   IMG
@@ -15,7 +15,7 @@ class UIPayload {
   transient PImage imgValue;
   
   UIPayload(float value_){
-    type = PayloadType.FLOAT; floatValue = value_;
+    type = PayloadType.NUMERIC; floatValue = value_;
   }
   
   UIPayload(String value_){
@@ -37,7 +37,7 @@ class UIPayload {
   
   Object getValue(){
     switch (type){
-      case FLOAT: return floatValue;
+      case NUMERIC: return floatValue;
       case TEXT: return textValue;
       case BOOL: return boolValue;
       case IMG: return imgValue;
