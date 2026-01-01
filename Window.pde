@@ -98,8 +98,8 @@ class Window {
     DataAccess accessRequirement = srcPork.resolveDataAccess(destPork);
     
     if (accessRequirement == null){
-      println("one thing in two places is imaginative but sloppy, until parallel timelines are accessible, copy");
-      println("(these ports have differing data access requirements. try making explicit deep copies of the data with CopyOperator)");
+      //println("one thing in two places is imaginative but sloppy, until parallel timelines are accessible, copy");
+      //println("(these ports have differing data access requirements. try making explicit deep copies of the data with CopyOperator)");
       return;
     }
     

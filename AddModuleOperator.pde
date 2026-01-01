@@ -14,7 +14,6 @@ class WindowOperator extends PrimeOperator {
   void execute(){
     String s = ((Module)listener).parent.id;
     outs.get(0).targetFlow.setWindowValue(s);
-    println(outs.get(0).targetFlow.getWindowValue());
   }
   
   boolean isSpeaker(){ return true; } 

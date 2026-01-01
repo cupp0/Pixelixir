@@ -10,6 +10,7 @@ enum DataCategory {
   IMAGE, 
   MODULE,
   WINDOW,
+  PORT, 
   UNDETERMINED
 }
 
@@ -24,6 +25,7 @@ public class Flow {
   private List<Flow> listValue;
   private String moduleValue;        //module id
   private String windowValue;        //module key id
+  private String portValue;          //port id
   //private ImageBuffer imageValue;
   
   public Flow(DataCategory type) {
@@ -68,6 +70,12 @@ public class Flow {
       f.windowValue = value;
       return f;
   }
+  
+  public static Flow ofPort(String value) {
+      Flow f = new Flow(DataCategory.PORT);
+      f.portValue = value;
+      return f;
+  }
 
   // ---------- Type ----------
   public DataCategory getType() {
@@ -102,6 +110,10 @@ public class Flow {
   
   public String getWindowValue() {
     return windowValue;
+  }
+  
+  public String getPortValue() {
+    return portValue;
   }
   
   public String valueToString(){
@@ -165,6 +177,10 @@ public class Flow {
   
   public void setWindowValue(String v) {
       this.windowValue = v;
+  }
+  
+  public void setPortValue(String v) {
+      this.portValue = v;
   }
    
   public void setListAtIndex(int i, Flow f) {
@@ -247,6 +263,10 @@ public class Flow {
         case WINDOW:
         destination.setWindowValue(source.getWindowValue());
         break;
+        
+        case PORT:
+        destination.setPortValue(source.getPortValue());
+        break;
       }
     } else {
       System.out.println("attempted to copy " + source.getType() + " to " + destination.getType());
@@ -281,6 +301,10 @@ public class Flow {
       
       case WINDOW:
       f.setWindowValue(getWindowValue());
+      break;
+      
+      case PORT:
+      f.setPortValue(getPortValue());
       break;
     }
     

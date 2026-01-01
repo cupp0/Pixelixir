@@ -20,27 +20,4 @@ class ModuleListOperator extends PrimeOperator{
     }
   }
   
-  ArrayList<Flow> instantiateList(int listSize, DataCategory listType){
-    ArrayList<Flow> newList = new ArrayList<Flow>();
-    for (int i = 0; i < listSize; i++){
-      Flow f = new Flow(listType);
-      switch(listType){      
-        case NUMERIC:
-        f.setFloatValue(0);
-        break;
-        
-        case BOOL:
-        f.setBoolValue(false);
-        break;
-  
-        case TEXT:
-        f.setTextValue("");
-        break;
-        
-      }
-      newList.add(new Flow(listType));
-    }
-   outs.get(0).targetFlow.setListValue(newList);
-    return newList;
-  }
 }

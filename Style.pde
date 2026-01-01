@@ -136,6 +136,7 @@ class StyleResolver {
       case LIST : return color(75, 125, 175);
       case MODULE : return color(175, 75, 125);
       case WINDOW : return color(50, 75, 150);
+      case PORT : return color(150, 175, 50);
       case UNDETERMINED : return getUnknownColor();
       default : return color(0);
     } 
