@@ -36,7 +36,9 @@ class PartsFactory{
     }    
     
     //set body (and eye) color
-    newMod.uiBits.get(0).setColor(newMod.getColor());
+    color c = newMod.getColor();
+    newMod.uiBits.get(0).setColor(c);
+    if (defaultUI instanceof CompositeUI){ defaultUI.setColor(c); }
 
     return newMod;    
   }

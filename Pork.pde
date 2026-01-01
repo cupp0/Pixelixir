@@ -74,6 +74,8 @@ abstract class Pork {
   
   abstract ArrayList<Pork> getConnectedPorks();
   
+  abstract boolean elligibleForConnection();
+  
 }
 
 //~InPork
@@ -91,11 +93,15 @@ class InPork extends Pork {
   ArrayList<Pork> getConnectedPorks(){
     ArrayList<Pork> connectedPorks = new ArrayList<Pork>();
 
-    if (((InPork)this).getSource() != null){
-      connectedPorks.add(((InPork)this).getSource());
+    if (this.getSource() != null){
+      connectedPorks.add(this.getSource());
     }
     
     return connectedPorks;
+  }
+  
+  boolean elligibleForConnection(){
+    return this.getSource() == null;
   }
 
 }
@@ -168,6 +174,18 @@ class OutPork extends Pork {
   
   boolean getHot(){
     return hotData;
+  }
+  
+  boolean elligibleForConnection(){
+    if (currentAccess == DataAccess.READ) return true;
+    
+    if (currentAccess == DataAccess.READWRITE){
+      return getDestinations().size() == 0;
+    }
+    
+    if (currentAccess == null) return true;
+    
+    return false;
   }
   
   ArrayList<Pork> getConnectedPorks(){

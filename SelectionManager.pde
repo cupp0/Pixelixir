@@ -118,12 +118,12 @@ class SelectionManager{
   void rebuildPorts(WindowData wdata, HashMap<String, Module> newMods){
     for (ModuleData mdata : wdata.modules){
       
-      if (newMods.get(mdata.id) instanceof DynamicPorks){
+      if (newMods.get(mdata.id).owner instanceof DynamicPorks){
         while(newMods.get(mdata.id).ins.size() < mdata.ins){
-          ((DynamicPorks)newMods.get(mdata.id)).addCanonicalPork();
+          ((DynamicPorks)newMods.get(mdata.id).owner).addCanonicalPork();
         }
         while(newMods.get(mdata.id).outs.size() < mdata.outs){
-          ((DynamicPorks)newMods.get(mdata.id)).addCanonicalPork();
+          ((DynamicPorks)newMods.get(mdata.id).owner).addCanonicalPork();
         }
       } 
       

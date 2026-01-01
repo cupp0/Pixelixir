@@ -145,9 +145,12 @@ class EventManager {
           
           //if left pressing outport, cue it for connection
           if (e.hover.modUI instanceof OutPortUI){
-            cuedPort = (OutPortUI)e.hover.modUI;
-            state = InteractionState.DRAGGING_OPEN_CONNECTION;
-            scope.addConnectionLine(cuedPort);
+            Pork p = scope.portMap.getPork(((OutPortUI)e.hover.modUI));
+            if (p.elligibleForConnection()){
+              cuedPort = (OutPortUI)e.hover.modUI;
+              state = InteractionState.DRAGGING_OPEN_CONNECTION;
+              scope.addConnectionLine(cuedPort);
+            }
           }
           
           //left press button

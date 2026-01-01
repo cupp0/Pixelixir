@@ -25,7 +25,7 @@ class Window {
     windowManager = new WindowManager(this);
     eventManager = new EventManager(this);
     cam = new Camera(this);
-    col = color (50+random(50), 100 + random(50), 150 + random(50));
+    col = color (25+random(100), 75 + random(100), 125 + random(100));
   } 
   
   void onHumanEvent(HumanEvent e){

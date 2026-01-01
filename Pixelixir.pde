@@ -6,12 +6,10 @@ import javax.swing.JOptionPane;
 import com.google.gson.*;
 
 //~Modules
-//these are available default modules. Unless you want to make a custom UI element, making a new Operator
-//involves adding its label somewhere here and making a corresonding Operator class. For instance,
-//add "filter" here and some class FilterOperator extends PrimeOperator and it will show up in add module
-//options
-
-//copy, concat, split, send, receive
+//these are available default modules. Saved modules go in the sketch /data/patches folder. Unless you 
+//want to make a custom UI element, making a new Operator only involves adding its label here and 
+//making a corresonding Operator class. For instance, add "filter" here and some class FilterOperator 
+//extends PrimeOperator and it will show up in add module options
 
 String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "composite"};
 String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};

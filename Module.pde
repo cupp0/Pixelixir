@@ -233,7 +233,7 @@ public class Module implements OperatorListener{
       ui.display();
     }
     
-    if (label != null && !(owner instanceof UIOperator)){
+    if (label != null && !(owner instanceof UIOperator) && !isComposite()){
       displayLabel();
     }
   }
@@ -270,6 +270,10 @@ public class Module implements OperatorListener{
   }
 
   color getColor(){
+    if (this.isComposite()){
+      return windows.get(this).col;
+    }
+    
     for (int i = 0; i < UIText.length; i++){
       for (String s : UIText[i]){
         if (s.equals(name)){

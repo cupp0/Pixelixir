@@ -10,7 +10,7 @@ class Camera {
   float zoomFactor = 1.5;
 
   float maxScl = 200;
-  float minScl = .05;
+  float minScl = .1;
   
   PVector wMouse = new PVector();
   
