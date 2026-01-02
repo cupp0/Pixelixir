@@ -107,6 +107,21 @@ class StyleResolver {
     return noiseGen.getColor();
   }
   
+  color getColorByLastEval(OutPork p){
+    color c = 0;
+    if (p.targetFlow != null){
+      c = getDataTypeColor(p.targetFlow.getType());
+    }
+    else {
+      c = getDataTypeColor(p.getCurrentDataType());
+    }
+    int framesSinceEval = frameCount - ((OutPork)p).lastEval;
+    if (framesSinceEval < 10){
+      c = addColor(c, color((10-framesSinceEval) * 12));
+    }
+    return c;
+  }
+  
   color getConnectionColorByPork(Pork p){
     color c = 0;
     if (p.targetFlow != null){

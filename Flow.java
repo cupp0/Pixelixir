@@ -234,6 +234,9 @@ public class Flow {
   
   //static copy
   static void copyData(Flow source, Flow destination){
+    if(source.type != destination.type){
+      destination.setType(source.getType()); 
+    }
     if (source.type == destination.type){
       switch(source.type){
         case NUMERIC:
