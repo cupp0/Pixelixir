@@ -12,11 +12,14 @@ public class BodyUI extends ModuleUI<BodyUIState>{
     shape(shape, state.pos.x, state.pos.y);
     
     //little edge that shows if the operator is writing or just reading
-    color leftEdgeColor = getWindow().eventManager.styleResolver.getDataColorByOperator(parent.owner);
-    if (leftEdgeColor != color(0)){
-      stroke(getWindow().eventManager.styleResolver.getDataColorByOperator(parent.owner));
-      strokeWeight(2);
-      line(state.pos.x, state.pos.y+radius, state.pos.x, state.pos.y+size.y-radius);
+    if (parent.isComposite())return;
+    if (!(parent.owner.hasOutput()) || !(parent.owner.hasInput())) return;
+    boolean mutating = parent.owner.isMutating();
+    color edgeColor = getWindow().eventManager.styleResolver.getColorByInputData(parent.owner);
+    if (edgeColor != color(0)){
+      stroke(getWindow().eventManager.styleResolver.getColorByInputData(parent.owner));
+      strokeWeight(2);      
+      if (mutating){line(state.pos.x, state.pos.y+radius, state.pos.x, state.pos.y+size.y-radius);}
     }
   }
   

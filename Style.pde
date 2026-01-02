@@ -129,8 +129,8 @@ class StyleResolver {
     } 
   }
   
-  color getDataTypeColor(DataType dc){
-    switch (dc) {
+  color getDataTypeColor(DataType dt){
+    switch (dt) {
       case NUMERIC : return color(175, 125, 75);
       case TEXT : return color(75, 175, 125);
       case LIST : return color(75, 125, 175);
@@ -142,23 +142,14 @@ class StyleResolver {
     } 
   }
   
-  color getDataColorByOperator(Operator op){
-    if (op == null) return color(0);
-    Flow f = op.getTargetFlow();
-    if (op.executionSemantics == ExecutionSemantics.MUTATES){
-      return getDataTypeColor(op.ins.get(0).getCurrentDataType());
-    }
-    return color(0);
+  color getColorByInputData(Operator op){
+    if (op.ins.size() == 0) return color(0);
+    if (!op.ins.get(0).isConnected()) return color(0);
+    return getDataTypeColor(op.ins.get(0).getCurrentDataType());
   }
   
   color getStrokeByPork(Pork p){
-    if (p.getCurrentAccess() == null){
-      return color(0);
-    }
-    switch(p.getCurrentAccess()){
-      case READONLY : return addColor(color(30), getDataTypeColor(p.getCurrentDataType()));      
-      case READWRITE : return getDataTypeColor(p.getCurrentDataType());      
-      default : return color(0);
-    }
+    if (p.getCurrentAccess() == null) return color(0);
+    return getDataTypeColor(p.getCurrentDataType()); 
   }
 }

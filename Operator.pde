@@ -4,31 +4,6 @@ enum ExecutionSemantics{
   GENERATES
 }
 
-//helper class for resolving ports that accept multiple data types
-class DataTypeBinder {
-  
-  DataType dc;
-  ArrayList<Pork> boundPorks = new ArrayList<Pork>();
-
-  DataTypeBinder(Pork p){
-    addPork(p);  
-  }
-  
-  void addPork(Pork p){ boundPorks.add(p); }
-  
-  ArrayList<Pork> getBoundPorks(){ return boundPorks; }
-  
-  void setDC(DataType dc_){ 
-    dc = dc_;
-    for (Pork p : boundPorks){
-      p.setCurrentDataType(dc);
-    }
-  }
-  
-  DataType getDC(){ return dc; }
-  
-}
-
 public abstract class Operator{
   
   protected OperatorListener listener; //module that needs to react to changes to this operator
@@ -38,9 +13,8 @@ public abstract class Operator{
   
   ArrayList<InPork> ins = new ArrayList<InPork>();                           //where we point for input data
   ArrayList<OutPork> outs = new ArrayList<OutPork>();                        //where we put output data
-  ArrayList<DataTypeBinder> typeBindings = new ArrayList<DataTypeBinder>(); //ports that resolve eachother's type
+  ArrayList<DataTypeBinder> typeBindings = new ArrayList<DataTypeBinder>();  //ports that resolve eachother's type
   
-  Flow targetFlow;
   ExecutionSemantics executionSemantics;
   
   Operator(){
@@ -48,19 +22,7 @@ public abstract class Operator{
   }
   
   abstract void initialize();
-  
-  //composites have some edge cases that shouldn't break anything, 
-  //but we should eventually override.
-  
-  void setTargetFlow(Flow f){
-    targetFlow = f;
-  }
-  
-  Flow getTargetFlow(){
-    return targetFlow;
-  }
-  
-  //@overrides - valve,
+   
   boolean shouldExecute(){
     //don't allow execution if we are missing inputs
     if (!inPorksFull()){return false; }
@@ -90,7 +52,6 @@ public abstract class Operator{
     }
   }
   
-  //composites also have some edge cases here.
   void postEvaluation(boolean executed){
     
     //this resets ports that coordinate where new data appears
@@ -121,21 +82,20 @@ public abstract class Operator{
   
   //most onConnection stuff is handled directly through ports but some Operators need to know as well
   //ValveOperator, for instance, needs to update its output DataType
-  void onConnection(Pork p){}
-  
+  void onConnection(Pork p){} 
   
   //defaults. may refactor ports entirely
-  InPork addInPork(DataType dc){                             
+  InPork addInPork(DataType dt){                             
     InPork in = new InPork(this, ins.size());                //create the pork
-    in.setDefaultDataType(dc);
+    in.setDefaultDataType(dt);
     ins.add(in);                                             //store it
     listener.onPorkAdded(in);                                //tell module about changes
     return in;
   }
   
-  OutPork addOutPork(DataType dc){                             
+  OutPork addOutPork(DataType dt){                             
     OutPork out = new OutPork(this, outs.size());             //create the pork
-    out.setDefaultDataType(dc);
+    out.setDefaultDataType(dt);
     outs.add(out);                                            //store it
     listener.onPorkAdded(out);                                //tell module about changes
     return out;
@@ -190,14 +150,20 @@ public abstract class Operator{
       if (i.getSource() == null) return false; 
     }
     return true;
-  }
-  
+  }  
   boolean outPorksFull(){
     for (OutPork o : outs){
       if (o.getDestinations().size() == 0) return false; 
     }
     return true;
   }
+  boolean isMutating(){
+    if (executionSemantics == ExecutionSemantics.GENERATES) return false;
+    if (ins.size() == 0) return false;
+    return ins.get(0).getCurrentAccess() == DataAccess.READWRITE;
+  }
+  boolean hasOutput(){ return outs.size() > 0; }
+  boolean hasInput(){ return ins.size() > 0; }
   
   //this method returns the typeBinder helper if the supplied pork is part of a binding
   DataTypeBinder isBound(Pork p){
@@ -251,18 +217,18 @@ public abstract class Operator{
   //this method resolves expected type for operators with indeterminite data 
   //for instance, a valve, send/receive, copy, etc.. It also propagates that
   //change down/up stream in the case of chained unresolved types
-  void propagateCurrentDataType(Pork where, DataType dc){
-    where.setCurrentDataType(dc);
+  void propagateCurrentDataType(Pork where, DataType dt){
+    where.setCurrentDataType(dt);
     for (DataTypeBinder dtb : typeBindings){
       if (dtb.getBoundPorks().contains(where)){ 
         
         //ensure we don't get stuck in a loop
-        if (dtb.getDC() != dc){
-          dtb.setDC(dc);
+        if (dtb.getDataType() != dt){
+          dtb.setDataType(dt);
           
           //propagate to all porks connected to any pork we have changed
           for (Pork p : dtb.getBoundPorks()){
-            p.owner.propagateCurrentDataType(p, dc);
+            p.owner.propagateCurrentDataType(p, dt);
           }
         }
       }
@@ -296,44 +262,40 @@ public abstract class Operator{
   //connected is responsible for resolving any data lifecycle questions 
   //DataAccess, and DataType is already set at this point. if readwrite, propagate. if readonly
   //allocate a new Flow downstream and propagate
-  void tryResolveTargetFlow(OutPork src, InPork dest){
+  void tryResolveTargetFlow(OutPork src){
     Flow f = src.targetFlow;
     
-    //null catch here so we don't try to copy a nothing
-    if (f == null){
-      dest.owner.propagateTargetFlow(dest, null); 
-      return;
+    for (InPork i : src.getDestinations()){
+      //null catch here so we don't try to copy a nothing
+      if (f == null){
+        i.owner.propagateTargetFlow(i, null); 
+        return;
+      }
+    
+      i.owner.propagateTargetFlow(i, f);
     }
 
-    //if it wants read write, that means dest is a mutation port
-    if (dest.getCurrentAccess() == DataAccess.READWRITE){
-      dest.owner.propagateTargetFlow(dest, src.targetFlow);
-      return;
-    } 
-    
-    //if we are here, that means we are at a mutation port but
-    //READONLY is specified, so copy the data
-    if (dest.isMutationPort()){
-      dest.owner.propagateTargetFlow(dest, src.targetFlow.copyFlow());
-      return;
-    }
-    
-    //if here, we aren't at a mutation port, so we can safely send
-    //the original flow
-    dest.owner.propagateTargetFlow(dest, src.targetFlow);
   }
   
   //this should only ever set targetFlow of in1 and out1 to f,
   //then propagate down from out1
   void propagateTargetFlow(InPork where, Flow f){
     
-    where.setTargetFlow(f);    
-    if (!where.isMutationPort()) return;     //not the mutation port, dont propagate
-
-    outs.get(0).setTargetFlow(f);            //out1 is the mutation port
+    where.setTargetFlow(f);
     
-    for (InPork p : outs.get(0).getDestinations()){
-      outs.get(0).owner.tryResolveTargetFlow(outs.get(0), p);
+    //if it wants read write, that means dest is a mutation port
+    if (where.getCurrentAccess() == DataAccess.READWRITE){
+      outs.get(0).setTargetFlow(f);
+      tryResolveTargetFlow(outs.get(0));
+      return;
+    } 
+    
+    //this code is for mutation ops that are currently read only. That means
+    //we need to put a new Flow at its mutation outport
+    if (executionSemantics == ExecutionSemantics.MUTATES){
+      outs.get(0).setTargetFlow(new Flow(outs.get(0).getCurrentDataType()));
+      tryResolveTargetFlow(outs.get(0));
+      return;
     }
   
   }

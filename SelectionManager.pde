@@ -52,6 +52,7 @@ class SelectionManager{
           cdata.fromPortIndex = c.source.index;
           cdata.toModule = c.destination.parent.id;
           cdata.toPortIndex = c.destination.index;
+          cdata.access = ((InPork)where.portMap.getPork(c.destination)).getCurrentAccess();
           wdata.connections.add(cdata);
         }
       }
@@ -231,7 +232,11 @@ class SelectionManager{
       //build the connection
       OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
       InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);
-      where.attemptConnection(src, dest, DataAccess.READONLY);
+      if(cdata.access == null){
+        where.attemptConnection(src, dest, DataAccess.READONLY);
+      } else{
+        where.attemptConnection(src, dest, cdata.access);
+      }
     }
     
     //find any composite and rebuild those connections too

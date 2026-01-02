@@ -14,6 +14,7 @@ class ConnectionData {
   int fromPortIndex;
   String toModule;
   int toPortIndex;
+  DataAccess access;
 }
 
 class WindowData {

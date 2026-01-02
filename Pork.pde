@@ -28,13 +28,13 @@ abstract class Pork {
   
   void setTargetFlow(Flow f){
     targetFlow = f;
-    owner.setTargetFlow(f);
+    //owner.setTargetFlow(f);
   }
   
-  void setCurrentDataType(DataType dc){
-    currentDataType = dc;
+  void setCurrentDataType(DataType dt){
+    currentDataType = dt;
     if (targetFlow != null){
-      targetFlow.setType(dc); 
+      targetFlow.setType(dt); 
     }
   }
   
@@ -42,9 +42,9 @@ abstract class Pork {
     return currentDataType;
   }
   
-  void setDefaultDataType(DataType dc){
-    defaultDataType = dc;
-    setCurrentDataType(dc);
+  void setDefaultDataType(DataType dt){
+    defaultDataType = dt;
+    setCurrentDataType(dt);
   }
   
   DataType getDefaultDataType(){
@@ -74,6 +74,8 @@ abstract class Pork {
   abstract ArrayList<Pork> getConnectedPorks();
   
   abstract boolean elligibleForConnection();
+  
+  boolean isConnected(){ return getConnectedPorks().size() > 0; }
   
 }
 
@@ -140,7 +142,7 @@ class OutPork extends Pork {
     
     //if targetFlow is not null, we need to propagate the Flow identity
     if (targetFlow != null){
-      owner.tryResolveTargetFlow(this, dest);
+      owner.tryResolveTargetFlow(this);
     }
     
     //ops with dynamic port count need to when when connections are made
