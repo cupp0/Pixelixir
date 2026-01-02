@@ -6,9 +6,9 @@ class DragOperator extends PrimeOperator {
   }
   
   void initialize(){    
-    addInPork(DataCategory.MODULE);
-    addInPork(DataCategory.NUMERIC);
-    addInPork(DataCategory.NUMERIC);
+    addInPork(DataType.MODULE);
+    addInPork(DataType.NUMERIC);
+    addInPork(DataType.NUMERIC);
   }
   
   void execute(){

@@ -5,7 +5,7 @@ abstract class LogicOp extends PrimeOperator implements LogicOperator<Boolean>{
   }
   
   void initialize(){
-    addInPork(DataCategory.BOOL); addInPork(DataCategory.BOOL); addOutPork(DataCategory.BOOL).setTargetFlow(new Flow(DataCategory.BOOL));
+    addInPork(DataType.BOOL); addInPork(DataType.BOOL); addOutPork(DataType.BOOL).setTargetFlow(new Flow(DataType.BOOL));
   }
   
   void execute(){
@@ -45,7 +45,7 @@ class NotOperator extends LogicOp{
  
  @Override
   void initialize(){
-    addInPork(DataCategory.BOOL); addOutPork(DataCategory.BOOL).setTargetFlow(new Flow(DataCategory.BOOL));
+    addInPork(DataType.BOOL); addOutPork(DataType.BOOL).setTargetFlow(new Flow(DataType.BOOL));
   }
   
   void execute(){                  

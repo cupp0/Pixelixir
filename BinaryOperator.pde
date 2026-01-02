@@ -8,9 +8,9 @@ public abstract class BinaryOp extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.NUMERIC); 
-    addInPork(DataCategory.NUMERIC); 
-    addOutPork(DataCategory.NUMERIC);
+    addInPork(DataType.NUMERIC); 
+    addInPork(DataType.NUMERIC); 
+    addOutPork(DataType.NUMERIC);
   }
   
   void execute(){    

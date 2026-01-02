@@ -6,8 +6,8 @@ class CopyOperator extends PrimeOperator implements DynamicPorks{
   }
   
   void initialize(){
-    setPorkSemantics(addInPork(DataCategory.UNDETERMINED));
-    addOutPork(DataCategory.UNDETERMINED).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
+    setPorkSemantics(addInPork(DataType.UNDETERMINED));
+    addOutPork(DataType.UNDETERMINED).setTargetFlow(new Flow(DataType.UNDETERMINED));
     setPorkSemantics(outs.get(0));
   }
   
@@ -34,10 +34,10 @@ class CopyOperator extends PrimeOperator implements DynamicPorks{
   }
   
   void addCanonicalPork(){
-    DataCategory dc = typeBindings.get(0).getDC();
-    OutPork o = addOutPork(DataCategory.UNDETERMINED);
-    o.setTargetFlow(new Flow(DataCategory.UNDETERMINED));
-    o.setCurrentDataCategory(dc);
+    DataType dc = typeBindings.get(0).getDC();
+    OutPork o = addOutPork(DataType.UNDETERMINED);
+    o.setTargetFlow(new Flow(DataType.UNDETERMINED));
+    o.setCurrentDataType(dc);
     setPorkSemantics(o);
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }

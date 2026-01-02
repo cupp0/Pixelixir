@@ -6,7 +6,7 @@ class WindowOperator extends PrimeOperator {
   }
   
   void initialize(){    
-    addOutPork(DataCategory.WINDOW).setTargetFlow(new Flow(DataCategory.WINDOW));
+    addOutPork(DataType.WINDOW).setTargetFlow(new Flow(DataType.WINDOW));
   }
   
   boolean shouldExecute(){ return true; }

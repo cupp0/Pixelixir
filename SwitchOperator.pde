@@ -6,7 +6,7 @@ class SwitchOperator extends UIOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.BOOL).setTargetFlow(new Flow(DataCategory.BOOL));
+    addOutPork(DataType.BOOL).setTargetFlow(new Flow(DataType.BOOL));
   }
   
   void execute(){

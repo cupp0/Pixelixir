@@ -8,7 +8,7 @@ class WriteOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.TEXT); addInPork(DataCategory.UNDETERMINED); 
+    addInPork(DataType.TEXT); addInPork(DataType.UNDETERMINED); 
   }
   
   void execute(){

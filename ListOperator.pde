@@ -1,7 +1,7 @@
 class ListOperator extends PrimeOperator{
     
   int currentSize;
-  DataCategory currentDataCategory;
+  DataType currentDataType;
   
   ListOperator(){
     super();
@@ -9,18 +9,18 @@ class ListOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.NUMERIC);addInPork(DataCategory.UNDETERMINED); addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
+    addInPork(DataType.NUMERIC);addInPork(DataType.UNDETERMINED); addOutPork(DataType.LIST).setTargetFlow(new Flow(DataType.LIST));
   }
 
   void execute(){
     
-    if ((int)ins.get(0).targetFlow.getFloatValue() != currentSize || ins.get(1).getCurrentDataCategory() != currentDataCategory){
-      instantiateList((int)ins.get(0).targetFlow.getFloatValue(), ins.get(1).getCurrentDataCategory());
+    if ((int)ins.get(0).targetFlow.getFloatValue() != currentSize || ins.get(1).getCurrentDataType() != currentDataType){
+      instantiateList((int)ins.get(0).targetFlow.getFloatValue(), ins.get(1).getCurrentDataType());
     }
         
   }
   
-  ArrayList<Flow> instantiateList(int listSize, DataCategory listType){
+  ArrayList<Flow> instantiateList(int listSize, DataType listType){
     ArrayList<Flow> newList = new ArrayList<Flow>();
     for (int i = 0; i < listSize; i++){
       Flow f = new Flow(listType);

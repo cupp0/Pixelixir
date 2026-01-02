@@ -8,7 +8,7 @@ class RightMouseOperator extends RawInputOperator{
   }
   
   void initialize(){    
-    addOutPork(DataCategory.BOOL).setTargetFlow(new Flow(DataCategory.BOOL));
+    addOutPork(DataType.BOOL).setTargetFlow(new Flow(DataType.BOOL));
   }
   
   //should compare with previous event and trigger data notification on

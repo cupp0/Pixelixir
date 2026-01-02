@@ -11,9 +11,9 @@ class SendOperator extends IOOperator implements DynamicPorks{
   }
   
   void addBoundPair(){
-    setPorkSemantics(addInPork(DataCategory.UNDETERMINED));
+    setPorkSemantics(addInPork(DataType.UNDETERMINED));
     
-    OutPork o = addOutPork(DataCategory.UNDETERMINED);
+    OutPork o = addOutPork(DataType.UNDETERMINED);
     setPorkSemantics(o);  
     o.setHidden(true);
   }

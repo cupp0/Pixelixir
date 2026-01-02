@@ -6,7 +6,7 @@ class TextfieldOperator extends UIOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.TEXT).setTargetFlow(new Flow(DataCategory.TEXT));
+    addOutPork(DataType.TEXT).setTargetFlow(new Flow(DataType.TEXT));
   }
 
   void execute(){   

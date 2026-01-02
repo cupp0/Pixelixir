@@ -6,7 +6,7 @@ class OutListOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.MODULE); addOutPork(DataCategory.LIST).setTargetFlow(new Flow(DataCategory.LIST));
+    addInPork(DataType.MODULE); addOutPork(DataType.LIST).setTargetFlow(new Flow(DataType.LIST));
   }
 
   void execute(){

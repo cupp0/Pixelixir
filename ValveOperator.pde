@@ -6,12 +6,12 @@ class ValveOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataCategory.UNDETERMINED); 
-    addInPork(DataCategory.BOOL); 
-    addOutPork(DataCategory.UNDETERMINED);
+    addInPork(DataType.UNDETERMINED); 
+    addInPork(DataType.BOOL); 
+    addOutPork(DataType.UNDETERMINED);
     setPorkSemantics(ins.get(0));
     setPorkSemantics(outs.get(0));
-    outs.get(0).setTargetFlow(new Flow(DataCategory.UNDETERMINED));
+    outs.get(0).setTargetFlow(new Flow(DataType.UNDETERMINED));
   }
   
   void setPorkSemantics(Pork p){

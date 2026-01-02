@@ -17,8 +17,8 @@ class ConnectOperator extends PrimeOperator {
   }
   
   void initialize(){    
-    addInPork(DataCategory.PORT);
-    addInPork(DataCategory.PORT);
+    addInPork(DataType.PORT);
+    addInPork(DataType.PORT);
   }
   
   void execute(){

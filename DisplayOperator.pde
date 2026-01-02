@@ -8,7 +8,7 @@ class DisplayOperator extends UIOperator{
   }  
 
   void initialize(){
-    addInPork(DataCategory.NUMERIC);addInPork(DataCategory.NUMERIC);addInPork(DataCategory.LIST);
+    addInPork(DataType.NUMERIC);addInPork(DataType.NUMERIC);addInPork(DataType.LIST);
   }
   
   void setDataListener(DataBender dl){
@@ -24,7 +24,7 @@ class DisplayOperator extends UIOperator{
     List<Flow> buffer = ins.get(2).targetFlow.getListValue();
     
     for (Flow f : buffer){
-      if (f.getType() != DataCategory.NUMERIC){
+      if (f.getType() != DataType.NUMERIC){
         return false;
       }
     }

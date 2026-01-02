@@ -105,16 +105,12 @@ class Window {
     }
     
     //are the data types compatible (float vs text, etc)
-    boolean compatibleDataType = Flow.compatible(srcPork.getCurrentDataCategory(), destPork.getCurrentDataCategory());
+    boolean compatibleDataType = Flow.compatible(srcPork.getCurrentDataType(), destPork.getCurrentDataType());
     
     if (!compatibleDataType){
       println("if you try to STRING a LIST to a BOOL's tail, you'll soon NUMERIC away to heaven (that connection's a fail)");
       return;
     }
-    
-    //if compatible, set both ports to the resolved access requirement, then build the connection
-    srcPork.setCurrentAccess(accessRequirement);
-    destPork.setCurrentAccess(accessRequirement);
     
     buildConnection(src, dest, accessRequirement);
   }
@@ -125,6 +121,10 @@ class Window {
     //corresponding data ports
     OutPork srcPork = ((OutPork)portMap.getPork(src));
     InPork destPork = ((InPork)portMap.getPork(dest));
+    
+    //if compatible, set both ports to the resolved access requirement, then build the connection
+    srcPork.setCurrentAccess(da);
+    destPork.setCurrentAccess(da);
     
     //add connection, both in UI land and Data land
     connections.add(new Connection(src, dest, da));

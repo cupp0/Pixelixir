@@ -6,7 +6,7 @@ class SliderOperator extends UIOperator{
   }
   
   void initialize(){
-    addOutPork(DataCategory.NUMERIC).setTargetFlow(new Flow(DataCategory.NUMERIC));
+    addOutPork(DataType.NUMERIC).setTargetFlow(new Flow(DataType.NUMERIC));
   }
   
   void execute(){

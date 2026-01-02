@@ -6,7 +6,7 @@ public abstract class UnaryOp extends PrimeOperator implements UnaryOperator<Flo
   }
   
   void initialize(){
-    addInPork(DataCategory.NUMERIC); addOutPork(DataCategory.NUMERIC);
+    addInPork(DataType.NUMERIC); addOutPork(DataType.NUMERIC);
   }
 
   public abstract float apply(float value);

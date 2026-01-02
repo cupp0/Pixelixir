@@ -5,8 +5,8 @@ abstract class Pork {
   final Operator owner;
   int index;
   Flow targetFlow;
-  DataCategory defaultDataCategory;
-  DataCategory currentDataCategory;
+  DataType defaultDataType;
+  DataType currentDataType;
   EnumSet<DataAccess> allowedAccess;
   DataAccess currentAccess;
   boolean hidden; 
@@ -21,9 +21,7 @@ abstract class Pork {
   
   boolean isMutationPort(){
     if (owner.getExecutionSemantics() == ExecutionSemantics.MUTATES){
-      if (index == 0){
-        return true;
-      }
+      return this.index == 0;
     }
     return false;
   }
@@ -33,24 +31,24 @@ abstract class Pork {
     owner.setTargetFlow(f);
   }
   
-  void setCurrentDataCategory(DataCategory dc){
-    currentDataCategory = dc;
+  void setCurrentDataType(DataType dc){
+    currentDataType = dc;
     if (targetFlow != null){
       targetFlow.setType(dc); 
     }
   }
   
-  DataCategory getCurrentDataCategory(){
-    return currentDataCategory;
+  DataType getCurrentDataType(){
+    return currentDataType;
   }
   
-  void setDefaultDataCategory(DataCategory dc){
-    defaultDataCategory = dc;
-    setCurrentDataCategory(dc);
+  void setDefaultDataType(DataType dc){
+    defaultDataType = dc;
+    setCurrentDataType(dc);
   }
   
-  DataCategory getDefaultDataCategory(){
-    return defaultDataCategory;
+  DataType getDefaultDataType(){
+    return defaultDataType;
   }
   
   void setCurrentAccess(DataAccess da){
@@ -127,24 +125,25 @@ class OutPork extends Pork {
   //we are concerned here with propagating expected data category
   //and, if appropriate, propagating Flow identity
   void onConnection(InPork dest){
-    DataCategory srcCat = this.getCurrentDataCategory();
-    DataCategory destCat = dest.getCurrentDataCategory();
+    DataType srcCat = this.getCurrentDataType();
+    DataType destCat = dest.getCurrentDataType();
     
     //if types disagree, they need resolved
     //the only valid way for a type to disagree is if one is UNDETERMINED
     if (srcCat != destCat){
-      if (srcCat == DataCategory.UNDETERMINED ){
-        this.owner.propagateCurrentDataCategory(this, destCat);
+      if (srcCat == DataType.UNDETERMINED ){
+        this.owner.propagateCurrentDataType(this, destCat);
       } else {
-        dest.owner.propagateCurrentDataCategory(dest, srcCat);
+        dest.owner.propagateCurrentDataType(dest, srcCat);
       }
     } 
     
     //if targetFlow is not null, we need to propagate the Flow identity
     if (targetFlow != null){
-      dest.owner.propagateTargetFlow(dest, this.targetFlow);
+      owner.tryResolveTargetFlow(this, dest);
     }
     
+    //ops with dynamic port count need to when when connections are made
     owner.onConnectionAdded(this);
     dest.owner.onConnectionAdded(dest);
     
@@ -207,7 +206,6 @@ class OutPork extends Pork {
     EnumSet<DataAccess> outAccess = this.getAllowedAccess();
     EnumSet<DataAccess> inAccess = other.getAllowedAccess();
     
-    println(this.owner.name, other.owner.name);
     if (outAccess.contains(attemptedAccess) && inAccess.contains(attemptedAccess)){
       return attemptedAccess;
     }

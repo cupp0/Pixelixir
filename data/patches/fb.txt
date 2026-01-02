@@ -1,0 +1,189 @@
+{
+  "modules": [
+    {
+      "name": "switch",
+      "id": "7f7c23c0-6dc0-4ac2-8b30-9b4c705c84d8",
+      "ins": 0,
+      "outs": 1,
+      "position": { "x": 210.0, "y": 120.0, "z": 0.0 },
+      "uiElements": [
+        {
+          "identityToken": "c7d6d49e-0c87-4a78-b49d-09f3c7b0a2a4",
+          "data": { "type": "BOOL", "floatValue": 0.0, "textValue": "", "boolValue": true },
+          "id": "2d39e9b5-1d1e-4c97-93c5-86aaefb2c1ef",
+          "pos": { "x": 10.0, "y": 10.0, "z": 0.0 },
+          "type": "switch"
+        }
+      ]
+    },
+    {
+      "name": "textfield",
+      "id": "bd3e5e43-2d5a-4a39-9e7f-7b0d4d2f10d4",
+      "ins": 0,
+      "outs": 1,
+      "position": { "x": 420.0, "y": 120.0, "z": 0.0 },
+      "uiElements": [
+        {
+          "identityToken": "c3d4b6e1-8a5b-4c4a-9c1a-718a5f6d2b8d",
+          "data": { "type": "TEXT", "floatValue": 0.0, "textValue": "counter", "boolValue": false },
+          "id": "1c7b9226-9c2b-4af5-a6df-1d7db69a8c9c",
+          "pos": { "x": 10.0, "y": 10.0, "z": 0.0 },
+          "type": "textfield"
+        }
+      ]
+    },
+    {
+      "name": "valve",
+      "id": "1c5b7f31-9f4a-4f6c-9a9a-3ef4c6f9f33c",
+      "ins": 2,
+      "outs": 1,
+      "position": { "x": 420.0, "y": 180.0, "z": 0.0 },
+      "uiElements": []
+    },
+    {
+      "name": "read",
+      "id": "a0a9a1ef-6e91-4e37-a7d0-1b3aef7d0aa0",
+      "ins": 1,
+      "outs": 1,
+      "position": { "x": 420.0, "y": 240.0, "z": 0.0 },
+      "uiElements": []
+    },
+    {
+      "name": "valve",
+      "id": "9a48e566-8d8d-4d0a-85e6-1c8f5a0b02a5",
+      "ins": 2,
+      "outs": 1,
+      "position": { "x": 420.0, "y": 300.0, "z": 0.0 },
+      "uiElements": []
+    },
+    {
+      "name": "slider",
+      "id": "d0bb64d2-3d7e-4f1d-8c6c-51c7a9a1f8f8",
+      "ins": 0,
+      "outs": 1,
+      "position": { "x": 210.0, "y": 240.0, "z": 0.0 },
+      "uiElements": [
+        {
+          "range": { "x": -1.0, "y": 1.0, "z": 0.0 },
+          "identityToken": "ac6c43e7-8f01-4b67-8f7b-0c98b5f7a6b2",
+          "data": { "type": "FLOAT", "floatValue": 0.1, "boolValue": false },
+          "id": "d5b2d605-2c64-4311-a713-0c3b3be6f7a0",
+          "pos": { "x": 10.0, "y": 10.0, "z": 0.0 },
+          "type": "slider"
+        }
+      ]
+    },
+    {
+      "name": "valve",
+      "id": "0f2f7e93-0f26-4f5b-9e07-7d1228b4d13b",
+      "ins": 2,
+      "outs": 1,
+      "position": { "x": 210.0, "y": 300.0, "z": 0.0 },
+      "uiElements": []
+    },
+    {
+      "name": "add",
+      "id": "5c5b9a44-0b7a-4ad6-98db-3e76f86f1d56",
+      "ins": 2,
+      "outs": 1,
+      "position": { "x": 320.0, "y": 380.0, "z": 0.0 },
+      "uiElements": []
+    },
+    {
+      "name": "write",
+      "id": "6c3f87d7-1f88-4f9a-9b50-3c7d3c07f8b7",
+      "ins": 2,
+      "outs": 0,
+      "position": { "x": 420.0, "y": 450.0, "z": 0.0 },
+      "uiElements": []
+    },
+    {
+      "name": "print",
+      "id": "a9f8e6f2-5a3d-4d4a-b7d7-0c8a8b2c9e1f",
+      "ins": 1,
+      "outs": 0,
+      "position": { "x": 320.0, "y": 450.0, "z": 0.0 },
+      "uiElements": []
+    }
+  ],
+  "connections": [
+    {
+      "fromModule": "bd3e5e43-2d5a-4a39-9e7f-7b0d4d2f10d4",
+      "fromPortIndex": 0,
+      "toModule": "1c5b7f31-9f4a-4f6c-9a9a-3ef4c6f9f33c",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "7f7c23c0-6dc0-4ac2-8b30-9b4c705c84d8",
+      "fromPortIndex": 0,
+      "toModule": "1c5b7f31-9f4a-4f6c-9a9a-3ef4c6f9f33c",
+      "toPortIndex": 1
+    },
+
+    {
+      "fromModule": "1c5b7f31-9f4a-4f6c-9a9a-3ef4c6f9f33c",
+      "fromPortIndex": 0,
+      "toModule": "a0a9a1ef-6e91-4e37-a7d0-1b3aef7d0aa0",
+      "toPortIndex": 0
+    },
+
+    {
+      "fromModule": "a0a9a1ef-6e91-4e37-a7d0-1b3aef7d0aa0",
+      "fromPortIndex": 0,
+      "toModule": "9a48e566-8d8d-4d0a-85e6-1c8f5a0b02a5",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "7f7c23c0-6dc0-4ac2-8b30-9b4c705c84d8",
+      "fromPortIndex": 0,
+      "toModule": "9a48e566-8d8d-4d0a-85e6-1c8f5a0b02a5",
+      "toPortIndex": 1
+    },
+
+    {
+      "fromModule": "d0bb64d2-3d7e-4f1d-8c6c-51c7a9a1f8f8",
+      "fromPortIndex": 0,
+      "toModule": "0f2f7e93-0f26-4f5b-9e07-7d1228b4d13b",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "7f7c23c0-6dc0-4ac2-8b30-9b4c705c84d8",
+      "fromPortIndex": 0,
+      "toModule": "0f2f7e93-0f26-4f5b-9e07-7d1228b4d13b",
+      "toPortIndex": 1
+    },
+
+    {
+      "fromModule": "9a48e566-8d8d-4d0a-85e6-1c8f5a0b02a5",
+      "fromPortIndex": 0,
+      "toModule": "5c5b9a44-0b7a-4ad6-98db-3e76f86f1d56",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "0f2f7e93-0f26-4f5b-9e07-7d1228b4d13b",
+      "fromPortIndex": 0,
+      "toModule": "5c5b9a44-0b7a-4ad6-98db-3e76f86f1d56",
+      "toPortIndex": 1
+    },
+
+    {
+      "fromModule": "1c5b7f31-9f4a-4f6c-9a9a-3ef4c6f9f33c",
+      "fromPortIndex": 0,
+      "toModule": "6c3f87d7-1f88-4f9a-9b50-3c7d3c07f8b7",
+      "toPortIndex": 0
+    },
+    {
+      "fromModule": "5c5b9a44-0b7a-4ad6-98db-3e76f86f1d56",
+      "fromPortIndex": 0,
+      "toModule": "6c3f87d7-1f88-4f9a-9b50-3c7d3c07f8b7",
+      "toPortIndex": 1
+    },
+
+    {
+      "fromModule": "5c5b9a44-0b7a-4ad6-98db-3e76f86f1d56",
+      "fromPortIndex": 0,
+      "toModule": "a9f8e6f2-5a3d-4d4a-b7d7-0c8a8b2c9e1f",
+      "toPortIndex": 0
+    }
+  ]
+}

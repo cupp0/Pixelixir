@@ -1,7 +1,7 @@
 //~Flow
 import  java.util.*;
 
-enum DataCategory {
+enum DataType {
   INT,
   NUMERIC,
   BOOL,
@@ -16,7 +16,7 @@ enum DataCategory {
 
 public class Flow {
   
-  private DataCategory type;
+  private DataType type;
 
   // Value storage for each category
   private float floatValue;
@@ -28,57 +28,57 @@ public class Flow {
   private String portValue;          //port id
   //private ImageBuffer imageValue;
   
-  public Flow(DataCategory type) {
+  public Flow(DataType type) {
     this.type = type;       
-    if (type == DataCategory.LIST){
+    if (type == DataType.LIST){
       listValue = new ArrayList<Flow>();
     }
   }
 
   public static Flow ofFloat(float value) {
-      Flow f = new Flow(DataCategory.NUMERIC);
+      Flow f = new Flow(DataType.NUMERIC);
       f.floatValue = value;
       return f;
   }
 
   public static Flow ofBool(boolean value) {
-      Flow f = new Flow(DataCategory.BOOL);
+      Flow f = new Flow(DataType.BOOL);
       f.boolValue = value;
       return f;
   }
 
   public static Flow ofText(String value) {
-      Flow f = new Flow(DataCategory.TEXT);
+      Flow f = new Flow(DataType.TEXT);
       f.textValue = value;
       return f;
   }
 
   public static Flow ofList(java.util.List<Flow> value) {
-      Flow f = new Flow(DataCategory.LIST);
+      Flow f = new Flow(DataType.LIST);
       f.listValue = value;
       return f;
   }
   
   public static Flow ofModule(String value) {
-      Flow f = new Flow(DataCategory.MODULE);
+      Flow f = new Flow(DataType.MODULE);
       f.moduleValue = value;
       return f;
   }
   
   public static Flow ofWindow(String value) {
-      Flow f = new Flow(DataCategory.WINDOW);
+      Flow f = new Flow(DataType.WINDOW);
       f.windowValue = value;
       return f;
   }
   
   public static Flow ofPort(String value) {
-      Flow f = new Flow(DataCategory.PORT);
+      Flow f = new Flow(DataType.PORT);
       f.portValue = value;
       return f;
   }
 
   // ---------- Type ----------
-  public DataCategory getType() {
+  public DataType getType() {
       return type;
   }
 
@@ -140,19 +140,19 @@ public class Flow {
   // ---------- Setters ----------
 
   //public void toFloat() {
-  //  setType(DataCategory.NUMERIC);
+  //  setType(DataType.NUMERIC);
   //}
 
   //public void toBool() {
-  //  setType(DataCategory.BOOL);
+  //  setType(DataType.BOOL);
   //}
 
   //public void toText() {
-  //  setType(DataCategory.TEXT);
+  //  setType(DataType.TEXT);
   //}
 
   //public void toList() {
-  //  setType(DataCategory.LIST);
+  //  setType(DataType.LIST);
   //}
 
   public void setFloatValue(float v) {
@@ -206,16 +206,16 @@ public class Flow {
 
   // ---------- type enforcement ----------
   
-  public static boolean compatible(DataCategory a, DataCategory b) {
-    if (a == DataCategory.UNDETERMINED || b == DataCategory.UNDETERMINED)
+  public static boolean compatible(DataType a, DataType b) {
+    if (a == DataType.UNDETERMINED || b == DataType.UNDETERMINED)
       return true;
 
     return a == b;
   }
 
-  public void setType(DataCategory newType) {
+  public void setType(DataType newType) {
     this.type = newType;
-    if (newType == DataCategory.LIST){
+    if (newType == DataType.LIST){
       listValue = new ArrayList<Flow>();
     }
   }
