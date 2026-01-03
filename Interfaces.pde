@@ -53,6 +53,8 @@ interface DataBender{
 
 interface DynamicPorks{
   void addCanonicalPork();
+  boolean isInputDynamic();
+  boolean isOutputDynamic();
 }
 
 //implemented by Window, whose eventManager handles any user interaction

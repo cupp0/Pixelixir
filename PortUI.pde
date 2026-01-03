@@ -58,12 +58,12 @@ public abstract class PortUI extends ModuleUI<PortUIState>{
   void display(){   
     rect(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y, radii[0], radii[1], radii[2], radii[3]);
     //if (parent.getWindow().portMap.getPork(this).targetFlow != null){
-    //  text(parent.getWindow().portMap.getPork(this).targetFlow.getAddress(), getAbsolutePosition().x, getAbsolutePosition().y);
+      //text(parent.getWindow().portMap.getPork(this).getAddress(), getAbsolutePosition().x, getAbsolutePosition().y);
     //}
-    if (parent.getWindow().portMap.getPork(this).targetFlow == null){
-      fill(255, 0, 0);    
-      ellipse(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y);
-    }
+    //if (parent.getWindow().portMap.getPork(this).targetFlow == null){
+    //  fill(255, 0, 0);    
+    //  ellipse(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y);
+    //}
   }
 
 }
@@ -90,12 +90,17 @@ class OutPortUI extends PortUI{
     name = "OutPort";
   } 
   
-  ArrayList<InPortUI> getDestinations(){    
-    ArrayList<InPortUI> list = new ArrayList<>();
-    for (InPork i : ((OutPork)getPorkPair()).getDestinations()){
-      list.add(((InPortUI)getWindow().portMap.getPort(i)));
+  ArrayList<InPortUI> getDestinations(){
+    Window w = getWindow();
+    ArrayList<InPortUI> ilist = new ArrayList<>();
+    
+    for (Connection c : w.connections){
+      if (c.source == this){
+        ilist.add((InPortUI)c.destination);
+      }
     }
-    return list;
+    
+    return ilist;
   }
 
 }

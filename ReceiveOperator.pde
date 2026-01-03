@@ -10,13 +10,9 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
   }
   
   void addBoundPair(){
-    InPork i = addInPork(DataType.UNDETERMINED);
-    setPorkSemantics(i);  
-    i.setHidden(true);   
-    setPorkSemantics(addOutPork(DataType.UNDETERMINED));
+    super.addBoundPair();
+    ins.get(outs.size()-1).setHidden(true);
   }
-  
-  
 
   //receive just built a connection. Do we need to make a port on the enclosing composite?
   //do we need to make a port on the receive?
@@ -35,5 +31,8 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
     addBoundPair();  
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
+  
+  boolean isInputDynamic(){ return true; }
+  boolean isOutputDynamic(){ return true; }
   
 }

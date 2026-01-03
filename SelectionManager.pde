@@ -45,15 +45,18 @@ class SelectionManager{
     //store connection info
     if (mods.size() > 0){  //could copy an empty composite
       Window where = mods.get(0).getWindow();
-      for (Connection c : where.connections) {      
-        if (mods.contains(c.source.parent) && mods.contains(c.destination.parent)) {
-          ConnectionData cdata = new ConnectionData();
-          cdata.fromModule = c.source.parent.id;
-          cdata.fromPortIndex = c.source.index;
-          cdata.toModule = c.destination.parent.id;
-          cdata.toPortIndex = c.destination.index;
-          cdata.access = graph.getEdge(where, c).dataAccess; //((InPork)where.portMap.getPork(c.destination)).getCurrentAccess();
-          wdata.connections.add(cdata);
+      
+      for (Module m : where.modules){
+        for (OutPortUI o : m.outs){
+          for (InPortUI i : o.getDestinations()){
+            ConnectionData cdata = new ConnectionData();
+            cdata.fromModule = o.parent.id;
+            cdata.fromPortIndex = o.index;
+            cdata.toModule = i.parent.id;
+            cdata.toPortIndex = i.index;
+            cdata.access = graph.getEdgeByPorts(where, o, i).dataAccess; //((InPork)where.portMap.getPork(c.destination)).getCurrentAccess();
+            wdata.connections.add(cdata);
+          }
         }
       }
     }
@@ -200,7 +203,7 @@ class SelectionManager{
         rebuildConnections(mdata.subwindow, newMods);
       }  
     }
-    
+
     // Rebuild connections
     for (ConnectionData cdata : wdata.connections) {
       Window where = windows.get(newMods.get(cdata.fromModule).parent);

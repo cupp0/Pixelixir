@@ -208,6 +208,7 @@ class OutPork extends Pork {
     EnumSet<DataAccess> outAccess = this.getAllowedAccess();
     EnumSet<DataAccess> inAccess = other.getAllowedAccess();
     
+    println(outAccess);
     if (outAccess.contains(attemptedAccess) && inAccess.contains(attemptedAccess)){
       return attemptedAccess;
     }

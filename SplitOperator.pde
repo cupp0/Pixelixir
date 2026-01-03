@@ -34,4 +34,7 @@ class SplitOperator extends PrimeOperator implements DynamicPorks{
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
   
+  boolean isInputDynamic(){ return false; }
+  boolean isOutputDynamic(){ return true; }
+  
 }

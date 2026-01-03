@@ -64,3 +64,10 @@ class AbsOperator extends UnaryOp{
     return abs(x); 
   }
 }
+
+class SqrtOperator extends UnaryOp{
+  SqrtOperator(){super();name = "sqrt";label =  "sqrt";}
+  public float apply(float x) { 
+    return sqrt(x); 
+  }
+}

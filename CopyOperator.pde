@@ -41,5 +41,8 @@ class CopyOperator extends PrimeOperator implements DynamicPorks{
     setPorkSemantics(o);
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
+  
+  boolean isInputDynamic(){ return false; }
+  boolean isOutputDynamic(){ return true; }
 
 }

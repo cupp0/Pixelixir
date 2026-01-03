@@ -2,6 +2,19 @@ class IOOperator extends PrimeOperator{
   
   void initialize(){}
   
+  void addBoundPair(){
+    EnumSet<DataAccess> readOrWrite = EnumSet.of(DataAccess.READONLY, DataAccess.READWRITE);
+    
+    InPork i =addInPork(DataType.UNDETERMINED);    
+    OutPork o = addOutPork(DataType.UNDETERMINED);
+    
+    i.setAllowedAccess(readOrWrite);
+    o.setAllowedAccess(readOrWrite);
+    
+    setPorkSemantics(i);
+    setPorkSemantics(o);
+  }
+  
   void setPorkSemantics(Pork p){
     if (p instanceof InPork){
       typeBindings.add(new DataTypeBinder(p));

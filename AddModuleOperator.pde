@@ -1,21 +1,44 @@
-class WindowOperator extends PrimeOperator {
-  
-  WindowOperator(){
+class AddModuleOperator extends PrimeOperator{
+   
+  AddModuleOperator(){
     super();
-    name = "window";
+    name = "addModule"; 
   }
   
-  void initialize(){    
-    addOutPork(DataType.WINDOW).setTargetFlow(new Flow(DataType.WINDOW));
+  void initialize(){
+    addInPork(DataType.TEXT); addInPork(DataType.WINDOW); addInPork(DataType.NUMERIC); addInPork(DataType.NUMERIC);
+    addOutPork(DataType.MODULE).setTargetFlow(new Flow(DataType.MODULE));
   }
-  
-  boolean shouldExecute(){ return true; }
-  
+
   void execute(){
-    String s = ((Module)listener).parent.id;
-    outs.get(0).targetFlow.setWindowValue(s);
+    if (!inputsAreValid())return;
+    
+    String n = ins.get(0).targetFlow.getTextValue();
+    Window w = windowByBoundaryID.get(ins.get(1).targetFlow.getWindowValue());
+    float x = ins.get(2).targetFlow.getFloatValue();
+    float y = ins.get(3).targetFlow.getFloatValue();
+    w.addModule(n).setBodyPosition(new PVector(x, y));
   }
   
-  boolean isSpeaker(){ return true; } 
- 
+  boolean inputsAreValid(){
+
+    String n = ins.get(0).targetFlow.getTextValue();
+    if (!isAModule(n)) return false;
+    if (ins.get(1).targetFlow == null){  return false; }
+    Window w = windowByBoundaryID.get(ins.get(1).targetFlow.getWindowValue());
+    if (w == null){ return false; }
+    
+    return true;
+  }
+  
+  boolean isAModule(String s){
+    for (String[] st : UIText){
+      for (String str : st){
+        if (s.equals(str)) return true;  
+      }
+    }
+    
+    return false;
+  }
+  
 }

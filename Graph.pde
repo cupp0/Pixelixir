@@ -220,6 +220,15 @@ Graph(){}
     return null;
   }
   
+  Edge getEdgeByPorts(Window w, OutPortUI o, InPortUI i){
+    for (Edge e : edges){
+      if (o == w.portMap.getPort(e.source) && i == w.portMap.getPort(e.destination)){
+        return e;
+      }
+    }
+    return null;
+  }
+  
   boolean isConnected(OutPork start, InPork target){
     if (reachablePorks(start).contains(target)){
       return true;
