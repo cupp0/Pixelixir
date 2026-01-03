@@ -11,12 +11,12 @@ class SendOperator extends IOOperator implements DynamicPorks{
   }
   
   void addBoundPair(){
-    setPorkSemantics(addInPork(DataType.UNDETERMINED));
-    
+    setPorkSemantics(addInPork(DataType.UNDETERMINED));    
     OutPork o = addOutPork(DataType.UNDETERMINED);
     setPorkSemantics(o);  
     o.setHidden(true);
   }
+  
   
   //index_ tells us which Sender Pork just built a new connection
   @Override

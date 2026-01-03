@@ -37,6 +37,27 @@ class TanOperator extends UnaryOp{
   }
 }
 
+class AsinOperator extends UnaryOp{
+  AsinOperator(){super();name = "asin";label =  "asin";}
+  public float apply(float x) { 
+    return asin(x); 
+  }
+}
+
+class AcosOperator extends UnaryOp{
+  AcosOperator(){super();name = "acos";label =  "acos";}
+  public float apply(float x) { 
+    return acos(x); 
+  }
+}
+
+class AtanOperator extends UnaryOp{
+  AtanOperator(){super();name = "atan";label =  "atan";}
+  public float apply(float x) { 
+    return atan(x); 
+  }
+}
+
 class AbsOperator extends UnaryOp{
   AbsOperator(){super();name = "abs";label =  "abs";}
   public float apply(float x) { 

@@ -12,8 +12,7 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
   void addBoundPair(){
     InPork i = addInPork(DataType.UNDETERMINED);
     setPorkSemantics(i);  
-    i.setHidden(true);
-    
+    i.setHidden(true);   
     setPorkSemantics(addOutPork(DataType.UNDETERMINED));
   }
   

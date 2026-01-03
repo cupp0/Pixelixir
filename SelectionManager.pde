@@ -52,7 +52,7 @@ class SelectionManager{
           cdata.fromPortIndex = c.source.index;
           cdata.toModule = c.destination.parent.id;
           cdata.toPortIndex = c.destination.index;
-          cdata.access = ((InPork)where.portMap.getPork(c.destination)).getCurrentAccess();
+          cdata.access = graph.getEdge(where, c).dataAccess; //((InPork)where.portMap.getPork(c.destination)).getCurrentAccess();
           wdata.connections.add(cdata);
         }
       }
@@ -192,12 +192,14 @@ class SelectionManager{
   }
   
   //have to build connections inside out, since some ops have dynamic ports.
-  //for instance, building a connection on a send or receive inside a composite
-  //can add a port to that composite. 
-  
-  //strategy: If connection is between primitives, send it. If there is a composite
-  //involved, recurse on that composite first.
   void rebuildConnections(WindowData wdata, HashMap<String, Module> newMods){
+    
+    //recurse through composites first, as send receive connections build ports outside
+    for (ModuleData mdata : wdata.modules){
+      if (newMods.get(mdata.id).isComposite()){
+        rebuildConnections(mdata.subwindow, newMods);
+      }  
+    }
     
     // Rebuild connections
     for (ConnectionData cdata : wdata.connections) {
@@ -207,28 +209,6 @@ class SelectionManager{
       Module srcMod  = newMods.get(cdata.fromModule);
       Module destMod  = newMods.get(cdata.toModule);
       
-      //if either are composite, recurse before building the connection
-      if (srcMod.isComposite()){
-        for (ModuleData mdata : wdata.modules){
-          
-          //find the correct module 
-          Module comparison = newMods.get(mdata.id);
-          if (srcMod == comparison){
-            rebuildConnections(mdata.subwindow, newMods);
-          }
-        }
-      }
-      
-      //repeat the process for the desitnation mod
-      if (destMod.isComposite()){
-        for (ModuleData mdata : wdata.modules){
-          Module comparison = newMods.get(mdata.id);
-          if (destMod == comparison){
-            rebuildConnections(mdata.subwindow, newMods);
-          }
-        }
-      }
-
       //build the connection
       OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
       InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);
@@ -236,13 +216,6 @@ class SelectionManager{
         where.attemptConnection(src, dest, DataAccess.READONLY);
       } else{
         where.attemptConnection(src, dest, cdata.access);
-      }
-    }
-    
-    //find any composite and rebuild those connections too
-    for (ModuleData mdata : wdata.modules){
-      if (newMods.get(mdata.id).isComposite()){
-        rebuildConnections(mdata.subwindow, newMods);
       }
     }
   }
