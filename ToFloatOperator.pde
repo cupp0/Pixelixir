@@ -8,6 +8,7 @@ class ToFloatOperator extends PrimeOperator{
   
   void initialize(){
     addInPork(DataType.UNDETERMINED); addOutPork(DataType.NUMERIC).setTargetFlow(new Flow(DataType.NUMERIC));
+    initializeTypeBinder(ins.get(0));
   }
   
   float valueToFloat(Flow f){

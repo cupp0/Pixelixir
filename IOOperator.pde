@@ -11,18 +11,9 @@ class IOOperator extends PrimeOperator{
     i.setAllowedAccess(readOrWrite);
     o.setAllowedAccess(readOrWrite);
     
-    setPorkSemantics(i);
-    setPorkSemantics(o);
+    initializeTypeBinder(i, o);
   }
-  
-  void setPorkSemantics(Pork p){
-    if (p instanceof InPork){
-      typeBindings.add(new DataTypeBinder(p));
-      return;
-    }    
-    typeBindings.get(p.index).addPork(p);
-  }
-  
+
   @Override
   boolean shouldExecute(){
     //if any data is hot, we should execute

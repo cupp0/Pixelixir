@@ -8,6 +8,8 @@ class SetOperator extends PrimeOperator{
   void initialize(){
     addInPork(DataType.LIST); addInPork(DataType.NUMERIC); addInPork(DataType.UNDETERMINED); 
     addOutPork(DataType.LIST);
+    
+    initializeTypeBinder(ins.get(2));
   }
     
   void execute(){ 

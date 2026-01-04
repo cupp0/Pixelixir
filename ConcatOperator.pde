@@ -7,6 +7,8 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
   
   void initialize(){
     addInPork(DataType.UNDETERMINED); addOutPork(DataType.LIST).setTargetFlow(new Flow(DataType.LIST));
+    
+    initializeTypeBinder(ins.get(0));
   }
   
   @Override
@@ -47,6 +49,7 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
     InPork i = addInPork(DataType.UNDETERMINED);
     i.setAllowedAccess(readOnly);
     i.setCurrentAccess(DataAccess.NONE);
+    initializeTypeBinder(i);
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
   

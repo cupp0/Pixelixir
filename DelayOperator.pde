@@ -8,17 +8,10 @@ class DelayOperator extends PrimeOperator{
   }
   
   void initialize(){
-    setPorkSemantics(addInPork(DataType.UNDETERMINED));
+    addInPork(DataType.UNDETERMINED);
     addOutPork(DataType.UNDETERMINED).setTargetFlow(new Flow(DataType.UNDETERMINED));
-    setPorkSemantics(outs.get(0));
-  }
-  
-  void setPorkSemantics(Pork p){
-    if (p instanceof InPork){
-      typeBindings.add(new DataTypeBinder(p));
-      return;
-    }    
-    typeBindings.get(0).addPork(p);
+
+    initializeTypeBinder(ins.get(0), outs.get(0));
   }
   
   void execute(){    

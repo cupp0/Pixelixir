@@ -8,6 +8,7 @@ class GetModuleOperator extends PrimeOperator{
   void initialize(){
     addInPork(DataType.WINDOW); addInPork(DataType.TEXT); 
     addOutPork(DataType.MODULE).setTargetFlow(new Flow(DataType.MODULE));
+    
   }
 
   void execute(){

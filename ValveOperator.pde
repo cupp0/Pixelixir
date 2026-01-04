@@ -9,17 +9,9 @@ class ValveOperator extends PrimeOperator{
     addInPork(DataType.UNDETERMINED); 
     addInPork(DataType.BOOL); 
     addOutPork(DataType.UNDETERMINED);
-    setPorkSemantics(ins.get(0));
-    setPorkSemantics(outs.get(0));
     outs.get(0).setTargetFlow(new Flow(DataType.UNDETERMINED));
-  }
-  
-  void setPorkSemantics(Pork p){
-    if (p instanceof InPork){
-      typeBindings.add(new DataTypeBinder(p));
-      return;
-    }    
-    typeBindings.get(0).addPork(p);
+    
+    initializeTypeBinder(ins.get(0), outs.get(0));
   }
   
   void execute(){    

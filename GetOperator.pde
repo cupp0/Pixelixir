@@ -7,6 +7,8 @@ class GetOperator extends PrimeOperator{
   
   void initialize(){
     addInPork(DataType.LIST); addInPork(DataType.NUMERIC); addOutPork(DataType.UNDETERMINED).setTargetFlow(new Flow(DataType.UNDETERMINED));
+    
+    initializeTypeBinder(outs.get(0));
   }
     
   void execute(){ 

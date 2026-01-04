@@ -5,7 +5,7 @@ class PrintOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataType.UNDETERMINED);
+    initializeTypeBinder(addInPork(DataType.UNDETERMINED));
   }
 
   void execute(){   

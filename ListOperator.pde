@@ -10,8 +10,9 @@ class ListOperator extends PrimeOperator{
   
   void initialize(){
     addInPork(DataType.NUMERIC);addInPork(DataType.UNDETERMINED); addOutPork(DataType.LIST).setTargetFlow(new Flow(DataType.LIST));
+    initializeTypeBinder(ins.get(0));
   }
-
+  
   void execute(){
     
     if ((int)ins.get(0).targetFlow.getFloatValue() != currentSize || ins.get(1).getCurrentDataType() != currentDataType){

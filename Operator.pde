@@ -102,11 +102,6 @@ public abstract class Operator{
     return out;
   }
   
-  //default data category is local, so we set that in AddPork methods above
-  //type bindings are concerned with other porks at the operator level so
-  //we have to override in relevant operator classes (valve, copy, I/O).
-  void setPorkSemantics(Pork p){ }
-
   //always returns a module with Composition.ONE
   Module getModule(){
     return (Module)listener;
@@ -176,10 +171,7 @@ public abstract class Operator{
     
     return null;
   }
-  
-  void setDefaultTypeBindings(){    
-  }
-  
+
   //data access is per port
   void setDefaultDataAccess(){
     
@@ -234,6 +226,14 @@ public abstract class Operator{
         }
       }
     }    
+  }
+  
+  void initializeTypeBinder(Pork in, OutPork... outs){
+    typeBindings.add(new DataTypeBinder(in));
+    for (OutPork o : outs){
+      typeBindings.get(typeBindings.size()-1).addPork(o);
+    }
+    return;
   }
   
   //when we remove a connection, check if our type requirement can
