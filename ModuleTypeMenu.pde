@@ -1,26 +1,26 @@
 //~ModuleTypeMenu
 class ModuleTypeMenu extends Menu<Window>{
   
-  PVector cursor;                  //for determining module spawn position
-  boolean moduleAdded = false;    
+  //boolean moduleAdded = false;    
   
-  ModuleTypeMenu(MenuListener ml, Window w){
-    super(ml, w); cursor = currentWindow.cam.toWorld(getRootMenu().pos.copy());
+  ModuleTypeMenu(MenuListener ml, Window w, PVector p){
+    super(ml, w, p);
     build(); // subclass defines options
   }
 
   void build() {
+    addRetreatOption(this, new WindowMenu(listener, ((WindowManager)listener).scope, pos));
     for (int i = 0; i < UIText.length; i++){
-      options.add(new MenuOption(this, UIText[i][0], i) {
+      options.add(new MenuOption(this, UIText[i][0], i+1) {
         void execute() { 
-          addSubmenu(new CustomMenu(listener, (Window)target, this.index, (ModuleTypeMenu)parent), this.index);
+          listener.switchMenu(new CustomMenu(listener, (Window)target, this.index-1, (ModuleTypeMenu)parent, pos), parent.pos);
         }
       });
     }
     
     options.add(new MenuOption(this, "SAVED", options.size()) {
       void execute() { 
-        addSubmenu(new SavedMenu(listener, (Window)target, this.index, (ModuleTypeMenu)parent), this.index);
+        listener.switchMenu(new SavedMenu(listener, (Window)target,/* this.index,*/ pos), parent.pos);
       }
     });
   }
@@ -28,12 +28,5 @@ class ModuleTypeMenu extends Menu<Window>{
   Window getWindow(){
     return (Window)target;
   }
-  
-  PVector getCursor(){
-    return cursor;
-  }
-  
-  void setCursor(PVector p){
-    cursor.set(p); 
-  }
+
 }

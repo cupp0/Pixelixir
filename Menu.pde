@@ -6,10 +6,10 @@ abstract class Menu<T>{
   PVector pos;
   PVector optionSize = new PVector(100, 20);
   ArrayList<MenuOption> options = new ArrayList<MenuOption>();
-  Menu activeSubmenu;
+  Menu activeSubmenu;                        //only display one menu at a time
 
-  Menu(MenuListener ml, T target_) {
-    listener = ml; target = target_;
+  Menu(MenuListener ml, T target_, PVector pos_) {
+    listener = ml; target = target_; setPosition(pos_);
   }
 
   // Subclasses populate options here
@@ -18,7 +18,7 @@ abstract class Menu<T>{
   abstract Window getWindow();
   
   void display() {
-
+    println(this);
     fill(0);
     stroke(0);
     strokeWeight(2);
@@ -31,18 +31,12 @@ abstract class Menu<T>{
     }
   }
   
-  //index used to position submenu
-  void addSubmenu(Menu newMenu, int index){
-    
-    //if a submenu is already open, close it and reassign activeSubmenu
-    if (activeSubmenu != null){
-      listener.onMenuExecution(activeSubmenu);
-    }
-    activeSubmenu = newMenu;
-    
-    PVector p = PVector.add(this.pos, new PVector(optionSize.x, index*optionSize.y));
-    listener.addMenu(newMenu, p);    
-    
+  void addRetreatOption(Menu source, Menu destination){
+    options.add(new MenuOption(source, "<", 0) {
+      void execute() {
+        listener.switchMenu(destination, parent.pos);
+      }
+    });
   }
   
   ArrayList<MenuOption> getOptions(){
@@ -51,13 +45,6 @@ abstract class Menu<T>{
   
   void setPosition(PVector pos_){
     pos = pos_.copy(); 
-    for (int i = 0; i < options.size(); i++){
-      options.get(i).setPosition(new PVector(0, i*optionSize.y));
-    }
   }
   
-  Menu getRootMenu(){
-    return ((WindowManager)listener).activeMenus.get(0); 
-  }
-
 }

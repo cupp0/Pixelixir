@@ -7,7 +7,7 @@ abstract class MenuOption implements Hoverable{
   int index;
 
   MenuOption(Menu parent_, String label_, int index_) {
-    parent = parent_; label = label_; index = index_; size = parent.optionSize.copy();
+    parent = parent_; label = label_; index = index_; size = parent.optionSize.copy();setPosition(new PVector(0, index*size.y));
   }
   
   void display(){

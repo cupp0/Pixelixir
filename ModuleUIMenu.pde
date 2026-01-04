@@ -1,7 +1,7 @@
 //~ModuleUIMenu
 class ModuleUIMenu extends Menu<ModuleUI>{
-  ModuleUIMenu(MenuListener ml, ModuleUI ui){
-    super(ml, ui);
+  ModuleUIMenu(MenuListener ml, ModuleUI ui, PVector p){
+    super(ml, ui, p);
     build(); // subclass defines options
   }
 
@@ -10,7 +10,7 @@ class ModuleUIMenu extends Menu<ModuleUI>{
       void execute() {
         DBUIState s = (DBUIState)((ModuleUI)target).state;
         nameUI(s);
-        listener.onMenuExecution(parent);
+        listener.exitMenu();
       }
     });
     
@@ -18,7 +18,7 @@ class ModuleUIMenu extends Menu<ModuleUI>{
       void execute() {
         DBUIState s = (DBUIState)((ModuleUI)target).state;
         renameUIGroup(s);
-        listener.onMenuExecution(parent);
+        listener.exitMenu();
       }
     });
     
@@ -26,7 +26,7 @@ class ModuleUIMenu extends Menu<ModuleUI>{
       void execute() {
         ModuleUI ui = (ModuleUI)target;
         ui.parent.removeUI(ui);
-        listener.onMenuExecution(parent);
+        listener.exitMenu();
       }
     });
   }

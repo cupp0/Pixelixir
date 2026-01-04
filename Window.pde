@@ -47,9 +47,7 @@ class Window {
     displayAnimations();  
     popMatrix();
     
-    for (Menu m : windowManager.activeMenus){
-      m.display();
-    };
+    windowManager.displayMenuIfActive();
   }
   
   void displayAnimations(){

@@ -57,9 +57,6 @@ class EventManager {
         if (inputManager.getState().isDown(CONTROL) && inputManager.getState().justPressed('S')){
           saveSketch();         
         }
-        if (inputManager.getState().isDown(CONTROL) && inputManager.getState().justPressed('L')){
-          loadSketch();     
-        }
         if (e.input.theKeyCode == BACKSPACE){
           selectionManager.onBackSpace();          
         }
@@ -97,6 +94,7 @@ class EventManager {
       
       if (e.input.action == Action.MOUSE_RELEASED){
         scope.windowManager.addWindowMenu(new PVector(mouseX, mouseY));
+        scope.spawnCursor.set(scope.cam.toWorld(new PVector(mouseX-28, mouseY)));
         state = InteractionState.MENU_OPEN;  
       }
       break;
@@ -317,7 +315,7 @@ class EventManager {
           //clears menus and sets state to NONE
           //probably bad to set interaction state in window manager instead of here.
           //not sure how to do it better. How does EventManager listen to WindowManager?
-          scope.windowManager.closeAllMenus();
+          scope.windowManager.exitMenu();
         }
       }
       break;

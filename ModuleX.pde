@@ -16,7 +16,7 @@ class ModuleXOperator extends PrimeOperator {
       Module m = getModule(ins.get(0).targetFlow.getModuleValue());
 
       if (m != null){
-        float x = m.getWindow().cam.toScreenX(m.getBodyPosition().x);
+        float x = m.getBodyPosition().x;
         outs.get(0).targetFlow.setFloatValue(x);
       }
     }

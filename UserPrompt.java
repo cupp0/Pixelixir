@@ -1,3 +1,5 @@
+
+import java.io.File;
 import javax.swing.*;
 
 class User {
@@ -54,4 +56,44 @@ class User {
 
     return result[0];
   }
+  
+  public static File promptSaveFolder(File patchesRoot) {
+    JFileChooser fc = new JFileChooser(patchesRoot);
+    fc.setDialogTitle("Choose patch category folder");
+    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    fc.setAcceptAllFileFilterUsed(false);
+
+    int res = fc.showOpenDialog(null);
+    if (res != JFileChooser.APPROVE_OPTION) return null;
+
+    File chosen = fc.getSelectedFile();
+
+    // Optional safety: enforce that chosen is inside patchesRoot
+    try {
+      File root = patchesRoot.getCanonicalFile();
+      File sel  = chosen.getCanonicalFile();
+      if (!sel.getPath().startsWith(root.getPath())) {
+        JOptionPane.showMessageDialog(null,
+            "Please choose a folder inside:\n" + root.getPath(),
+            "Invalid folder",
+            JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+    } catch (Exception ignored) {}
+
+    return chosen;
+  }
+
+  public static File promptSaveProjectDir(File patchesRoot, String defaultName) {
+    File folder = promptSaveFolder(patchesRoot);
+    if (folder == null) return null;
+
+    String name = JOptionPane.showInputDialog(null, "Project name:", defaultName);
+    if (name == null) return null;
+    name = name.trim();
+    if (name.isEmpty()) return null;
+
+    return new File(folder, name); // final folder where you save
+  }
+
 }

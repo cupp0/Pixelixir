@@ -22,20 +22,17 @@ class HoverTarget {
     type = HoverType.NONE;
   }
 
-  // Module body
   HoverTarget(ModuleUI m, HoverType t_, int index) {
     type = t_;
     modUI = m;
     cornerIndex = index;
   }
 
-  // Connection
   HoverTarget(Connection c) {
     type = HoverType.CONNECTION;
     connection = c;
   }
   
-  // Connection
   HoverTarget(MenuOption mo) {
     type = HoverType.MENUOPTION;
     menuOption = mo;
@@ -58,15 +55,13 @@ class HoverManager {
     current = new HoverTarget();
   
     //first check menu hover 
-    if (scope.windowManager.activeMenus.size() != 0){
-      for (Menu m : scope.windowManager.activeMenus){
-        ArrayList<MenuOption> ops = m.getOptions();
-        for (MenuOption mo : ops){
-          HoverTarget t = mo.hitTest(mouseX, mouseY);
-          if (t.type != HoverType.NONE) {
-            current = t;
-            return current;
-          }
+    if (scope.windowManager.activeMenu != null){
+      ArrayList<MenuOption> ops = scope.windowManager.activeMenu.getOptions();
+      for (MenuOption mo : ops){
+        HoverTarget t = mo.hitTest(mouseX, mouseY);
+        if (t.type != HoverType.NONE) {
+          current = t;
+          return current;
         }
       }
     } 

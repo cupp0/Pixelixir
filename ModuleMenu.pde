@@ -1,8 +1,8 @@
 //~ModuleMenu
 class ModuleMenu extends Menu<Module>{
   
-  ModuleMenu(MenuListener ml, Module m){
-    super(ml, m);
+  ModuleMenu(MenuListener ml, Module m, PVector p){
+    super(ml, m, p);
     build(); // subclass defines options
   }
 
@@ -10,14 +10,21 @@ class ModuleMenu extends Menu<Module>{
     options.add(new MenuOption(this, "copy", 0) {
       void execute() {
         selectionManager.copyModules(selectionManager.modules);
-        listener.onMenuExecution(parent);
+        listener.exitMenu();
+      }
+    });
+    
+    options.add(new MenuOption(this, "set name", 1) {
+      void execute() {
+        nameModule(target);
+        listener.exitMenu();
       }
     });
     
     if (((Module)target).composition == Composition.MANY){
-      options.add(new MenuOption(this, "add ui", 1) {
+      options.add(new MenuOption(this, "add ui", 2) {
         void execute() {
-          addSubmenu(new CompositeUIMenu(listener, (Module)target), this.index);
+          listener.switchMenu(new CompositeUIMenu(listener, (Module)target, pos), parent.pos);
         }
       });
     }

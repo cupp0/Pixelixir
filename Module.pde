@@ -3,7 +3,8 @@ enum Composition { MANY, ONE }
 public class Module implements OperatorListener{
   
   String id = UUID.randomUUID().toString();
-  String name, label; 
+  String name, label;
+  String userLabel = "";
   
   Composition composition;
   Operator owner;                                  //null if composition = MANY, in which case we care about internal send/receive
@@ -245,6 +246,14 @@ public class Module implements OperatorListener{
     textSize(12); 
     textAlign(CENTER);
     text(label, uiBits.get(0).state.pos.x+14, uiBits.get(0).state.pos.y+18); 
+  }
+  
+  void setUserLabel(String s){
+    userLabel = s;
+  }
+  
+  String getUserLabel(){
+    return userLabel;
   }
   
   void drag(PVector dragAmount){

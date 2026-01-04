@@ -2,7 +2,9 @@ import java.util.*;
 import java.lang.reflect.*;
 import java.util.function.BinaryOperator;
 import java.io.*;
-import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JFileChooser;
+
 import com.google.gson.*;
 
 //~Modules
@@ -16,7 +18,7 @@ String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "
 String[] unary = {"UNARY", "sin", "cos", "tan", "acos", "asin", "atan", "abs", "sqrt"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
 String[] utility = {"UTILITY", "print", "toFloat", "list", "read", "write", "set", "get", "copy", "valve", "concat", "split", "send", "receive", "delay"};
-String[] meta = {"META", "time", "mouseX", "mouseY", "leftMouse", "rightMouse", "mouseWheel", "key", "drag", "moduleX", "moduleY", "window", "moduleList", "inList", "outList", "connect", "addModule"};
+String[] meta = {"META", "time", "mouseX", "mouseY", "leftMouse", "rightMouse", "mouseWheel", "key", "drag", "moduleX", "moduleY", "window", "moduleList", "getModule", "inList", "outList", "connect", "addModule"};
 
 String[][] UIText = {UI, binary, unary, logic, utility, meta};
 

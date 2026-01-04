@@ -22,10 +22,10 @@ interface UIStateListener{
   void onUIPayloadChange(DBUIState s);
 }
 
-//Implemented by WindowManager
+//windowmanager 
 interface MenuListener{
-  void addMenu(Menu m, PVector p);
-  void onMenuExecution(Menu whichMenu);
+  void exitMenu();
+  void switchMenu(Menu m, PVector p);
 }
 
 //for evaluating unary ops on floats, I think I'm doing something weird 

@@ -1,15 +1,15 @@
 //WindowMenu
 class WindowMenu extends Menu<Window>{
   
-  WindowMenu(MenuListener ml, Window w){
-    super(ml, w);
+  WindowMenu(MenuListener ml, Window w, PVector p){
+    super(ml, w, p);
     build(); // subclass defines options
   }
 
   void build() {
     options.add(new MenuOption(this, "add modules", 0) {
       void execute() {
-        addSubmenu(new ModuleTypeMenu(listener, (Window)target), this.index);
+        listener.switchMenu(new ModuleTypeMenu(listener, (Window)target, parent.pos), parent.pos);
       }
     });
     
@@ -17,7 +17,7 @@ class WindowMenu extends Menu<Window>{
       options.add(new MenuOption(this, "copy", 1) {
         void execute() {
           selectionManager.copyModules(selectionManager.modules);
-          listener.onMenuExecution(parent);
+          listener.exitMenu();
         }
       });
     }
@@ -26,7 +26,7 @@ class WindowMenu extends Menu<Window>{
       options.add(new MenuOption(this, "paste", 2) {
         void execute() {
           selectionManager.pasteModules(selectionManager.clipboard, (Window)target, currentWindow.cam.toWorld(parent.pos.copy()));
-          listener.onMenuExecution(parent);
+          listener.exitMenu();
         }
       });
       
@@ -51,7 +51,7 @@ class WindowMenu extends Menu<Window>{
             }
           }
           
-          listener.onMenuExecution(parent);
+          listener.exitMenu();
         }
       });
     }
