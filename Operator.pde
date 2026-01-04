@@ -293,7 +293,7 @@ public abstract class Operator{
     
     //this code is for mutation ops that are currently read only. That means
     //we need to put a new Flow at its mutation outport
-    if (executionSemantics == ExecutionSemantics.MUTATES){
+    if (executionSemantics == ExecutionSemantics.MUTATES && where.index == 0){
       outs.get(0).setTargetFlow(new Flow(outs.get(0).getCurrentDataType()));
       tryResolveTargetFlow(outs.get(0));
       return;

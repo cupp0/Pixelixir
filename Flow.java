@@ -197,7 +197,9 @@ public class Flow {
   
   //remove from list by index
   public void removeFromList(int i){
-    listValue.remove(i);
+    System.out.println(listValue.size());
+    if (i >= 0 && i < listValue.size()) {listValue.remove(i);}
+    else { System.out.println("remove index out of bounds"); }
   }
   
   public void clearList(){
