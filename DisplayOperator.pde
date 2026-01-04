@@ -9,6 +9,7 @@ class DisplayOperator extends UIOperator{
 
   void initialize(){
     addInPork(DataType.NUMERIC);addInPork(DataType.NUMERIC);addInPork(DataType.LIST);
+    setDataListener(getDataBender());
   }
   
   void setDataListener(DataBender dl){

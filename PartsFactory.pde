@@ -29,10 +29,6 @@ class PartsFactory{
        
     if (defaultUI != null){
       newMod.addUI(defaultUI);
-      
-      if (newMod.owner instanceof DisplayOperator){
-        ((DisplayOperator)newMod.owner).setDataListener((DisplayUIState)defaultUI.state);
-      }
     }    
     
     //set body (and eye) color

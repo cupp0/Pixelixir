@@ -18,7 +18,6 @@ abstract class Menu<T>{
   abstract Window getWindow();
   
   void display() {
-    println(this);
     fill(0);
     stroke(0);
     strokeWeight(2);

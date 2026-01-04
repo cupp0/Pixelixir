@@ -45,6 +45,7 @@ public abstract class Operator{
   
   void evaluate(){
     if (shouldExecute()){
+      //println(name);
       execute();  
       postEvaluation(true);
     } else {

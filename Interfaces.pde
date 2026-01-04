@@ -17,6 +17,10 @@ interface OperatorListener {
   void onPorkRemoved(Pork p);
 }
 
+interface GraphListener{
+  void onGraphChange();
+}
+
 //implemented by ModuleUI, listens to states for changes to data (UIPayloads) and UI (exposure changes)
 interface UIStateListener{
   void onUIPayloadChange(DBUIState s);

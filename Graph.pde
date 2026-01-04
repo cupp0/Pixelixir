@@ -2,6 +2,7 @@
 
 class Graph {
   
+  ArrayList<GraphListener> listeners = new ArrayList<>();             //iterators listen here
   ArrayList<Edge> edges = new ArrayList<>();                          //stores connections between porks    
   ArrayList<Operator> allOps = new ArrayList<Operator>();             //unordered list
   ArrayList<Operator> topoSort = new ArrayList<Operator>();           //updated when we add/remove a module/connection
@@ -9,8 +10,7 @@ class Graph {
   ArrayList<OutPork> updaters = new ArrayList<>();                    //ports that are providing new data
   
 Graph(){}
-  
-  
+   
   //graph should probably handle all that onConnection stuff currently in Pork
   void addEdge(OutPork from, InPork towards, DataAccess ds){    
     edges.add(new Edge(from, towards, ds));    
@@ -79,6 +79,10 @@ Graph(){}
           }
         }
       }
+    }
+    
+    for (GraphListener gl : listeners){
+      gl.onGraphChange();
     }
   }
   
@@ -197,6 +201,32 @@ Graph(){}
     return ops;
   }
   
+  Graph getSubgraph(Operator from){
+    Set<Operator> ops = new HashSet<>();
+    for (OutPork o : from.outs){
+      for (Operator op : reachableOps(o)){
+        ops.add(op); 
+      }
+    }    
+    ArrayList<Edge> eds = new ArrayList<>();
+    for (Edge e : edges){
+      if (ops.contains(e.source.owner)  && ops.contains(e.destination.owner)){
+        eds.add(e);
+      }
+    }
+    
+    Graph sg = new Graph();
+    
+    for (Operator op : ops){
+      sg.addOperator(op);
+    }   
+    for (Edge e : eds){
+      sg.addEdge(e.source, e.destination, e.dataAccess);
+    }
+    
+    return sg;
+  }
+  
   //returns any edges that connect 2 mods contained in fromMods
   ArrayList<Edge> getConnectingEdges(ArrayList<Module> fromMods, Window where){
     ArrayList<Edge> connectingEdges = new ArrayList<Edge>();
@@ -240,6 +270,14 @@ Graph(){}
   
   String getAddress(){
     return this.toString().substring(this.toString().indexOf('@'));
+  }
+  
+  void addListener(GraphListener gl){
+    listeners.add(gl);
+  }
+  
+  void removeListener(GraphListener gl){
+    listeners.remove(gl);
   }
   
 }

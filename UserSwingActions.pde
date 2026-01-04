@@ -1,11 +1,13 @@
  void saveSketch(){
    File patchesRoot = new File(sketchPath("data/patches"));
    File projectDir = User.promptSaveProjectDir(patchesRoot, "untitled");
-   
-   if (projectDir != null) {
-     println(projectDir.getAbsolutePath());
-     // savePatch(projectDir);
-   }
+   // Check if the user entered something and didn't cancel
+    if (projectDir != null) {
+  
+      // Save the input to a file
+      String[] data = {gson.toJson(selectionManager.copyModules(bigbang.modules))};
+      saveStrings(projectDir, data);
+    } 
   }
   
   void nameUI(DBUIState s){

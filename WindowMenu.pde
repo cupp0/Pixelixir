@@ -7,30 +7,34 @@ class WindowMenu extends Menu<Window>{
   }
 
   void build() {
+    
     options.add(new MenuOption(this, "add modules", 0) {
       void execute() {
         listener.switchMenu(new ModuleTypeMenu(listener, (Window)target, parent.pos), parent.pos);
       }
     });
     
+    int count = 1; 
     if (selectionManager.modules.size() > 0){
-      options.add(new MenuOption(this, "copy", 1) {
+      options.add(new MenuOption(this, "copy", count) {
         void execute() {
           selectionManager.copyModules(selectionManager.modules);
           listener.exitMenu();
         }
       });
+      count++;
     }
     
     if (selectionManager.clipboard != null){
-      options.add(new MenuOption(this, "paste", 2) {
+      options.add(new MenuOption(this, "paste", count) {
         void execute() {
           selectionManager.pasteModules(selectionManager.clipboard, (Window)target, currentWindow.cam.toWorld(parent.pos.copy()));
           listener.exitMenu();
         }
       });
+      count++;
       
-      options.add(new MenuOption(this, "paste with new id", 3) {
+      options.add(new MenuOption(this, "paste with new id", count) {
         void execute() {
           HashMap<String, Module> newMods = selectionManager.pasteModules(selectionManager.clipboard, (Window)target, currentWindow.cam.toWorld(parent.pos.copy()));       
           HashMap<String, String> newIds = new HashMap<String, String>();
@@ -54,6 +58,7 @@ class WindowMenu extends Menu<Window>{
           listener.exitMenu();
         }
       });
+      count++;
     }
   }
   
