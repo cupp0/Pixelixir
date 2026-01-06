@@ -1,7 +1,8 @@
-//helper class for resolving ports that accept multiple data types
+//type contract for porks
 class DataTypeBinder {
   
-  DataType dt;
+  EnumSet<DataType> allowedTypes;
+  DataType currentType;
   ArrayList<Pork> boundPorks = new ArrayList<Pork>();
 
   DataTypeBinder(Pork p){
@@ -12,13 +13,20 @@ class DataTypeBinder {
   
   ArrayList<Pork> getBoundPorks(){ return boundPorks; }
   
-  void setDataType(DataType dt_){ 
-    dt = dt_;
+  //propagates type to anyting connected as well
+  void setDataType(DataType dt){ 
+    currentType = dt;
     for (Pork p : boundPorks){
-      p.setCurrentDataType(dt);
+      p.setCurrentDataType(currentType);
+      ArrayList<Pork> ps = p.getConnectedPorks();
+      for (Pork por : ps){
+        if (por.getCurrentDataType() != dt){
+          por.owner.propagateCurrentDataType(por, dt); 
+        }
+      }
     }
   }
   
-  DataType getDataType(){ return dt; }
+  DataType getCurrentType(){ return currentType; }
   
 }

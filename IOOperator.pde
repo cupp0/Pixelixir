@@ -1,11 +1,13 @@
-class IOOperator extends PrimeOperator{
+//this is all of the shared behavior between SendOperator and ReceiveOperator
+abstract class IOOperator extends PrimeOperator implements DynamicPorks{
   
-  void initialize(){}
+  void initialize(){ addBoundPair(); }
   
+  //send and receive call this then hide whichever port they need to
   void addBoundPair(){
     EnumSet<DataAccess> readOrWrite = EnumSet.of(DataAccess.READONLY, DataAccess.READWRITE);
     
-    InPork i =addInPork(DataType.UNDETERMINED);    
+    InPork i = addInPork(DataType.UNDETERMINED);    
     OutPork o = addOutPork(DataType.UNDETERMINED);
     
     i.setAllowedAccess(readOrWrite);
@@ -13,41 +15,24 @@ class IOOperator extends PrimeOperator{
     
     initializeTypeBinder(i, o);
   }
-
-  @Override
-  boolean shouldExecute(){
-    //if any data is hot, we should execute
-    for (InPork i : ins){
-      if (i.getSource() != null){
-        if (i.getSource().getDataStatus() == DataStatus.HOT){
-          return true;
-        }
-      }
-    }
-    
-    //if there are no hot ins, don't execute
-    return false;
-  }
   
+  //pass through mutator
   void execute(){}
   
-  //composites also have some edge cases here.
-  void postEvaluation(boolean executed){
-
-    //this updates outs that dynamically affect evaluation
-    //at "runtime" (mid evaluation sequence)
-    if (executed){
-      for (InPork i : ins){
-        if (i.getSource() != null){
-          outs.get(i.index).setDataStatus(i.getSource().getDataStatus());
-        }
-      }
-    }    
+  //pass through the data status of whatever is upstream
+  void postExecution(){
+    for (OutPork o : outs){
+      if (ins.get(o.index).getSource() == null) continue;
+      o.setDataStatus(ins.get(o.index).getSource().getDataStatus());       
+    }
   }
-
+  
+  //send and receive are the only Ops that can have multiple mutation pathways.
+  //every other Op that can mutate does so exclusively through in1 and out1.
+  //Send/Receive are just passthrough, so we have to build a parallel mutation bridge
+  //thingy
   @Override
-  void setDefaultDataAccess(){   
-    
+  void setDefaultDataAccess(){       
     EnumSet<DataAccess> readOrWrite = EnumSet.of(DataAccess.READONLY, DataAccess.READWRITE);
     
     for (InPork i : ins){
@@ -61,18 +46,24 @@ class IOOperator extends PrimeOperator{
     }
   }
   
+  void addCanonicalPork(){
+    addBoundPair();  
+    ((Module)listener).getWindow().registerPorts((Module)listener);
+  }
+  
   //this should only ever set targetFlow of in1 and out1 to f,
   //then propagate down from out1
   @Override
-  void propagateTargetFlow(InPork where, Flow f){
-    
+  void propagateTargetFlow(InPork where, Flow f){    
     where.setTargetFlow(f);    
     outs.get(where.index).setTargetFlow(f);
     
     for (InPork p : outs.get(where.index).getDestinations()){
       p.owner.propagateTargetFlow(p, f);
-    }
-  
+    }  
   }
+  
+  boolean isInputDynamic(){ return true; }
+  boolean isOutputDynamic(){ return true; }
 
 }

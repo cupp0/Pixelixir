@@ -12,18 +12,8 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
   }
   
   @Override
-  boolean shouldExecute(){
-    //if any data is hot, we should execute
-    for (InPork i : ins){
-      if (i.getSource() != null){
-        if (i.getSource().getDataStatus() == DataStatus.HOT){
-          return true;
-        }
-      }
-    }
-    
-    //if there are no hot ins, don't execute
-    return false;
+  boolean validInputConnections(){
+    return true;
   }
   
   void execute(){
@@ -42,6 +32,10 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
     if (inPorksFull()){
       addCanonicalPork();
     }    
+  }
+  
+  void rebuildPorks(int inCount, int outCount){
+    while (ins.size() < inCount) addCanonicalPork();
   }
   
   void addCanonicalPork(){

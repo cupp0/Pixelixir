@@ -15,9 +15,9 @@ import com.google.gson.*;
 
 String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "composite"};
 String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};
-String[] unary = {"UNARY", "sin", "cos", "tan", "acos", "asin", "atan", "abs", "sqrt"};
+String[] unary = {"UNARY", "sin", "cos", "tan", "acos", "asin", "atan", "abs", "sqrt", "floor", "round"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
-String[] list = {"LIST", "list", "append", "remove", "set", "get", "concat", "split"};
+String[] list = {"LIST", "list", "append", "remove", "set", "get", "concat", "split", "size"};
 String[] utility = {"UTILITY", "print", "iterator", "toFloat", "read", "write", "copy", "valve", "send", "receive", "delay"};
 String[] meta = {"META", "time", "mouseX", "mouseY", "leftMouse", "rightMouse", "mouseWheel", "key", "drag", "moduleX", "moduleY", "window", "moduleList", "getModule", "inList", "outList", "connect", "addModule"};
 
@@ -27,8 +27,9 @@ color UICol = color(125, 100, 175);
 color binaryCol = color(175, 100, 125);
 color unaryCol = color(175, 100, 255);
 color logicCol = color(175);
-color comparisonCol = color(125, 175, 125);
+color listCol = color(125, 175, 125);
 color utlityCol = color(75);
+color metaCol = color(100, 150, 50);
 
 Module mama;
 Window bigbang;

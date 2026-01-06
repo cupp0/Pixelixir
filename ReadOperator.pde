@@ -8,7 +8,10 @@ class ReadOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataType.TEXT); addOutPork(DataType.UNDETERMINED).setTargetFlow(new Flow(DataType.UNDETERMINED));
+    addInPork(DataType.TEXT); 
+    addOutPork(DataType.UNDETERMINED).setTargetFlow(new Flow(DataType.UNDETERMINED));
+    
+    initializeTypeBinder(outs.get(0));
   }
   
   void execute(){
@@ -16,10 +19,14 @@ class ReadOperator extends PrimeOperator{
     Flow readData = flowRegistry.readFlow(address);
     
     //if nothing found at this address do nothing
-    if (readData == null){ return; }    
+    if (readData == null){ println("nothing to read"); return; }    
+    if (readData.getType() != outs.get(0).getCurrentDataType()){
+      println("read " + readData.getType() + ", expected " + outs.get(0).getCurrentDataType());
+      setExecutionStatus(ExecutionStatus.BADDATA);
+      return;
+    }
         
     //else, copy the data to the output
-    outs.get(0).targetFlow.setType(readData.getType());
     Flow.copyData(readData, outs.get(0).targetFlow);
   }
   

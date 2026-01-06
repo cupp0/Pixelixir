@@ -124,6 +124,9 @@ class StyleResolver {
   
   color getConnectionColorByPork(Pork p){
     color c = 0;
+    if (p.getDataStatus() == DataStatus.BAD){
+      return color(255, 0, 0);
+    }
     if (p.targetFlow != null){
       c = getDataTypeColor(p.targetFlow.getType());
     }

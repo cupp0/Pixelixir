@@ -302,10 +302,13 @@ public class Module implements OperatorListener{
             return logicCol;
             
             case 4: 
-            return comparisonCol;
+            return listCol;
 
             case 5: 
             return utlityCol;
+            
+            case 6: 
+            return metaCol;
 
           }
         }

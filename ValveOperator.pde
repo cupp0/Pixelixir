@@ -15,15 +15,17 @@ class ValveOperator extends PrimeOperator{
   }
   
   void execute(){    
+    if (ins.get(0).targetFlow == null) return;
     Flow.copyData(ins.get(0).targetFlow, outs.get(0).targetFlow);
   }
 
   @Override
-  boolean shouldExecute(){
-    if (!inPorksFull()){
-      return false;
+  void confirmExecutionStatus(){
+    if (ins.get(1).targetFlow.getBoolValue()){
+      setExecutionStatus(ExecutionStatus.GO); 
+    } else {
+      setExecutionStatus(ExecutionStatus.NOGO); 
     }
-    return ins.get(1).targetFlow.getBoolValue();
   }
   
   boolean isSpeaker(){ return true; }

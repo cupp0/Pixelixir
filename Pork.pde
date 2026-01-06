@@ -1,14 +1,23 @@
 //Pork is responsible for routing and between operators and storing data
 //~Pork
+
+enum DataStatus {
+  HOT,
+  COLD, 
+  BAD
+}
+
 abstract class Pork {
   
   final Operator owner;
   int index;
+  int lastEval = 0;
   Flow targetFlow;
   DataType defaultDataType;
   DataType currentDataType;
   EnumSet<DataAccess> allowedAccess;
   DataAccess currentAccess;
+  DataStatus dataStatus;
   boolean hidden; 
   
   Pork(Operator owner_, int index_){
@@ -67,6 +76,15 @@ abstract class Pork {
     return allowedAccess; 
   }
   
+  void setDataStatus(DataStatus ds){
+    dataStatus = ds;
+    if (ds == DataStatus.HOT) lastEval = frameCount;
+  }
+  
+  DataStatus getDataStatus(){
+    return dataStatus;
+  }
+  
   void setHidden(boolean b){
     hidden = b;
   }
@@ -107,14 +125,8 @@ class InPork extends Pork {
 
 }
 
-enum DataStatus {HOT, COLD, BAD}
-
 //~OutPork
 class OutPork extends Pork {
-  
-  DataStatus dataStatus;
-  boolean speaking = false;
-  int lastEval = 0;
   
   OutPork(Operator owner_, int index_){
     super(owner_, index_);
@@ -124,20 +136,19 @@ class OutPork extends Pork {
     return graph.getDestinations(this);
   }
   
-  //we are concerned here with propagating expected data category
+  //we are concerned here with propagating expected data type
   //and, if appropriate, propagating Flow identity
   void onConnection(InPork dest){
-    DataType srcCat = this.getCurrentDataType();
-    DataType destCat = dest.getCurrentDataType();
+    
+    DataType srcType = this.getCurrentDataType();
+    DataType destType = dest.getCurrentDataType();
     
     //if types disagree, they need resolved
     //the only valid way for a type to disagree is if one is UNDETERMINED
-    if (srcCat != destCat){
-      if (srcCat == DataType.UNDETERMINED ){
-        this.owner.propagateCurrentDataType(this, destCat);
-      } else {
-        dest.owner.propagateCurrentDataType(dest, srcCat);
-      }
+    if (srcType != destType){
+      Pork unresolvedPork = (srcType == DataType.UNDETERMINED) ? this : dest;
+      DataType resolvedType = (srcType == DataType.UNDETERMINED) ? destType : srcType;
+      unresolvedPork.owner.propagateCurrentDataType(unresolvedPork, resolvedType);
     } 
     
     //if targetFlow is not null, we need to propagate the Flow identity
@@ -167,17 +178,7 @@ class OutPork extends Pork {
   //these listeners are InPorks that have the capactity to provide new data to a 
   //different window (Composite ins, sends).
   void dataNotification() {    
-    speaking = true;    
     graph.addUpdater(this);
-  }
-  
-  void setDataStatus(DataStatus ds){
-    dataStatus = ds;
-    if (dataStatus == DataStatus.HOT) lastEval = frameCount;
-  }
-  
-  DataStatus getDataStatus(){
-    return dataStatus;
   }
   
   boolean elligibleForConnection(){

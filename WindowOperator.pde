@@ -8,9 +8,7 @@ class WindowOperator extends PrimeOperator {
   void initialize(){    
     addOutPork(DataType.WINDOW).setTargetFlow(new Flow(DataType.WINDOW));
   }
-  
-  boolean shouldExecute(){ return true; }
-  
+    
   void execute(){
     String s = ((Module)listener).parent.id;
     outs.get(0).targetFlow.setWindowValue(s);

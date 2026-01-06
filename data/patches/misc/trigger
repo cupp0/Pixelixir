@@ -1,0 +1,204 @@
+{
+  "modules": [
+    {
+      "name": "composite",
+      "id": "50d0d75e-b332-47db-8cf1-8f00801efc3f",
+      "ins": 0,
+      "outs": 2,
+      "position": {
+        "x": 265.34592,
+        "y": 233.7778,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "identityToken": "abc",
+          "data": {
+            "type": "BOOL",
+            "floatValue": 0.0,
+            "boolValue": false
+          },
+          "id": "14d81ade-3c0b-4d34-9516-a5ad765c8573",
+          "pos": {
+            "x": 32.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "button"
+        }
+      ],
+      "subwindow": {
+        "modules": [
+          {
+            "name": "send",
+            "id": "61bc7306-69ec-45c3-ad22-53170e997726",
+            "ins": 2,
+            "outs": 0,
+            "position": {
+              "x": 242.90143,
+              "y": 305.1111,
+              "z": 0.0
+            },
+            "uiElements": []
+          },
+          {
+            "name": "button",
+            "id": "afdc060f-ad9a-4856-b764-2d28f992a02c",
+            "ins": 0,
+            "outs": 1,
+            "position": {
+              "x": 287.9674,
+              "y": 101.82752,
+              "z": 0.0
+            },
+            "uiElements": [
+              {
+                "identityToken": "abc",
+                "data": {
+                  "type": "BOOL",
+                  "floatValue": 0.0,
+                  "boolValue": false
+                },
+                "id": "99b3d128-7623-4729-b76c-0ebafa1218d4",
+                "pos": {
+                  "x": 10.0,
+                  "y": 10.0,
+                  "z": 0.0
+                },
+                "type": "button"
+              }
+            ]
+          },
+          {
+            "name": "delay",
+            "id": "c08f4c57-1feb-4563-a46b-29ecfbfeec69",
+            "ins": 1,
+            "outs": 1,
+            "position": {
+              "x": 287.60083,
+              "y": 190.73306,
+              "z": 0.0
+            },
+            "uiElements": []
+          },
+          {
+            "name": "valve",
+            "id": "1beb9f33-1d38-4218-9acb-d7ef11b2b22e",
+            "ins": 2,
+            "outs": 1,
+            "position": {
+              "x": 287.83676,
+              "y": 147.25105,
+              "z": 0.0
+            },
+            "uiElements": []
+          },
+          {
+            "name": "switch",
+            "id": "70847ffc-293d-4dc7-92f8-59e305171054",
+            "ins": 0,
+            "outs": 1,
+            "position": {
+              "x": 331.66742,
+              "y": 102.028854,
+              "z": 0.0
+            },
+            "uiElements": [
+              {
+                "identityToken": "cbe21013-96f2-4c7d-86be-43dcda7b827b",
+                "data": {
+                  "type": "BOOL",
+                  "floatValue": 0.0,
+                  "boolValue": true
+                },
+                "id": "74dd0844-4d14-434a-8f92-3f2e32752ddb",
+                "pos": {
+                  "x": 10.0,
+                  "y": 10.0,
+                  "z": 0.0
+                },
+                "type": "switch"
+              }
+            ]
+          },
+          {
+            "name": "and",
+            "id": "99505d71-8a52-4b5d-9ee4-ddf7b607a250",
+            "ins": 2,
+            "outs": 1,
+            "position": {
+              "x": 243.2908,
+              "y": 261.1849,
+              "z": 0.0
+            },
+            "uiElements": []
+          },
+          {
+            "name": "not",
+            "id": "69b91510-e92b-496d-9ede-b3032327e733",
+            "ins": 1,
+            "outs": 1,
+            "position": {
+              "x": 287.38162,
+              "y": 233.00063,
+              "z": 0.0
+            },
+            "uiElements": []
+          }
+        ],
+        "connections": [
+          {
+            "fromModule": "afdc060f-ad9a-4856-b764-2d28f992a02c",
+            "fromPortIndex": 0,
+            "toModule": "1beb9f33-1d38-4218-9acb-d7ef11b2b22e",
+            "toPortIndex": 0,
+            "access": "READONLY"
+          },
+          {
+            "fromModule": "c08f4c57-1feb-4563-a46b-29ecfbfeec69",
+            "fromPortIndex": 0,
+            "toModule": "69b91510-e92b-496d-9ede-b3032327e733",
+            "toPortIndex": 0,
+            "access": "READONLY"
+          },
+          {
+            "fromModule": "1beb9f33-1d38-4218-9acb-d7ef11b2b22e",
+            "fromPortIndex": 0,
+            "toModule": "c08f4c57-1feb-4563-a46b-29ecfbfeec69",
+            "toPortIndex": 0,
+            "access": "READONLY"
+          },
+          {
+            "fromModule": "1beb9f33-1d38-4218-9acb-d7ef11b2b22e",
+            "fromPortIndex": 0,
+            "toModule": "99505d71-8a52-4b5d-9ee4-ddf7b607a250",
+            "toPortIndex": 0,
+            "access": "READONLY"
+          },
+          {
+            "fromModule": "70847ffc-293d-4dc7-92f8-59e305171054",
+            "fromPortIndex": 0,
+            "toModule": "1beb9f33-1d38-4218-9acb-d7ef11b2b22e",
+            "toPortIndex": 1,
+            "access": "READONLY"
+          },
+          {
+            "fromModule": "99505d71-8a52-4b5d-9ee4-ddf7b607a250",
+            "fromPortIndex": 0,
+            "toModule": "61bc7306-69ec-45c3-ad22-53170e997726",
+            "toPortIndex": 0,
+            "access": "READONLY"
+          },
+          {
+            "fromModule": "69b91510-e92b-496d-9ede-b3032327e733",
+            "fromPortIndex": 0,
+            "toModule": "99505d71-8a52-4b5d-9ee4-ddf7b607a250",
+            "toPortIndex": 1,
+            "access": "READONLY"
+          }
+        ]
+      }
+    }
+  ],
+  "connections": []
+}

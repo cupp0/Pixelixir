@@ -71,3 +71,17 @@ class SqrtOperator extends UnaryOp{
     return sqrt(x); 
   }
 }
+
+class FloorOperator extends UnaryOp{
+  FloorOperator(){super();name = "floor";label =  "floor";}
+  public float apply(float x) { 
+    return floor(x); 
+  }
+}
+
+class RoundOperator extends UnaryOp{
+  RoundOperator(){super();name = "round";label =  "round";}
+  public float apply(float x) { 
+    return round(x); 
+  }
+}

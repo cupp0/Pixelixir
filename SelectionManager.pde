@@ -123,12 +123,7 @@ class SelectionManager{
     for (ModuleData mdata : wdata.modules){
       
       if (newMods.get(mdata.id).owner instanceof DynamicPorks){
-        while(newMods.get(mdata.id).ins.size() < mdata.ins){
-          ((DynamicPorks)newMods.get(mdata.id).owner).addCanonicalPork();
-        }
-        while(newMods.get(mdata.id).outs.size() < mdata.outs){
-          ((DynamicPorks)newMods.get(mdata.id).owner).addCanonicalPork();
-        }
+        ((DynamicPorks)newMods.get(mdata.id).owner).rebuildPorks(mdata.ins, mdata.outs);
       } 
       
       //if composite, recurse.
@@ -215,6 +210,7 @@ class SelectionManager{
       //build the connection
       OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
       InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);
+            
       if(cdata.access == null){
         where.attemptConnection(src, dest, DataAccess.READONLY);
       } else{

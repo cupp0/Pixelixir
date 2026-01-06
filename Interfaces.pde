@@ -57,6 +57,7 @@ interface DataBender{
 
 interface DynamicPorks{
   void addCanonicalPork();
+  void rebuildPorks(int inCount, int outCount);
   boolean isInputDynamic();
   boolean isOutputDynamic();
 }

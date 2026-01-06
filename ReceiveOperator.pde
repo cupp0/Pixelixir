@@ -1,17 +1,29 @@
-class ReceiveOperator extends IOOperator implements DynamicPorks{  
+class ReceiveOperator extends IOOperator{  
   
   ReceiveOperator(){
     super();
     name = "receive"; setExecutionSemantics(ExecutionSemantics.MUTATES);
   }
   
-  void initialize(){
-    addBoundPair();  
-  }
-  
+  //hide input, exposed on enclosing composite
+  @Override
   void addBoundPair(){
     super.addBoundPair();
-    ins.get(outs.size()-1).setHidden(true);
+    ins.get(ins.size()-1).setHidden(true);
+  }
+  
+  //only difference is we don't tell listener (Module) to make 
+  //a corresponding InPortUI
+  @Override
+  InPork addInPork(DataType dt){                             
+    InPork in = new InPork(this, ins.size());                //create the pork
+    in.setDefaultDataType(dt);
+    ins.add(in);                                             //store it
+    return in;
+  }
+  
+  void rebuildPorks(int inCount, int outCount){
+    while (outs.size() < outCount) addCanonicalPork(); 
   }
 
   //receive just built a connection. Do we need to make a port on the enclosing composite?
@@ -24,15 +36,5 @@ class ReceiveOperator extends IOOperator implements DynamicPorks{
     }    
     tryExposingHiddenPorts();
   }
-
-  //for any ports w need to add after op initialization. Has to do with when we register 
-  //ports with their window. Perhaps we just keep a global portMap? Why not
-  void addCanonicalPork(){
-    addBoundPair();  
-    ((Module)listener).getWindow().registerPorts((Module)listener);
-  }
-  
-  boolean isInputDynamic(){ return true; }
-  boolean isOutputDynamic(){ return true; }
   
 }

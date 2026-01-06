@@ -1,7 +1,13 @@
 //~Operator
-enum ExecutionSemantics{
+enum ExecutionSemantics {
   MUTATES,
   GENERATES
+}
+
+enum ExecutionStatus{ 
+  GO,
+  NOGO,
+  BADDATA 
 }
 
 public abstract class Operator{
@@ -16,6 +22,7 @@ public abstract class Operator{
   ArrayList<DataTypeBinder> typeBindings = new ArrayList<DataTypeBinder>();  //ports that resolve eachother's type
   
   ExecutionSemantics executionSemantics;
+  ExecutionStatus executionStatus;
   
   Operator(){
     setExecutionSemantics(ExecutionSemantics.GENERATES);  //generate by default
@@ -23,54 +30,78 @@ public abstract class Operator{
   
   abstract void initialize();
    
-  boolean shouldExecute(){
-    //don't allow execution if we are missing inputs
-    if (!inPorksFull()){return false; }
+  void determineExecutionStatus(){    
+    //missing connections at input
+    if (!validInputConnections()){
+      setExecutionStatus(ExecutionStatus.NOGO);
+      return;
+    }
     
-    //if it's a speaker (UI generators, valve
-    if (isSpeaker()){ return true; }
+    //bad data upstream (ie NUMERIC downstream from a Read that outputs TEXT)
+    for (InPork i : ins){
+      if (i.getSource() == null) continue;
+      if (i.getSource().getDataStatus() == DataStatus.BAD){
+        setExecutionStatus(ExecutionStatus.BADDATA);
+        return;
+      }
+    }
+    
+    //from this point, ops should handle special cases.
+    //in most cases, set to GO if there is HOT data at any inport
+    //exceptions in Valve, speaker (UI that dont have inputs, for instance)
+    confirmExecutionStatus();    
+  }
+  
+  //this is the method we should override for special cases
+  void confirmExecutionStatus(){
+    //sliders, time, 
+    if (isSpeaker()){
+      setExecutionStatus(ExecutionStatus.GO);
+      return;
+    }
     
     //if any data is hot, we should execute
     for (InPork i : ins){
+      if (i.getSource() == null) continue;      
       if (i.getSource().getDataStatus() == DataStatus.HOT){
-        return true;
+        setExecutionStatus(ExecutionStatus.GO);
+        return;
       }
     }
     
-    //if there are no hot ins, don't execute
-    return false;
+    //if we are here, all inputs are valid but the data is cold (ie valve is closed)
+    setExecutionStatus(ExecutionStatus.NOGO);
   }
   
+  void setExecutionStatus(ExecutionStatus es){
+    executionStatus = es;
+  }
+  
+  ExecutionStatus getExecutionStatus(){
+    return executionStatus;
+  }
+  
+  //stuff like concat overrides this
+  boolean validInputConnections(){
+    return inPorksFull();
+  }
+
   abstract void execute();
   
   void evaluate(){
-    if (shouldExecute()){
-      //println(name);
-      execute();  
-      postEvaluation(true);
-    } else {
-      postEvaluation(false);
+    determineExecutionStatus();
+    if (executionStatus == ExecutionStatus.GO){
+      execute();
     }
+    postExecution();
   }
   
-  void postEvaluation(boolean executed){
-    
-    //this resets ports that coordinate where new data appears
-    //at each scope
-    for (OutPork o : outs){ o.speaking = false; }
-      
-    //this updates outs that dynamically affect evaluation
-    //at "runtime" (mid evaluation sequence)
-    if (executed){
-      for (OutPork o : outs){
-        o.setDataStatus(DataStatus.HOT);
-      }
-    } else {
-      for (OutPork o : outs){
-        o.setDataStatus(DataStatus.COLD);
-      }
+  void postExecution(){
+    for (OutPork o : outs){
+      if(executionStatus == ExecutionStatus.GO){ o.setDataStatus(DataStatus.HOT); }
+      if(executionStatus == ExecutionStatus.NOGO){ o.setDataStatus(DataStatus.COLD); }
+      if(executionStatus == ExecutionStatus.BADDATA){ o.setDataStatus(DataStatus.BAD); }        
     }
-    
   }
   
   void setListener(Module m){
@@ -141,6 +172,7 @@ public abstract class Operator{
   boolean isSpeaker() { return false; }
   boolean isListener() { return false; }
   boolean isContinuous() { return false; }
+  
   boolean inPorksFull(){
     for (InPork i : ins){
       if (i.getSource() == null) return false; 
@@ -158,6 +190,7 @@ public abstract class Operator{
     if (ins.size() == 0) return false;
     return ins.get(0).getCurrentAccess() == DataAccess.READWRITE;
   }
+  
   boolean hasOutput(){ return outs.size() > 0; }
   boolean hasInput(){ return ins.size() > 0; }
   
@@ -207,24 +240,15 @@ public abstract class Operator{
 
   }
   
-  //this method resolves expected type for operators with indeterminite data 
-  //for instance, a valve, send/receive, copy, etc.. It also propagates that
-  //change down/up stream in the case of chained unresolved types
+  //if we are here, that means argument where was UNDETERMINED.
+  //so we find it DataTypeBinder and propagate the new type
   void propagateCurrentDataType(Pork where, DataType dt){
+    
     where.setCurrentDataType(dt);
+    
     for (DataTypeBinder dtb : typeBindings){
-      if (dtb.getBoundPorks().contains(where)){ 
-        
-        //ensure we don't get stuck in a loop
-        if (dtb.getDataType() != dt){
-          dtb.setDataType(dt);
-          
-          //propagate to all porks connected to any pork we have changed
-          for (Pork p : dtb.getBoundPorks()){
-            p.owner.propagateCurrentDataType(p, dt);
-          }
-        }
-      }
+      if (!dtb.getBoundPorks().contains(where)) continue;        
+      dtb.setDataType(dt);
     }    
   }
   
@@ -331,7 +355,6 @@ public abstract class Operator{
     }
   }
   
-  void addUpdater(UpdateObject uo){}
-  void onSpeaking(InPork where){}
+  //void addUpdater(UpdateObject uo){}
   
 } 

@@ -57,9 +57,9 @@ public abstract class PortUI extends ModuleUI<PortUIState>{
   
   void display(){   
     rect(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y, radii[0], radii[1], radii[2], radii[3]);
-    if (parent.getWindow().portMap.getPork(this).targetFlow != null){
-      text(parent.getWindow().portMap.getPork(this).targetFlow.getAddress(), getAbsolutePosition().x, getAbsolutePosition().y);
-    }
+    //if (parent.getWindow().portMap.getPork(this).targetFlow != null){
+    //  text(parent.getWindow().portMap.getPork(this).targetFlow.getAddress(), getAbsolutePosition().x, getAbsolutePosition().y);
+    //}
     //if (parent.getWindow().portMap.getPork(this).targetFlow == null){
     //  fill(255, 0, 0);    
     //  ellipse(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y);

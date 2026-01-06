@@ -26,6 +26,7 @@ public class Flow {
   private String moduleValue;        //module id
   private String windowValue;        //module key id
   private String portValue;          //port id
+  
   //private ImageBuffer imageValue;
   
   public Flow(DataType type) {
@@ -129,6 +130,10 @@ public class Flow {
       return getTextValue();
       
       case LIST:
+      String s = "";
+      for (Flow f : getListValue()){
+        s+=(f.valueToString())+", ";
+      }
       return "list";
       
       default:
@@ -182,7 +187,7 @@ public class Flow {
   public void setPortValue(String v) {
       this.portValue = v;
   }
-   
+ 
   public void setListAtIndex(int i, Flow f) {
     if (i >= 0 && i < this.listValue.size()){
       this.listValue.set(i, f);
@@ -236,6 +241,7 @@ public class Flow {
   
   //static copy
   static void copyData(Flow source, Flow destination){
+    System.out.println(source == null || destination == null);
     if(source.type != destination.type){
       destination.setType(source.getType()); 
     }

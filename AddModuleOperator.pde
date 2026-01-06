@@ -6,7 +6,7 @@ class AddModuleOperator extends PrimeOperator{
   }
   
   void initialize(){
-    addInPork(DataType.TEXT); addInPork(DataType.WINDOW); addInPork(DataType.NUMERIC); addInPork(DataType.NUMERIC);
+    addInPork(DataType.TEXT); addInPork(DataType.WINDOW); 
     addOutPork(DataType.MODULE).setTargetFlow(new Flow(DataType.MODULE));
   }
 
@@ -15,9 +15,7 @@ class AddModuleOperator extends PrimeOperator{
     
     String n = ins.get(0).targetFlow.getTextValue();
     Window w = windowByBoundaryID.get(ins.get(1).targetFlow.getWindowValue());
-    float x = ins.get(2).targetFlow.getFloatValue();
-    float y = ins.get(3).targetFlow.getFloatValue();
-    w.addModule(n).setBodyPosition(new PVector(x, y));
+    w.addModule(n);
   }
   
   boolean inputsAreValid(){
