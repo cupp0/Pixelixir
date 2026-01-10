@@ -1,61 +1,55 @@
 //~Window
-class Window {
+class Window implements Interactable{
   
-  // ~ ~ ~ MANAGERS ~ ~ ~ //
-  WindowManager windowManager;
-  EventManager eventManager;
+  // handle inputs, menus, interaction
+  WindowMan windowMan;
   
-  // ~ ~ ~ DATA/ROUTING ~ ~ ~ //
+  // organizational info
   Module boundary;                                           //the module we are looking inside of
+  BiMap portMap = new BiMap();                               //Port / pork bimap 
+  PVector spawnCursor = new PVector(200, 200);               //where we spawn the next module by default                                         
+  
+  // display
   ArrayList<Module> modules = new ArrayList<>();             //the UI that represents our operator's juicy innards
   ArrayList<Connection> connections = new ArrayList<>();     //ui class for edges
-  BiMap portMap = new BiMap();                               //Port / pork bimap 
-  
-  // ~ ~ ~ DISPLAY ~ ~ ~ //
-  color col;
-  Camera cam;
-  
-  //these two should probably be a part of some Overlays layer along with menus in WindowManager
-  ConnectionLine connectionLine;
+  Style style;
+  ConnectionLine connectionLine;                            //where do these two belong?
   SelectionRectangle selectionRectangle;                                                  
-  PVector spawnCursor = new PVector(200, 200);              //where we spawn the next module underdefault conditions                                          
   
   Window(Module from){
     boundary = from;
-    windowManager = new WindowManager(this);
-    eventManager = new EventManager(this);
-    cam = new Camera(this);
-    col = color (25+random(100), 75 + random(100), 125 + random(100));
+    windowMan = new WindowMan(this);
+    style = new Style(color (25+random(100), 75 + random(100), 125 + random(100)));
   } 
   
-  void onHumanEvent(HumanEvent e){
-    eventManager.handle(e);
+  public Style getStyle(){
+    return style;
   }
 
   void display(){    
-    background(col);
+    background(style.getFill());
     noiseGen.stepColor(); 
-    cam.update();
+    windowMan.stateMan.cam.update();
     
     pushMatrix();
-    translate(cam.xOff, cam.yOff);
-    scale(cam.scl);
+    translate(windowMan.stateMan.cam.xOff,windowMan.stateMan.cam.yOff);
+    scale(windowMan.stateMan.cam.scl);
     for (Module m : modules) {
       m.display();
       displayConnections(m);
     }    
-    displayAnimations();  
-    popMatrix();
+    displayAnimations();      
+    popMatrix();   
     
-    windowManager.displayMenuIfActive();
+    windowMan.displayMenuIfActive();
   }
   
   void displayAnimations(){
     if (selectionRectangle != null){
-      selectionRectangle.display(windowManager.getCurrentMouse());
+      selectionRectangle.display(windowMan.stateMan.getCurrentMouse());
     }
     if (connectionLine != null){
-      connectionLine.display(windowManager.getCurrentMouse());
+      connectionLine.display(windowMan.stateMan.getCurrentMouse());
     }
   }
   
@@ -79,11 +73,11 @@ class Window {
   //need to set the new window's offset wherever the mouse is so we are always zooming in/out on/from
   //the center of the window
   void setWindow(Module whichOne, boolean isZoomingIn){
-    selectionManager.clearSelection();
+    selectionMan.clearSelection();
     
     currentWindow = windows.get(whichOne);
     if (isZoomingIn){
-      currentWindow.cam.setCamOnCompositeZoom();
+      currentWindow.windowMan.stateMan.cam.setCamOnCompositeZoom();
     }
   }
   
@@ -164,11 +158,7 @@ class Window {
   void removeSelectionRectangle(){
     selectionRectangle = null;
   }
-  
-  //registering module with window includes
-  //setting the parent, 
-  //registering ports with portMap
-  //appending to modules
+
   Module addModule(String what){
    
     //create the module, operator, and default UI
@@ -187,7 +177,7 @@ class Window {
     //arranges module UI
     newMod.organizeUI();
     
-    updateSpawnPosition(newMod);
+    updateSpawnPosition(PVector.add(newMod.getBodyPosition(), new PVector(0, newMod.uiBits.get(0).size.y+16)));
     
     registerModule(newMod);
   
@@ -214,7 +204,6 @@ class Window {
   }
   
   void deregisterModule(Module m){
-    //store the object at the window level
     modules.remove(m);
     m.setParent(null);
     deregisterPorts(m);
@@ -230,8 +219,8 @@ class Window {
   }
   
   //sets to spawn below the argument module
-  void updateSpawnPosition(Module m){
-    spawnCursor = PVector.add(m.getBodyPosition(), new PVector(0, m.uiBits.get(0).size.y+16));
+  void updateSpawnPosition(PVector p){
+    spawnCursor = p.copy();
   }
   
   //just stores objects, doesn't build any UI or position anything
@@ -306,11 +295,11 @@ class Window {
   }
   
   void setColor(color c){
-    col = c;
+    style.fill = c;
   }
   
   color getColor(){
-    return col;
+    return style.getFill();
   }
    
   PVector getCursor(){
@@ -320,4 +309,108 @@ class Window {
   void setCursor(PVector p){
     spawnCursor.set(p);
   }
+  
+  StateChange onInteraction(HumanEvent e){
+    
+    StateMan sm = windowMan.stateMan;
+    //if doing nothing, do stuff
+    if (sm.isInteractionState(InteractionState.NONE)){      
+        //key commands
+        if (sm.inputMan.getState().isDown(CONTROL)){
+          if(sm.inputMan.getState().justPressed('S'))saveSketch();
+          if(sm.inputMan.getState().justPressed('C'))selectionMan.copyModules(selectionMan.modules);    
+          if(sm.inputMan.getState().justPressed('V'))selectionMan.pasteModules(selectionMan.clipboard, this, new PVector(e.xMouse, e.yMouse));    
+        }
+   
+        if (e.input.theKey == 'r')windowMan.stateMan.cam.resetCam();
+        if (e.input.theKeyCode == BACKSPACE)selectionMan.onBackSpace();
+          
+        //right mouse  
+        if (sm.inputMan.getState().isMouseDown(RIGHT)){
+          if (sm.isMouseDoing(Action.MOUSE_DRAGGED, RIGHT)){
+            addSelectionRectangle(e);
+            return new StateChange(StateAction.ADD, InteractionState.SELECTING_MODULES, this);
+          }
+        }    
+        
+        if (sm.isMouseDoing(Action.MOUSE_RELEASED, RIGHT)){
+          windowMan.addWindowMenu(new PVector(e.input.xMouse, e.input.yMouse));
+          updateSpawnPosition(new PVector(e.xMouse-60, e.yMouse));
+          return new StateChange(StateAction.ADD, InteractionState.MENU_OPEN, this);
+        }
+        
+        //left mouse  
+        if (sm.inputMan.getState().isMouseDown(LEFT)){
+          if (sm.isMouseDoing(Action.MOUSE_DRAGGED, LEFT)){
+            return new StateChange(StateAction.ADD, InteractionState.PANNING, this);
+          }
+        }   
+        //left mouse
+        if (sm.isMouseDoing(Action.MOUSE_RELEASED, LEFT)){
+          selectionMan.clearSelection();
+        }     
+        
+        if (sm.isMouseDoing(Action.MOUSE_WHEEL)){
+          windowMan.stateMan.cam.zoom(e.input.wheelDelta);
+          checkWindowTransition(e);
+        }
+    }
+    
+    
+    //if panning, we can pan or end pan
+    if (sm.isInteractionState(InteractionState.PANNING, this)){
+        if (e.input.action == Action.MOUSE_DRAGGED){
+          windowMan.stateMan.cam.pan(new PVector(e.xMouse - e.pxMouse, e.yMouse - e.pyMouse));
+        }
+        if (e.input.action == Action.MOUSE_RELEASED) {
+          return new StateChange(StateAction.REMOVE, InteractionState.PANNING, this);
+        }
+    }
+    
+    
+    //if menu open, we can exit menu
+    if (sm.isInteractionState(InteractionState.MENU_OPEN)){
+        if (e.input.action == Action.MOUSE_PRESSED){
+          windowMan.exitMenu();
+          return new StateChange(StateAction.REMOVE, InteractionState.MENU_OPEN, this);
+        }
+    }
+      
+      
+    //if are selecting modules, we can finalze selection
+    if (sm.isInteractionState(InteractionState.SELECTING_MODULES)){
+        if (e.input.action == Action.MOUSE_RELEASED){
+          q();
+          selectionMan.modules = getModulesInside(new PVector(windowMan.stateMan.storedX, windowMan.stateMan.storedY), new PVector(e.xMouse, e.yMouse));
+          removeSelectionRectangle();
+          return new StateChange(StateAction.REMOVE, InteractionState.SELECTING_MODULES, this);
+        }
+    }
+
+    return new StateChange(StateAction.DO_NOTHING);
+  }
+  
+  //dummy method, window is hovered (canvas) any time nothing else is hovered
+  HoverTarget hitTest(float x, float y) {
+    return new HoverTarget(this);
+  }
+  
+  //on zoom, check if we need to change windows
+  void checkWindowTransition(HumanEvent e){
+
+    if (e.hover.ui instanceof CompositeUI){           
+      //if hovering an eye and zooming in, transition to new window
+      if (e.input.wheelDelta > 0 && windowMan.stateMan.cam.scl > windowMan.stateMan.cam.maxScl){
+        setWindow(((ModuleUI)e.hover.ui).parent, true);
+      }         
+    }
+    
+    //if zooming out, check the window exists before transitioning
+    if (e.input.wheelDelta < 0 && windowMan.stateMan.cam.scl < windowMan.stateMan.cam.minScl){
+      if (windows.containsKey(boundary.parent)){
+        setWindow(boundary.parent, false);
+      }
+    }
+  }
+  
 }

@@ -27,6 +27,8 @@ class DisplayUI extends DBUI{
     }
   }
   
-  void onInteraction(HumanEvent e){}
+  StateChange interaction(HumanEvent e){
+    return new StateChange(StateAction.DO_NOTHING);
+  }
   
 }

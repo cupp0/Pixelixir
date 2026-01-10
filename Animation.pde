@@ -54,7 +54,7 @@ class SelectionRectangle extends Animation{
   }
   
   void display(PVector where){
-    strokeWeight(2/currentWindow.cam.scl);
+    strokeWeight(2/currentWindow.windowMan.stateMan.cam.scl);
     stroke(0);    
     noFill();
     rect(anchor.x, anchor.y, where.x-anchor.x, where.y-anchor.y);

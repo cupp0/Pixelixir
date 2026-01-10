@@ -17,9 +17,13 @@ class SwitchUI extends DBUI{
     displayIdentity();
   }
   
-  void onInteraction(HumanEvent e){
-    boolean pressed = (e.input.action == Action.MOUSE_PRESSED);
-    state.onLocalEvent(new UIPayload(pressed));
+  StateChange interaction(HumanEvent e){
+    
+    if(e.input.action == Action.MOUSE_PRESSED){
+      state.onLocalEvent(new UIPayload(true));
+    }
+
+    return new StateChange(StateAction.DO_NOTHING);
   }
 
 }

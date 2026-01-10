@@ -19,15 +19,12 @@ class InputState {
         typedCharacters.clear();
     }
     
-    public void printState(){
-      println("~~~");
-      for (Integer i : downKeys){
-        print(i);
-      }
-    }
-    
     public boolean isDown(int keyCode) {
       return downKeys.contains(keyCode);
+    }
+    
+    public boolean isMouseDown(int butt) {
+      return downMouseButtons.contains(butt);
     }
 
     public boolean justPressed(int keyCode) {

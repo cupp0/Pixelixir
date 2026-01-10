@@ -15,7 +15,7 @@ public class BodyUI extends ModuleUI<BodyUIState>{
     if (parent.isComposite())return;
     if (!(parent.owner.hasOutput()) || !(parent.owner.hasInput())) return;
     if(!parent.owner.isMutating()) return;
-    color edgeColor = getWindow().eventManager.styleResolver.getColorByLastEval(parent.owner.outs.get(0));
+    color edgeColor = getWindow().windowMan.styleResolver.getColorByLastEval(parent.owner.outs.get(0));
     if (edgeColor != color(0)){
       stroke(edgeColor);
       strokeWeight(2);      
@@ -39,12 +39,7 @@ public class BodyUI extends ModuleUI<BodyUIState>{
     for (int i = 0; i < count; i++) {
       PVector a = PVector.add(state.pos, cornerPoints.get(i).pos);
       PVector b = PVector.add(state.pos, cornerPoints.get((i+1) % count).pos); // wrap for closed shape
-  
-      //float d = distToSegment(currentWindow.cam.wMouse.x, currentWindow.cam.wMouse.y, a.x, a.y, b.x, b.y);
-      //if (d < 5 && d < closestDist) {
-      //  closestDist = d;
-      //  closestIndex = i+1; 
-      //}
+
     }
     return closestIndex;
   }
@@ -78,5 +73,39 @@ public class BodyUI extends ModuleUI<BodyUIState>{
     
     return hovered;    
   }
+  
+  StateChange onInteraction(HumanEvent e){
+    StateMan sm = getWindow().windowMan.stateMan;
     
+    if (sm.isInteractionState(InteractionState.NONE)){
+        if (sm.isMouseDoing(Action.MOUSE_PRESSED, LEFT)){
+          selectionMan.addTo(this.parent);
+          return new StateChange(StateAction.ADD, InteractionState.DRAGGING_MODULES, this);
+        }
+        
+        if (sm.isMouseDoing(Action.MOUSE_PRESSED, RIGHT)){
+          getWindow().windowMan.addModuleMenu(parent, new PVector(e.input.xMouse, e.input.yMouse));
+          return new StateChange(StateAction.ADD, InteractionState.MENU_OPEN, this);
+        }
+    }
+    
+    
+    if (sm.isInteractionState(InteractionState.DRAGGING_MODULES)){
+        if(e.input.action == Action.MOUSE_DRAGGED) {  
+          getWindow().dragModules(selectionMan.modules, e);
+          return new StateChange(StateAction.DO_NOTHING);
+        }
+        if (e.input.action == Action.MOUSE_RELEASED) {
+          CompositeUI eye = sm.hoveringEye();
+          if (eye != null){
+            Window target = windows.get(eye.parent);  
+            selectionMan.moveSelection(selectionMan.modules, currentWindow, target);
+          }
+          return new StateChange(StateAction.REMOVE, InteractionState.DRAGGING_MODULES, this);
+        }
+    }
+    
+    return new StateChange(StateAction.DO_NOTHING);
+  }
+  
 }

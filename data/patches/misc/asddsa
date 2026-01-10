@@ -1,0 +1,41 @@
+{
+  "modules": [
+    {
+      "name": "get",
+      "id": "24dc8bdf-08bd-45dd-acf7-92c8062bb055",
+      "ins": 2,
+      "outs": 1,
+      "position": {
+        "x": 200.0,
+        "y": 200.0,
+        "z": 0.0
+      },
+      "uiElements": []
+    },
+    {
+      "name": "set",
+      "id": "382b1039-919a-43a2-a059-5c0f40e955d8",
+      "ins": 3,
+      "outs": 1,
+      "position": {
+        "x": 200.0,
+        "y": 244.0,
+        "z": 0.0
+      },
+      "uiElements": []
+    },
+    {
+      "name": "remove",
+      "id": "ffb80721-e3e5-4ff4-b6e5-29d3b14677f8",
+      "ins": 2,
+      "outs": 1,
+      "position": {
+        "x": 200.0,
+        "y": 288.0,
+        "z": 0.0
+      },
+      "uiElements": []
+    }
+  ],
+  "connections": []
+}

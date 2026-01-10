@@ -10,7 +10,7 @@ class SwitchUIState extends DBUIState{
   void onLocalEvent(UIPayload p){
     boolean newBool = !data.getBoolValue();
     setData(new UIPayload(newBool));
-    identityManager.propagateIdentityEvent(identityToken, this);    
+    identityMan.propagateIdentityEvent(identityToken, this);    
   }
   
   String getType(){ return "switch"; }  

@@ -79,6 +79,10 @@ class InPortUI extends PortUI{
   OutPortUI getSource(){
     return ((OutPortUI)getWindow().portMap.getPort(((InPork)getPorkPair()).getSource()));
   }
+  
+  StateChange onInteraction(HumanEvent e){
+    return new StateChange(StateAction.DO_NOTHING);  
+  }
 
 }
 
@@ -101,6 +105,49 @@ class OutPortUI extends PortUI{
     }
     
     return ilist;
+  }
+  
+  StateChange onInteraction(HumanEvent e){
+    StateMan sm = parent.getWindow().windowMan.stateMan;
+    
+    //create an open connection
+    if (sm.isInteractionState(InteractionState.NONE)){
+      if (sm.isMouseDoing(Action.MOUSE_PRESSED, LEFT)){
+        
+        Pork p = getPorkPair();
+        if (p.elligibleForConnection()){
+          parent.getWindow().addConnectionLine(this);
+          return new StateChange(StateAction.ADD, InteractionState.DRAGGING_OPEN_CONNECTION, this);  
+        }
+      }
+    }
+    
+    //drag open connection
+    if (sm.isInteractionState(InteractionState.DRAGGING_OPEN_CONNECTION)){      
+      //remove open connection
+      if (e.input.theKeyCode == BACKSPACE){
+        parent.getWindow().removeConnectionLine();
+        return new StateChange(StateAction.REMOVE, InteractionState.DRAGGING_OPEN_CONNECTION, this); 
+      }
+      
+      //attempt connection
+      if (sm.isMouseDoing(Action.MOUSE_PRESSED)){
+        
+        HoverTarget ht = e.hover;       
+        if (!(ht.ui instanceof InPortUI)) return new StateChange(StateAction.DO_NOTHING); 
+        
+        DataAccess da = (e.input.mouseButt == LEFT)? DataAccess.READONLY : DataAccess.READWRITE;
+        if (((InPortUI)ht.ui).getSource() == null){
+          parent.getWindow().attemptConnection(this, ((InPortUI)ht.ui), da);
+          if(!sm.inputMan.getState().isDown(CONTROL)){
+            parent.getWindow().removeConnectionLine();
+            return new StateChange(StateAction.REMOVE, InteractionState.DRAGGING_OPEN_CONNECTION, this); 
+          }
+        }
+      }
+    }
+    
+    return new StateChange(StateAction.DO_NOTHING);  
   }
 
 }

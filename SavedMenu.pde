@@ -11,7 +11,7 @@ class SavedMenu extends Menu<Window>{
   }
 
   void build() {
-    addRetreatOption(this, new ModuleTypeMenu(listener, ((WindowManager)listener).scope, pos));
+    addRetreatOption(this, new ModuleTypeMenu(listener, ((WindowMan)listener).scope, pos));
     File folder = new File(dataPath("patches/")); 
     File[] listOfFiles = folder.listFiles();
     for (int i = 0; i < listOfFiles.length; i++){

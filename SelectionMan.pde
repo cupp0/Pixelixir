@@ -1,9 +1,13 @@
-//~SelectionManager
-class SelectionManager{
+//~SelectionMan
+class SelectionMan{
   
   ArrayList<Module> modules = new ArrayList<Module>();            //what is selected
   ArrayList<Module> copiedModules = new ArrayList<Module>();      //stored for copy/paste and what not
   String clipboard;
+  
+  StateChange onInteraction(HumanEvent e){
+    return new StateChange(StateAction.DO_NOTHING);  
+  }
   
   boolean containsModule(Module m){
     if (modules.contains(m)){return true;}
@@ -62,7 +66,7 @@ class SelectionManager{
     }
     
     clipboard = gson.toJson(wdata);
-    //println(clipboard);
+    println(clipboard);
     return wdata;
   }
   
@@ -201,6 +205,7 @@ class SelectionManager{
 
     // Rebuild connections
     for (ConnectionData cdata : wdata.connections) {
+      println(newMods.get(cdata.fromModule));
       Window where = windows.get(newMods.get(cdata.fromModule).parent);
       
       //the two modules we are attempting to connect
@@ -314,7 +319,7 @@ class SelectionManager{
   
   PVector copiedPosition(Module m){
     PVector topLeft = topLeft(copiedModules).copy();
-    PVector maus = currentWindow.cam.toWorld(new PVector (mouseX, mouseY)).copy();
+    PVector maus = currentWindow.windowMan.stateMan.cam.toWorld(new PVector (mouseX, mouseY)).copy();
     PVector mPos = m.uiBits.get(0).state.pos.copy().sub(topLeft);
     return mPos.add(maus);
   }

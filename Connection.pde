@@ -4,7 +4,7 @@
 enum ConnectionStyle {CABLE, DOTS}
 
 //spring physics for connection animation
-class Connection implements Hoverable{
+class Connection implements Interactable, Renderable{
   
   final PortUI source;
   final PortUI destination;
@@ -52,9 +52,13 @@ class Connection implements Hoverable{
     return style;
   }
   
+  Window getWindow(){
+    return source.getWindow(); 
+  }
+  
   void display(){
     
-    applyStyle(source.parent.getWindow().eventManager.styleResolver.resolve(this));
+    applyStyle(source.parent.getWindow().windowMan.styleResolver.resolve(this));
 
     if (connectionStyle == ConnectionStyle.CABLE){
       displayCable();
@@ -203,4 +207,9 @@ class Connection implements Hoverable{
     float by = y1 + b*vy;
     return dist(px, py, bx, by);
   }
+  
+  StateChange onInteraction(HumanEvent e){
+    return new StateChange(StateAction.DO_NOTHING);
+  }
+
 }

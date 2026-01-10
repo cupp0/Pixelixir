@@ -5,7 +5,7 @@
     if (projectDir != null) {
   
       // Save the input to a file
-      String[] data = {gson.toJson(selectionManager.copyModules(bigbang.modules))};
+      String[] data = {gson.toJson(selectionMan.copyModules(bigbang.modules))};
       saveStrings(projectDir, data);
     } 
   }
@@ -22,14 +22,13 @@
     String name = User.prompt("enter ui name:", s.identityToken);
   
     if (name != null && !name.isEmpty()) {
-      if(identityManager.identityGroupExists(s.identityToken)){
-        identityManager.renameGroup(s.identityToken, name);
+      if(identityMan.identityGroupExists(s.identityToken)){
+        identityMan.renameGroup(s.identityToken, name);
       }
     }
   }
   
   void nameModule(Module m){
-    println(m.userLabel);
     String name = User.prompt("enter module name:", "");
   
     if (name != null && !name.isEmpty()) {

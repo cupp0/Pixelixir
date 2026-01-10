@@ -10,7 +10,7 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
   } 
   
   boolean isHovered(){
-    return (vecDistance(currentWindow.cam.wMouse, getAbsolutePosition().copy().add(size.x/2, size.y/2)) < irisR);
+    return (vecDistance(currentWindow.windowMan.stateMan.cam.wMouse, getAbsolutePosition().copy().add(size.x/2, size.y/2)) < irisR);
   }
   
   void display(){   
@@ -20,8 +20,8 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
     ellipse(getAbsolutePosition().x+size.x/2, getAbsolutePosition().y+size.y/2, size.x*2, size.y*2);
   
     // --- Iris and pupil follow the mouse ---
-    float dx = (currentWindow.cam.wMouse.x - getAbsolutePosition().x-size.x/2);
-    float dy = (currentWindow.cam.wMouse.y - getAbsolutePosition().y-size.y/2);
+    float dx = (currentWindow.windowMan.stateMan.cam.wMouse.x - getAbsolutePosition().x-size.x/2);
+    float dy = (currentWindow.windowMan.stateMan.cam.wMouse.y - getAbsolutePosition().y-size.y/2);
     float angle = atan2(dy, dx);
     float distMax = size.x*1.1; // how far iris can move inside sclera
     float d = min(dist(dx, dy, 0, 0), distMax);
@@ -46,6 +46,9 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
     fill(style.fill);
     ellipse(getAbsolutePosition().x+pupilX+size.x/2, getAbsolutePosition().y+pupilY+size.y/2, pupilR*2, pupilR*2);
   }
-
+  
+  StateChange onInteraction(HumanEvent e){
+    return new StateChange(StateAction.DO_NOTHING);
+  }
 
 }

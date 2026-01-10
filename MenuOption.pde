@@ -1,5 +1,5 @@
 //~MenuOption
-abstract class MenuOption implements Hoverable{
+abstract class MenuOption implements Interactable, Renderable{
   
   Menu parent;
   String label;
@@ -12,10 +12,9 @@ abstract class MenuOption implements Hoverable{
   
   void display(){
     PVector p = getAbsolutePosition();    
-    applyStyle(parent.getWindow().eventManager.styleResolver.resolve(this));
+    applyStyle(parent.getWindow().windowMan.styleResolver.resolve(this));
     rect(p.x, p.y, size.x, size.y, 4);
-    
-    
+      
     fill(255);
     textSize(12);
     text(label, p.x+3, p.y+14);
@@ -37,6 +36,15 @@ abstract class MenuOption implements Hoverable{
     return isHovered(x, y)
       ? new HoverTarget(this)
       : new HoverTarget();
+  }
+  
+  StateChange onInteraction(HumanEvent e){
+    StateMan sm = ((WindowMan)parent.listener).stateMan;
+    if (sm.isMouseDoing(Action.MOUSE_PRESSED, LEFT)){
+      execute();
+    }
+
+    return new StateChange(StateAction.DO_NOTHING);
   }
   
   Style getStyle(){

@@ -241,7 +241,6 @@ public class Flow {
   
   //static copy
   static void copyData(Flow source, Flow destination){
-    System.out.println(source == null || destination == null);
     if(source.type != destination.type){
       destination.setType(source.getType()); 
     }

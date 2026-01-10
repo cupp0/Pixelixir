@@ -15,15 +15,15 @@ class DBUIState extends UIState implements DataBender{
 
   void trySetIdentityToken(String newName){
     
-    if (identityManager.identityGroupExists(newName)){
-      if (identityManager.groups.get(newName).getType() != this.getType()){
-        println("that identity is held by " + identityManager.groups.get(newName).getType());
+    if (identityMan.identityGroupExists(newName)){
+      if (identityMan.groups.get(newName).getType() != this.getType()){
+        println("that identity is held by " + identityMan.groups.get(newName).getType());
         return;
       } 
     }
     
     identityToken = newName;    
-    identityManager.submitToken(identityToken, this); 
+    identityMan.submitToken(identityToken, this); 
   }
 
   void setData(UIPayload p){
@@ -38,8 +38,8 @@ class DBUIState extends UIState implements DataBender{
     //set value of this state with UIPayload in UIEvent
     setData(p);
       
-    if (identityManager.identityGroupExists(identityToken)){
-      identityManager.propagateIdentityEvent(identityToken, this); 
+    if (identityMan.identityGroupExists(identityToken)){
+      identityMan.propagateIdentityEvent(identityToken, this); 
     } else {   
       //if this state is attached to a prime operator (this states' ui is on a module whose operator is prime)
       tryUpdateOperator();

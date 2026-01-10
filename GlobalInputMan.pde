@@ -11,13 +11,13 @@ class GlobalInputEvent {
   final GlobalEventType type;
   final Action action;
   final int timestamp;
-  final float xMouse, yMouse;
+  final int xMouse, yMouse;
   final int mouseButt;
   final float wheelDelta;
   final char theKey;
   final int theKeyCode;
   
-  GlobalInputEvent(GlobalEventType type_, Action action_, int timestamp_, float xMouse_, float yMouse_,
+  GlobalInputEvent(GlobalEventType type_, Action action_, int timestamp_, int xMouse_, int yMouse_,
              int mouseButt_, float wheelDelta_,
              char theKey_, int theKeyCode_) {
     this.type = type_;
@@ -32,7 +32,7 @@ class GlobalInputEvent {
   }
 }
 
-class GlobalInputManager{
+class GlobalInputMan{
   
   ArrayList<GlobalEventListener> globalListeners = new ArrayList<>(); //these are primitive ops that want raw input data
 
@@ -45,11 +45,10 @@ class GlobalInputManager{
     for (GlobalEventListener l : globalListeners){
       l.onGlobalInputEvent(e);
     }
-    currentWindow.windowManager.onGlobalInputEvent(e);
+    currentWindow.windowMan.onGlobalInputEvent(e);
   }
   
    void handleMouseEvent(Action action) {
-
     GlobalInputEvent e = new GlobalInputEvent(
       GlobalEventType.MOUSE,
       action,

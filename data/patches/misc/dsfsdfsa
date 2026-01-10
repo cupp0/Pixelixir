@@ -1,0 +1,61 @@
+{
+  "modules": [
+    {
+      "name": "switch",
+      "id": "40e2073d-c57e-4239-89b6-7d1fb2f4858f",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 200.0,
+        "y": 200.0,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "identityToken": "81d13ed1-da3f-46a2-801a-597eaf9ed27e",
+          "data": {
+            "type": "BOOL",
+            "floatValue": 0.0,
+            "boolValue": false
+          },
+          "id": "5eb1e44a-fe52-4d18-bc05-ec3073f9bc44",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "switch"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "id": "ffc05606-2398-4b9a-a1de-15a96f89cc08",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 200.0,
+        "y": 248.0,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "identityToken": "9e9cd21a-f4dd-4709-ae70-194e90610c78",
+          "data": {
+            "type": "BOOL",
+            "floatValue": 0.0,
+            "boolValue": false
+          },
+          "id": "697f8a5e-260a-41df-90bd-8290526813c4",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "button"
+        }
+      ]
+    }
+  ],
+  "connections": []
+}

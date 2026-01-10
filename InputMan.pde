@@ -1,5 +1,5 @@
-//~InputManager
-class InputManager {
+//~InputMan
+class InputMan {
 
     private InputState state = new InputState();
 
@@ -7,22 +7,22 @@ class InputManager {
       return state;
     }
     
-    void update(HumanEvent e){
-      switch(e.input.action){
+    void update(GlobalInputEvent e){
+      switch(e.action){
         case MOUSE_PRESSED:
-        addMousePress(e.input.mouseButt);
+        addMousePress(e.mouseButt);
         break;
         
         case MOUSE_RELEASED:
-        removeMousePress(e.input.mouseButt);
+        removeMousePress(e.mouseButt);
         break;
         
         case KEY_PRESSED:
-        addKey(e.input.theKeyCode);
+        addKey(e.theKeyCode);
         break;
         
         case KEY_RELEASED:
-        removeKey(e.input.theKeyCode);
+        removeKey(e.theKeyCode);
         break;
       }
       //state.printState();

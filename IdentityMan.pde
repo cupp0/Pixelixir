@@ -1,17 +1,16 @@
 
-//~IdentityManager
-//UI Identity group manager
-public class IdentityManager {
+//~IdentityMan
+//UI Identity group Man
+public class IdentityMan {
 
     private Map<String, IdentityGroup> groups;  // token -> group
 
-    public IdentityManager() {
+    public IdentityMan() {
         groups = new HashMap<>();
     }
 
     void propagateIdentityEvent(String token, DataBender db){
       if (identityGroupExists(token)){
-        //println("propgating to " + groups.get(token).members.size() + db.getType());
         groups.get(token).setSharedValue(db.getData());
       }
     }
@@ -37,7 +36,6 @@ public class IdentityManager {
     }
 
     public IdentityGroup createGroup(String type, String token) {
-      //println("creating group " + type + ": " + token);
       //if group already exists, return it
       if (identityGroupExists(token)){
         println("attempted to create a group that already exists");

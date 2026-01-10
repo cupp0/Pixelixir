@@ -232,7 +232,7 @@ public class Module implements OperatorListener{
   void display(){
   //display ports, sliders, buttons, etc.
     for (ModuleUI ui : uiBits){
-      ui.applyStyle(getWindow().eventManager.styleResolver.resolve(ui));
+      ui.applyStyle(getWindow().windowMan.styleResolver.resolve(ui));
       ui.display();
     }
     
@@ -282,7 +282,7 @@ public class Module implements OperatorListener{
 
   color getColor(){
     if (this.isComposite()){
-      return windows.get(this).col;
+      return windows.get(this).style.getFill();
     }
     
     for (int i = 0; i < UIText.length; i++){

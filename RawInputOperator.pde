@@ -3,7 +3,7 @@ abstract class RawInputOperator extends PrimeOperator implements GlobalEventList
   
   RawInputOperator(){
     super();
-    globalInputManager.registerGlobalListener(this);
+    globalInputMan.registerGlobalListener(this);
   }
   
   abstract void onGlobalInputEvent(GlobalInputEvent e);

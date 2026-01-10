@@ -15,11 +15,11 @@ import com.google.gson.*;
 
 String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "composite"};
 String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};
-String[] unary = {"UNARY", "sin", "cos", "tan", "acos", "asin", "atan", "abs", "sqrt", "floor", "round"};
+String[] unary = {"UNARY", "sin", "cos", "tan", "acos", "asin", "atan", "abs", "sqrt", "floor", "round", "random"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
 String[] list = {"LIST", "list", "append", "remove", "set", "get", "concat", "split", "size"};
 String[] utility = {"UTILITY", "print", "iterator", "toFloat", "read", "write", "copy", "valve", "send", "receive", "delay"};
-String[] meta = {"META", "time", "mouseX", "mouseY", "leftMouse", "rightMouse", "mouseWheel", "key", "drag", "moduleX", "moduleY", "window", "moduleList", "getModule", "inList", "outList", "connect", "addModule"};
+String[] meta = {"META", "time", "mouseX", "mouseY", "moduleWidth", "moduleHeight", "leftMouse", "rightMouse", "mouseWheel", "key", "drag", "moduleX", "moduleY", "window", "moduleList", "getModule", "inList", "outList", "connect", "addModule"};
 
 String[][] UIText = {UI, binary, unary, logic, list, utility, meta};
 
@@ -35,9 +35,10 @@ Module mama;
 Window bigbang;
 Window currentWindow;
 Graph graph = new Graph();
-GlobalInputManager globalInputManager = new GlobalInputManager();
-SelectionManager selectionManager = new SelectionManager();
-IdentityManager identityManager = new IdentityManager();
+
+GlobalInputMan globalInputMan = new GlobalInputMan();
+SelectionMan selectionMan = new SelectionMan();
+IdentityMan identityMan = new IdentityMan();
 PartsFactory partsFactory = new PartsFactory();        
 FlowRegistry flowRegistry = new FlowRegistry(); 
 NoiseGenerator noiseGen = new NoiseGenerator();

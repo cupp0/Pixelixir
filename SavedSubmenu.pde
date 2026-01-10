@@ -12,7 +12,7 @@ class SavedSubmenu extends Menu<Window>{
   }
 
   void build() {
-    addRetreatOption(this, new SavedMenu(listener, ((WindowManager)listener).scope, pos));
+    addRetreatOption(this, new SavedMenu(listener, ((WindowMan)listener).scope, pos));
     File folder = new File(dataPath("patches/"+subfolder+"/")); 
     File[] listOfFiles = folder.listFiles();
     for (int i = 0; i < listOfFiles.length; i++){
@@ -23,7 +23,7 @@ class SavedSubmenu extends Menu<Window>{
             String[] data = loadStrings(file);
             String appendedData = "";
             for (String s : data){ appendedData += s; }
-            selectionManager.pasteModules(appendedData, currentWindow, currentWindow.cam.toWorld(pos.copy()));
+            selectionMan.pasteModules(appendedData, currentWindow, currentWindow.windowMan.stateMan.cam.toWorld(pos.copy()));
           } else {
             println("no such file");
           }

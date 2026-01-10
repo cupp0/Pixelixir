@@ -20,7 +20,27 @@ class SliderUI extends DBUI{
     displayIdentity();
   }
   
-  void onInteraction(HumanEvent e){
+  StateChange interaction(HumanEvent e){
+    StateMan sm = getWindow().windowMan.stateMan;
+     
+    if (e.input.action == Action.MOUSE_PRESSED){
+      drag(e);
+      return new StateChange(StateAction.ADD, InteractionState.DRAGGING_SLIDER, this);
+    }        
+    
+    if (e.input.action == Action.MOUSE_DRAGGED){
+      drag(e);
+    }
+    
+    if (e.input.action == Action.MOUSE_RELEASED){
+      q();
+      return new StateChange(StateAction.REMOVE, InteractionState.DRAGGING_SLIDER, this);
+    }
+    
+    return new StateChange(StateAction.DO_NOTHING);
+  }
+  
+  void drag(HumanEvent e){
     float x = e.xMouse;
     PVector sliderRange = ((SliderUIState)state).range.copy();
     float newValue = round(constrain(map(x, getAbsolutePosition().x, getAbsolutePosition().x+size.x, sliderRange.x, sliderRange.y), sliderRange.x,sliderRange.y));

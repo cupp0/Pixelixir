@@ -15,20 +15,20 @@ class WindowMenu extends Menu<Window>{
     });
     
     int count = 1; 
-    if (selectionManager.modules.size() > 0){
+    if (selectionMan.modules.size() > 0){
       options.add(new MenuOption(this, "copy", count) {
         void execute() {
-          selectionManager.copyModules(selectionManager.modules);
+          selectionMan.copyModules(selectionMan.modules);
           listener.exitMenu();
         }
       });
       count++;
     }
     
-    if (selectionManager.clipboard != null){
+    if (selectionMan.clipboard != null){
       options.add(new MenuOption(this, "paste", count) {
         void execute() {
-          selectionManager.pasteModules(selectionManager.clipboard, (Window)target, currentWindow.cam.toWorld(parent.pos.copy()));
+          selectionMan.pasteModules(selectionMan.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.pos.copy()));
           listener.exitMenu();
         }
       });
@@ -36,7 +36,7 @@ class WindowMenu extends Menu<Window>{
       
       options.add(new MenuOption(this, "paste with new id", count) {
         void execute() {
-          HashMap<String, Module> newMods = selectionManager.pasteModules(selectionManager.clipboard, (Window)target, currentWindow.cam.toWorld(parent.pos.copy()));       
+          HashMap<String, Module> newMods = selectionMan.pasteModules(selectionMan.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.pos.copy()));       
           HashMap<String, String> newIds = new HashMap<String, String>();
           
           for (Module m : newMods.values()){

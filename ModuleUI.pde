@@ -1,5 +1,5 @@
 //~ModuleUI
-abstract class ModuleUI<T extends UIState> extends BaseUI implements UIStateListener, Hoverable{
+abstract class ModuleUI<T extends UIState> extends BaseUI implements UIStateListener, Interactable, Renderable{
   
   protected T state;                                        //UI state object
   Module parent;                                            //the Module this piece of UI is owned by
@@ -106,14 +106,14 @@ abstract class ModuleUI<T extends UIState> extends BaseUI implements UIStateList
   
   //corners take precedence over edges take precedence over body
   HoverTarget hitTest(float x, float y) {  
-    if (isCornerHovered(x, y) != null){
-      return new HoverTarget(this, HoverType.CORNER, isCornerHovered(x, y).index);      
-    }
-    if (isEdgeHovered(x, y) != null){
-      return new HoverTarget(this, HoverType.EDGE, isEdgeHovered(x, y).index);   
-    }
+    //if (isCornerHovered(x, y) != null){
+    //  return new HoverTarget(this, HoverType.CORNER, isCornerHovered(x, y).index);      
+    //}
+    //if (isEdgeHovered(x, y) != null){
+    //  return new HoverTarget(this, HoverType.EDGE, isEdgeHovered(x, y).index);   
+    //}
     if (isBodyHovered(x, y)){
-      return new HoverTarget(this, HoverType.BODY, -1);
+      return new HoverTarget(this);
     }
     return new HoverTarget();
   }
@@ -159,4 +159,30 @@ abstract class ModuleUI<T extends UIState> extends BaseUI implements UIStateList
       parent.sendDataToOperator(((DataBender)s).getData());
     }
   }
+  
+  //only shared interaction among ModuleUI is drag
+  StateChange onInteraction(HumanEvent e){     
+    StateMan sm = getWindow().windowMan.stateMan;
+    
+    if (sm.isInteractionState(InteractionState.NONE)){
+      if (sm.inputMan.getState().isDown(SHIFT)){
+        if (sm.isMouseDoing(Action.MOUSE_PRESSED, LEFT)){
+          return new StateChange(StateAction.ADD, InteractionState.DRAGGING_UI, this);
+        }
+      }
+    }
+    
+    if (sm.isInteractionState(InteractionState.DRAGGING_UI)){
+      if (sm.isMouseDoing(Action.MOUSE_DRAGGED)){
+        drag(new PVector(e.xMouse - e.pxMouse, e.yMouse - e.pyMouse));
+      }
+      
+      if (sm.isMouseDoing(Action.MOUSE_RELEASED)){
+        return new StateChange(StateAction.REMOVE, InteractionState.DRAGGING_UI, this);
+      }
+    }
+    
+    return new StateChange(StateAction.DO_NOTHING);
+  }
+  
 }

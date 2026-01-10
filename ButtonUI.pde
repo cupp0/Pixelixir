@@ -11,9 +11,19 @@ class ButtonUI extends DBUI{
     displayIdentity();
   }
   
-  void onInteraction(HumanEvent e){
-    boolean pressed = (e.input.action == Action.MOUSE_PRESSED);
-    state.onLocalEvent(new UIPayload(pressed));
+  StateChange interaction(HumanEvent e){
+    
+    if(e.input.action == Action.MOUSE_PRESSED){
+      state.onLocalEvent(new UIPayload(true));
+      return new StateChange(StateAction.ADD, InteractionState.HOLDING_BUTTON, this); 
+    }
+    
+    if(e.input.action == Action.MOUSE_RELEASED){
+      state.onLocalEvent(new UIPayload(false));
+      return new StateChange(StateAction.REMOVE, InteractionState.HOLDING_BUTTON, this); 
+    }
+    
+    return new StateChange(StateAction.DO_NOTHING);
   }
 
 }

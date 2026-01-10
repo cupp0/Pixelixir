@@ -1,7 +1,7 @@
 //~Menu
 abstract class Menu<T>{
   
-  final MenuListener listener;             //window manager that needs menu info
+  final MenuListener listener;             //window Man that needs menu info
   T target;
   PVector pos;
   PVector optionSize = new PVector(100, 20);
@@ -45,5 +45,5 @@ abstract class Menu<T>{
   void setPosition(PVector pos_){
     pos = pos_.copy(); 
   }
-  
+ 
 }

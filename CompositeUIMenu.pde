@@ -7,7 +7,7 @@ class CompositeUIMenu extends Menu<Module>{
   }
 
   void build() {
-    addRetreatOption(this, new WindowMenu(listener, ((WindowManager)listener).scope, pos));
+    addRetreatOption(this, new WindowMenu(listener, ((WindowMan)listener).scope, pos));
     for (int i = 1; i < UI.length-1; i++){ //exclude Eye. We only want one eye per module
       options.add(new MenuOption(this, UI[i], i) {
         void execute() {

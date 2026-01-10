@@ -31,20 +31,25 @@ class TextfieldUI extends DBUI{
     displayIdentity();
   }
 
-  void onInteraction(HumanEvent e){
+  StateChange interaction(HumanEvent e){
+    StateMan sm = parent.getWindow().windowMan.stateMan;
     
-    String currentText = getUIPayload().getTextValue();   
-    if (e.input.action == Action.MOUSE_PRESSED){
+    if(e.input.action == Action.MOUSE_PRESSED){
       // Move cursor to click position
       if (!isFocus){
         isFocus = true;
         float mx = e.xMouse - (state.pos.x+5);
         cursorPos = findCursorIndex(mx);
+        return new StateChange(StateAction.ADD, InteractionState.TYPING, this); 
       } else { 
         isFocus = false; 
+        return new StateChange(StateAction.REMOVE, InteractionState.TYPING, this); 
       }
     }
-    if (e.input.action == Action.KEY_PRESSED){
+    
+       
+    if (sm.interactionMan.state == InteractionState.TYPING && e.input.action == Action.KEY_PRESSED){
+      String currentText = getUIPayload().getTextValue();
       if (e.input.theKey == BACKSPACE) {
         if (cursorPos > 0) {
           currentText = currentText.substring(0, cursorPos-1) + currentText.substring(cursorPos);
@@ -66,7 +71,9 @@ class TextfieldUI extends DBUI{
      
       //create UI event
       state.onLocalEvent(new UIPayload(currentText));
-    }    
+    } 
+    
+    return new StateChange(StateAction.DO_NOTHING); 
   }
 
   // Figure out which character index corresponds to a pixel position

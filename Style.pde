@@ -3,13 +3,23 @@ class Style {
   color fill, stroke;
   float strokeWeight;
   
+  //for most UI
   Style(color fill_, color stroke_, float strokeWeight_){
     fill = fill_; stroke = stroke_; strokeWeight = strokeWeight_;
+  }
+  
+  //for Windows
+  Style(color fill_){
+    fill = fill_;
   }
   
   Style copyStyle(){
     return new Style(fill, stroke, strokeWeight);
   }
+  
+  color getFill(){ return fill; }
+  color getStroke(){ return stroke; }
+  float getStrokeWeight(){ return strokeWeight; }
 }
 
 //should b static
@@ -18,24 +28,26 @@ class Style {
 class StyleResolver {
   
   //who it's resolving styles for.
-  EventManager eventManager;
+  Window scope;
   
-  StyleResolver(EventManager eventManager_){
-    eventManager = eventManager_;  
+  StyleResolver(Window scope_){
+    scope = scope_;
   }
   
-  Style resolve(Hoverable ui) {
+  Style resolve(Renderable ui) {
     
-    Window w = eventManager.scope;
-    HoverTarget currentHover = w.windowManager.hoverManager.getCurrent();
+    //curent program state, and what we are currently hovering, for convenience
+    StateMan currentState = scope.windowMan.stateMan;
+    HoverTarget currentHover = currentState.hoverMan.currentHover;
+    //base style we will be modifying
     Style modifiedStyle = ui.getStyle().copyStyle();
     
     //color connections
     if (ui instanceof Connection){
       modifiedStyle.fill = color(0);
-      Pork carriedData = w.portMap.getPork(((Connection)ui).source);
+      Pork carriedData = scope.portMap.getPork(((Connection)ui).source);
       modifiedStyle.stroke = getConnectionColorByPork(carriedData);
-      if (ui == currentHover.connection){
+      if (ui == currentHover.getUI()){
         modifiedStyle.strokeWeight++;
         modifiedStyle.stroke = addColor(modifiedStyle.stroke, color(25));
       }
@@ -43,25 +55,22 @@ class StyleResolver {
     
     //color ports
     if (ui instanceof PortUI){      
-      modifiedStyle.fill = getColorByPork(w.portMap.getPork((PortUI) ui));
-      modifiedStyle.stroke = getStrokeByPork(w.portMap.getPork((PortUI) ui));
+      modifiedStyle.fill = getColorByPork(scope.portMap.getPork((PortUI) ui));
+      modifiedStyle.stroke = getStrokeByPork(scope.portMap.getPork((PortUI) ui));
     }
     
     //if module is selected, change module body appearance
     if (ui instanceof ModuleUI){
-      if (ui == currentHover.modUI){
+      if (ui == currentHover.getUI()){
         modifiedStyle.stroke = addColor(modifiedStyle.stroke, color(25));
         modifiedStyle.fill = addColor(modifiedStyle.fill, color(25));
-        if (eventManager.is(InteractionState.HOLDING_BUTTON)){
-          modifiedStyle.fill = addColor(modifiedStyle.fill, color(50));
-        }
       }
       
-      if (selectionManager.modules.contains(((ModuleUI)ui).parent)){
+      if (selectionMan.modules.contains(((ModuleUI)ui).parent)){
         modifiedStyle.fill = addColor(modifiedStyle.fill, color(70));
         modifiedStyle.stroke = addColor(modifiedStyle.stroke, color(75));
         modifiedStyle.strokeWeight = (modifiedStyle.strokeWeight+1); 
-        if (eventManager.is(InteractionState.DRAGGING_MODULES)){
+        if (currentState.interactionMan.state == InteractionState.DRAGGING_MODULES){
           modifiedStyle.fill = setTransparency(modifiedStyle.fill, 127);
           modifiedStyle.stroke = setTransparency(modifiedStyle.stroke, 127);
         }
@@ -69,14 +78,15 @@ class StyleResolver {
     }
     
     if (ui instanceof BodyUI){
-      modifiedStyle.strokeWeight = modifiedStyle.strokeWeight*currentWindow.cam.scl;
+      modifiedStyle.strokeWeight = modifiedStyle.strokeWeight*currentWindow.windowMan.stateMan.cam.scl;
     }
     
     if (ui instanceof MenuOption){
-      if (ui == currentHover.menuOption){
+      if (ui == currentState.hoverMan.currentHover.getUI()){
         modifiedStyle.fill = addColor(modifiedStyle.fill, color(30));
       }
     }
+    
     return modifiedStyle;
   }
   

@@ -85,3 +85,10 @@ class RoundOperator extends UnaryOp{
     return round(x); 
   }
 }
+
+class RandomOperator extends UnaryOp{
+  RandomOperator(){super();name = "random";label =  "random";}
+  public float apply(float x) { 
+    return random(x); 
+  }
+}

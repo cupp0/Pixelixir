@@ -1,14 +1,13 @@
 //~Interfaces
-  
-//implemented by any UI that can be interacted with via mouse, currently ModuleUI and ConnectionUI, eventually MenuUI
-interface Hoverable {
+
+//do action, return state change
+interface Interactable{
+  StateChange onInteraction(HumanEvent e);
   HoverTarget hitTest(float x, float y);
-  Style getStyle();
 }
 
-//only ModuleUI that you can directly interact with (slider, texfield, etc)
-interface Interactable{
-  void onInteraction(HumanEvent e);
+interface Renderable{
+  Style getStyle();
 }
 
 //implemented by Module. Module needs to know about some changes to Operator
@@ -26,7 +25,7 @@ interface UIStateListener{
   void onUIPayloadChange(DBUIState s);
 }
 
-//windowmanager 
+//windowMan 
 interface MenuListener{
   void exitMenu();
   void switchMenu(Menu m, PVector p);
@@ -62,7 +61,7 @@ interface DynamicPorks{
   boolean isOutputDynamic();
 }
 
-//implemented by Window, whose eventManager handles any user interaction
+//implemented by Window, whose eventMan handles any user interaction
 //I guess 
 interface HumanEventListener {
   void onHumanEvent(HumanEvent event);

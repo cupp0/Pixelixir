@@ -9,7 +9,7 @@ class ModuleMenu extends Menu<Module>{
   void build() {
     options.add(new MenuOption(this, "copy", 0) {
       void execute() {
-        selectionManager.copyModules(selectionManager.modules);
+        selectionMan.copyModules(selectionMan.modules);
         listener.exitMenu();
       }
     });

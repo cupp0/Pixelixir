@@ -1,0 +1,66 @@
+{
+  "modules": [
+    {
+      "name": "slider",
+      "id": "e1e4d694-ae0f-4b06-bfcf-06984ea00b49",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 200.0,
+        "y": 200.0,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "range": {
+            "x": -100.0,
+            "y": 100.0,
+            "z": 0.0
+          },
+          "identityToken": "17d68f21-ae61-4511-9404-714ee5eaf861",
+          "data": {
+            "type": "NUMERIC",
+            "floatValue": 0.0,
+            "boolValue": false
+          },
+          "id": "2869133e-ddcd-4a51-86d2-4db99c7dddef",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "slider"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "id": "b6c8375d-1207-47c9-9728-480a0d80adc2",
+      "ins": 0,
+      "outs": 1,
+      "position": {
+        "x": 200.0,
+        "y": 248.0,
+        "z": 0.0
+      },
+      "uiElements": [
+        {
+          "identityToken": "b11b5f99-50f1-4e88-926a-27ff787306ac",
+          "data": {
+            "type": "BOOL",
+            "floatValue": 0.0,
+            "boolValue": false
+          },
+          "id": "b7f45809-28fa-4480-8861-1347c9db3d64",
+          "pos": {
+            "x": 10.0,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "type": "button"
+        }
+      ]
+    }
+  ],
+  "connections": []
+}

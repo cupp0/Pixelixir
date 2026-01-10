@@ -9,7 +9,7 @@ class ModuleTypeMenu extends Menu<Window>{
   }
 
   void build() {
-    addRetreatOption(this, new WindowMenu(listener, ((WindowManager)listener).scope, pos));
+    addRetreatOption(this, new WindowMenu(listener, ((WindowMan)listener).scope, pos));
     for (int i = 0; i < UIText.length; i++){
       options.add(new MenuOption(this, UIText[i][0], i+1) {
         void execute() { 
