@@ -209,6 +209,14 @@ class Connection implements Interactable, Renderable{
   }
   
   StateChange onInteraction(HumanEvent e){
+    StateMan sm = getWindow().windowMan.stateMan;
+
+    if (sm.isInteractionState(InteractionState.NONE)){              
+      if (e.input.theKeyCode == BACKSPACE){
+        getWindow().removeConnection(this);
+      }        
+    }
+    
     return new StateChange(StateAction.DO_NOTHING);
   }
 

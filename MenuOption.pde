@@ -27,7 +27,7 @@ abstract class MenuOption implements Interactable, Renderable{
   }
   
   PVector getAbsolutePosition(){
-    return PVector.add(parent.pos.copy(), this.pos);
+    return PVector.add(parent.actualPos.copy(), this.pos);
   }
 
   abstract void execute();

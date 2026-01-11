@@ -6,26 +6,22 @@ class Camera {
   float xOff, yOff, scl;                          // current offsets
   float targetXOff, targetYOff, targetScl;        //for easing zoom
 
-  float zoomSpeed = 0.25;  // how fast we ease toward targets
+  float zoomSpeed = .25;  // how fast we ease toward targets
   float zoomFactor = 1.5;
 
   float maxScl = 200;
-  float minScl = .1;
-  
-  PVector wMouse = new PVector();
-  
+  float minScl = .05;
+    
   Camera(Window view_) {
     view = view_;
     xOff = yOff = targetXOff = targetYOff = 0;
     scl = targetScl = 1;
   }
 
-  // call in draw()
   void update() {
     scl += (targetScl - scl) * zoomSpeed;
     xOff += (targetXOff - xOff) * zoomSpeed;
     yOff += (targetYOff - yOff) * zoomSpeed;
-    wMouse = toWorld(new PVector (mouseX, mouseY)).copy();
   }
 
   // handle mouse wheel events

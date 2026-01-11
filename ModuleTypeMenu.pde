@@ -3,24 +3,24 @@ class ModuleTypeMenu extends Menu<Window>{
   
   //boolean moduleAdded = false;    
   
-  ModuleTypeMenu(MenuListener ml, Window w, PVector p){
-    super(ml, w, p);
-    build(); // subclass defines options
+  ModuleTypeMenu(MenuListener ml, Window w){
+    super(ml, w);
+    addOptions();
   }
 
-  void build() {
-    addRetreatOption(this, new WindowMenu(listener, ((WindowMan)listener).scope, pos));
+  void addOptions() {
+    addRetreatOption(this, new WindowMenu(listener, ((WindowMan)listener).scope));
     for (int i = 0; i < UIText.length; i++){
       options.add(new MenuOption(this, UIText[i][0], i+1) {
         void execute() { 
-          listener.switchMenu(new CustomMenu(listener, (Window)target, this.index-1, (ModuleTypeMenu)parent, pos), parent.pos);
+          listener.switchMenu(new CustomMenu(listener, (Window)target, this.index-1), parent.targetPos);
         }
       });
     }
     
     options.add(new MenuOption(this, "SAVED", options.size()) {
       void execute() { 
-        listener.switchMenu(new SavedMenu(listener, (Window)target,/* this.index,*/ pos), parent.pos);
+        listener.switchMenu(new SavedMenu(listener, (Window)target), parent.targetPos);
       }
     });
   }

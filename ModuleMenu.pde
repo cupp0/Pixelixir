@@ -1,15 +1,16 @@
 //~ModuleMenu
 class ModuleMenu extends Menu<Module>{
   
-  ModuleMenu(MenuListener ml, Module m, PVector p){
-    super(ml, m, p);
-    build(); // subclass defines options
+  ModuleMenu(MenuListener ml, Module m){
+    super(ml, m);
+    addOptions(); 
   }
 
-  void build() {
+  void addOptions() {
     options.add(new MenuOption(this, "copy", 0) {
       void execute() {
-        selectionMan.copyModules(selectionMan.modules);
+        SelectionMan sm = ((WindowMan)listener).stateMan.selectionMan;
+        sm.copyModules(sm.modules);
         listener.exitMenu();
       }
     });
@@ -24,7 +25,7 @@ class ModuleMenu extends Menu<Module>{
     if (((Module)target).composition == Composition.MANY){
       options.add(new MenuOption(this, "add ui", 2) {
         void execute() {
-          listener.switchMenu(new CompositeUIMenu(listener, (Module)target, pos), parent.pos);
+          listener.switchMenu(new CompositeUIMenu(listener, (Module)target), parent.targetPos);
         }
       });
     }

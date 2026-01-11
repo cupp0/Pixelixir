@@ -33,7 +33,6 @@ class SliderUI extends DBUI{
     }
     
     if (e.input.action == Action.MOUSE_RELEASED){
-      q();
       return new StateChange(StateAction.REMOVE, InteractionState.DRAGGING_SLIDER, this);
     }
     

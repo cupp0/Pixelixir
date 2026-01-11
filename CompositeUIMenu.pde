@@ -1,13 +1,13 @@
 //CompositeUIMenu
 class CompositeUIMenu extends Menu<Module>{
   
-  CompositeUIMenu(MenuListener ml, Module m, PVector pos){
-    super(ml, m, pos);
-    build();
+  CompositeUIMenu(MenuListener ml, Module m){
+    super(ml, m);
+    addOptions();
   }
 
-  void build() {
-    addRetreatOption(this, new WindowMenu(listener, ((WindowMan)listener).scope, pos));
+  void addOptions() {
+    addRetreatOption(this, new WindowMenu(listener, ((WindowMan)listener).scope));
     for (int i = 1; i < UI.length-1; i++){ //exclude Eye. We only want one eye per module
       options.add(new MenuOption(this, UI[i], i) {
         void execute() {

@@ -22,7 +22,7 @@ class Style {
   float getStrokeWeight(){ return strokeWeight; }
 }
 
-//should b static
+//shud b static
 
 //~StyleResolver
 class StyleResolver {
@@ -66,7 +66,7 @@ class StyleResolver {
         modifiedStyle.fill = addColor(modifiedStyle.fill, color(25));
       }
       
-      if (selectionMan.modules.contains(((ModuleUI)ui).parent)){
+      if (currentState.selectionMan.modules.contains(((ModuleUI)ui).parent)){
         modifiedStyle.fill = addColor(modifiedStyle.fill, color(70));
         modifiedStyle.stroke = addColor(modifiedStyle.stroke, color(75));
         modifiedStyle.strokeWeight = (modifiedStyle.strokeWeight+1); 
@@ -134,9 +134,7 @@ class StyleResolver {
   
   color getConnectionColorByPork(Pork p){
     color c = 0;
-    if (p.getDataStatus() == DataStatus.BAD){
-      return color(255, 0, 0);
-    }
+    if (badPork(p)){return color(255, 0, 0);}
     if (p.targetFlow != null){
       c = getDataTypeColor(p.targetFlow.getType());
     }
@@ -151,6 +149,7 @@ class StyleResolver {
   }
   
   color getColorByPork(Pork p){
+    if (badPork(p)){return color(255, 0, 0);}
     switch (p.getCurrentDataType()) {
       case BOOL : return getBoolFill(p);
       default : return getDataTypeColor(p.getCurrentDataType());
@@ -178,6 +177,23 @@ class StyleResolver {
   
   color getStrokeByPork(Pork p){
     if (p.getCurrentAccess() == null) return color(0);
+    if (badPork(p)){return color(255, 0, 0);}
     return getDataTypeColor(p.getCurrentDataType()); 
+  }
+  
+  boolean badPork(Pork p){
+    if (p instanceof OutPork){
+      if (p.getDataStatus() == DataStatus.BAD){
+        return true;
+      }
+    }
+    if (p instanceof InPork){
+      if (((InPork)p).getSource() != null){
+        if (((InPork)p).getSource().getDataStatus() == DataStatus.BAD){
+          return true;
+        }
+      }
+    } 
+    return false;
   }
 }

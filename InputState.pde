@@ -23,6 +23,10 @@ class InputState {
       return downKeys.contains(keyCode);
     }
     
+    //public boolean isDown(char c) {
+    //  return downKeys.contains(c);
+    //}
+    
     public boolean isMouseDown(int butt) {
       return downMouseButtons.contains(butt);
     }

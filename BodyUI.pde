@@ -15,7 +15,7 @@ public class BodyUI extends ModuleUI<BodyUIState>{
     if (parent.isComposite())return;
     if (!(parent.owner.hasOutput()) || !(parent.owner.hasInput())) return;
     if(!parent.owner.isMutating()) return;
-    color edgeColor = getWindow().windowMan.styleResolver.getColorByLastEval(parent.owner.outs.get(0));
+    color edgeColor = getWindow().windowMan.styleResolver.getConnectionColorByPork(parent.owner.ins.get(0).getSource());
     if (edgeColor != color(0)){
       stroke(edgeColor);
       strokeWeight(2);      
@@ -79,7 +79,7 @@ public class BodyUI extends ModuleUI<BodyUIState>{
     
     if (sm.isInteractionState(InteractionState.NONE)){
         if (sm.isMouseDoing(Action.MOUSE_PRESSED, LEFT)){
-          selectionMan.addTo(this.parent);
+          sm.selectionMan.addTo(this.parent);
           return new StateChange(StateAction.ADD, InteractionState.DRAGGING_MODULES, this);
         }
         
@@ -89,17 +89,17 @@ public class BodyUI extends ModuleUI<BodyUIState>{
         }
     }
     
-    
     if (sm.isInteractionState(InteractionState.DRAGGING_MODULES)){
-        if(e.input.action == Action.MOUSE_DRAGGED) {  
-          getWindow().dragModules(selectionMan.modules, e);
+        if(e.input.action == Action.MOUSE_DRAGGED) { 
+          //println(frameCount+ ": dragging " + e.xMouse);
+          getWindow().dragModules(sm.selectionMan.modules, e);
           return new StateChange(StateAction.DO_NOTHING);
         }
         if (e.input.action == Action.MOUSE_RELEASED) {
           CompositeUI eye = sm.hoveringEye();
           if (eye != null){
             Window target = windows.get(eye.parent);  
-            selectionMan.moveSelection(selectionMan.modules, currentWindow, target);
+            sm.selectionMan.moveSelection(sm.selectionMan.modules, currentWindow, target);
           }
           return new StateChange(StateAction.REMOVE, InteractionState.DRAGGING_MODULES, this);
         }

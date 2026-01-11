@@ -1,12 +1,13 @@
 //~SelectionMan
 class SelectionMan{
   
+  Window scope;
   ArrayList<Module> modules = new ArrayList<Module>();            //what is selected
   ArrayList<Module> copiedModules = new ArrayList<Module>();      //stored for copy/paste and what not
   String clipboard;
   
-  StateChange onInteraction(HumanEvent e){
-    return new StateChange(StateAction.DO_NOTHING);  
+  SelectionMan(Window scope_){
+    scope = scope_;  
   }
   
   boolean containsModule(Module m){
@@ -46,22 +47,16 @@ class SelectionMan{
       wdata.modules.add(mdata);
     }
     
-    //store connection info
-    if (mods.size() > 0){  //could copy an empty composite
-      Window where = mods.get(0).getWindow();
-      
-      for (Module m : where.modules){
-        for (OutPortUI o : m.outs){
-          for (InPortUI i : o.getDestinations()){
-            ConnectionData cdata = new ConnectionData();
-            cdata.fromModule = o.parent.id;
-            cdata.fromPortIndex = o.index;
-            cdata.toModule = i.parent.id;
-            cdata.toPortIndex = i.index;
-            cdata.access = graph.getEdgeByPorts(where, o, i).dataAccess; //((InPork)where.portMap.getPork(c.destination)).getCurrentAccess();
-            wdata.connections.add(cdata);
-          }
-        }
+    //store relevant connections
+    for (Connection c : scope.connections){
+      if (mods.contains(c.source.parent) && mods.contains(c.destination.parent)){
+        ConnectionData cdata = new ConnectionData();
+        cdata.fromModule = c.source.parent.id;
+        cdata.fromPortIndex = c.source.index;
+        cdata.toModule = c.destination.parent.id;
+        cdata.toPortIndex = c.destination.index;
+        cdata.access = graph.getEdgeByPorts(scope, ((OutPortUI)c.source), ((InPortUI)c.destination)).dataAccess; //((InPork)where.portMap.getPork(c.destination)).getCurrentAccess();
+        wdata.connections.add(cdata);
       }
     }
     
@@ -203,9 +198,9 @@ class SelectionMan{
       }  
     }
 
+    println(wdata.connections.size());
     // Rebuild connections
     for (ConnectionData cdata : wdata.connections) {
-      println(newMods.get(cdata.fromModule));
       Window where = windows.get(newMods.get(cdata.fromModule).parent);
       
       //the two modules we are attempting to connect

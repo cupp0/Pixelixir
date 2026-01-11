@@ -11,20 +11,23 @@ class GlobalInputEvent {
   final GlobalEventType type;
   final Action action;
   final int timestamp;
-  final int xMouse, yMouse;
+  final int xMouse, yMouse, pxMouse, pyMouse;
   final int mouseButt;
   final float wheelDelta;
   final char theKey;
   final int theKeyCode;
   
-  GlobalInputEvent(GlobalEventType type_, Action action_, int timestamp_, int xMouse_, int yMouse_,
-             int mouseButt_, float wheelDelta_,
-             char theKey_, int theKeyCode_) {
+  GlobalInputEvent(GlobalEventType type_, Action action_, int timestamp_,
+    int xMouse_, int yMouse_, int pxMouse_, int pyMouse_, int mouseButt_, 
+    float wheelDelta_, char theKey_, int theKeyCode_){
+      
     this.type = type_;
     this.action = action_;
     this.timestamp = timestamp_;
     this.xMouse = xMouse_;
     this.yMouse = yMouse_;
+    this.pxMouse = pxMouse_;
+    this.pyMouse = pyMouse_;
     this.mouseButt = mouseButt_;
     this.wheelDelta = wheelDelta_;
     this.theKey = theKey_;
@@ -35,7 +38,9 @@ class GlobalInputEvent {
 class GlobalInputMan{
   
   ArrayList<GlobalEventListener> globalListeners = new ArrayList<>(); //these are primitive ops that want raw input data
-
+  int lx = 0;
+  int ly = 0;
+  
   void registerGlobalListener(GlobalEventListener l){
     globalListeners.add(l);  
   }
@@ -45,7 +50,7 @@ class GlobalInputMan{
     for (GlobalEventListener l : globalListeners){
       l.onGlobalInputEvent(e);
     }
-    currentWindow.windowMan.onGlobalInputEvent(e);
+    currentWindow.windowMan.stateMan.onInput(e);  //perfectly reasonable
   }
   
    void handleMouseEvent(Action action) {
@@ -55,11 +60,16 @@ class GlobalInputMan{
       millis(),
       mouseX, 
       mouseY,
+      lx,
+      ly,
       mouseButton,
       0.0f,
       '\0',
       0
     );
+    
+    lx = mouseX;
+    ly = mouseY;
     dispatch(e);
   }
   
@@ -71,11 +81,16 @@ class GlobalInputMan{
       millis(),
       mouseX,
       mouseY,
+      lx,
+      ly,
       mouseButton,
       -delta,
       '\0',
       0
     );
+    
+    lx = mouseX;
+    ly = mouseY;
     dispatch(e);
   }
   
@@ -86,11 +101,16 @@ class GlobalInputMan{
       millis(),
       mouseX, 
       mouseY,
+      lx,
+      ly,
       mouseButton,
       0.0f,
       key,
       keyCode
     );
+    
+    lx = mouseX;
+    ly = mouseY;
     dispatch(e);
   }
   

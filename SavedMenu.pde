@@ -5,19 +5,19 @@ class SavedMenu extends Menu<Window>{
   int menuId;
   ModuleTypeMenu immediateParent;
   
-  SavedMenu(MenuListener ml, Window w, PVector p){
-    super(ml, w, p);// menuId = menuId_; 
-    build(); // subclass defines options
+  SavedMenu(MenuListener ml, Window w){
+    super(ml, w);// menuId = menuId_; 
+    addOptions();
   }
 
-  void build() {
-    addRetreatOption(this, new ModuleTypeMenu(listener, ((WindowMan)listener).scope, pos));
+  void addOptions() {
+    addRetreatOption(this, new ModuleTypeMenu(listener, ((WindowMan)listener).scope));
     File folder = new File(dataPath("patches/")); 
     File[] listOfFiles = folder.listFiles();
     for (int i = 0; i < listOfFiles.length; i++){
       options.add(new MenuOption(this, listOfFiles[i].getName(), i+1) {
         void execute() { 
-          listener.switchMenu(new SavedSubmenu(listener, (Window)target, this.index, pos, label), parent.pos);
+          listener.switchMenu(new SavedSubmenu(listener, (Window)target, this.index, label), parent.targetPos);
         }
       });
     }

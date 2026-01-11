@@ -1,11 +1,11 @@
 //~ModuleUIMenu
 class ModuleUIMenu extends Menu<ModuleUI>{
-  ModuleUIMenu(MenuListener ml, ModuleUI ui, PVector p){
-    super(ml, ui, p);
-    build(); // subclass defines options
+  ModuleUIMenu(MenuListener ml, ModuleUI ui){
+    super(ml, ui);
+    addOptions();
   }
 
-  void build() {
+  void addOptions() {
     options.add(new MenuOption(this, "set identity", 0) {
       void execute() {
         DBUIState s = (DBUIState)((ModuleUI)target).state;

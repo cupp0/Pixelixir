@@ -5,6 +5,7 @@ class StateMan{
   
   HumanEvent currentEvent;
   InputMan inputMan = new InputMan();                          //stores raw input state (mouse/keys)
+  SelectionMan selectionMan;
   InteractionMan interactionMan;                               //what are we interacting with, what are we doing
   HoverMan hoverMan;                                           //what are we hovering
   Camera cam;                                                  //camera state
@@ -12,12 +13,14 @@ class StateMan{
 
   StateMan(Window scope_){
     scope = scope_;
+    selectionMan = new SelectionMan(scope_);
     interactionMan = new InteractionMan(scope_);
     hoverMan = new HoverMan(scope_); 
     cam = new Camera(scope_);  
   }
   
   void onInput(GlobalInputEvent e){
+    
     //translate mouse coords to world coords
     updateMouse(e);
     
@@ -34,14 +37,17 @@ class StateMan{
     );
     
     inputMan.update(currentEvent.input);                      //update input state
-    interactionMan.update(inputMan, hoverMan, currentEvent);  //interact with stuff if needed
+    interactionMan.update(hoverMan, currentEvent);  //interact with stuff if needed    
     inputMan.endFrame();                                      //clear transient state stuff, this doesn't go here
   }
   
   void updateMouse(GlobalInputEvent ge){
     px = cx; py = cy;               //store previous mouse positions, as well as new current pos
-    cx = cam.toWorldX(ge.xMouse);
-    cy = cam.toWorldY(ge.yMouse);
+    int sx = ge.xMouse;
+    int sy = ge.yMouse;
+    
+    cx = cam.toWorldX(sx);
+    cy = cam.toWorldY(sy);
    
     //store mouse position if pressed
     if (ge.action == Action.MOUSE_PRESSED){
@@ -65,25 +71,15 @@ class StateMan{
     return (currentEvent.input.action == a && inputMan.state.justPressed(whichKey));
   }
   
-  //are we doing s
   boolean isInteractionState(InteractionState s){
     return interactionMan.state == s;
   }
   
-  //are we doing s
   boolean isInteractionState(InteractionState s, Interactable i){
     return (interactionMan.state == s && interactionMan.target == i);
   }
 
   InteractionMan getInteractionMan() { return interactionMan;}
-    
-  PVector getCurrentMouse(){
-    return new PVector(cx, cy);
-  }
-  
-  PVector getStoredMouse(){
-    return new PVector(storedX, storedY);
-  }
   
   //where else to track if we are hovering an eye
   CompositeUI hoveringEye(){

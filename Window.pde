@@ -46,10 +46,10 @@ class Window implements Interactable{
   
   void displayAnimations(){
     if (selectionRectangle != null){
-      selectionRectangle.display(windowMan.stateMan.getCurrentMouse());
+      selectionRectangle.display(new PVector(windowMan.stateMan.cx, windowMan.stateMan.cy));
     }
     if (connectionLine != null){
-      connectionLine.display(windowMan.stateMan.getCurrentMouse());
+      connectionLine.display(new PVector(windowMan.stateMan.cx, windowMan.stateMan.cy));
     }
   }
   
@@ -73,8 +73,7 @@ class Window implements Interactable{
   //need to set the new window's offset wherever the mouse is so we are always zooming in/out on/from
   //the center of the window
   void setWindow(Module whichOne, boolean isZoomingIn){
-    selectionMan.clearSelection();
-    
+
     currentWindow = windows.get(whichOne);
     if (isZoomingIn){
       currentWindow.windowMan.stateMan.cam.setCamOnCompositeZoom();
@@ -177,10 +176,9 @@ class Window implements Interactable{
     //arranges module UI
     newMod.organizeUI();
     
-    updateSpawnPosition(PVector.add(newMod.getBodyPosition(), new PVector(0, newMod.uiBits.get(0).size.y+16)));
-    
+    //store it
     registerModule(newMod);
-  
+    
     return newMod;
   }
   
@@ -189,9 +187,11 @@ class Window implements Interactable{
     modules.add(m);
     m.setParent(this.boundary);
     registerPorts(m);
-    if (m.owner instanceof ReceiveOperator || m.owner instanceof SendOperator){
+    if (m.owner instanceof IOOperator){
       m.owner.tryExposingHiddenPorts();
     }
+    windowMan.lastSpawned = m;
+    updateSpawnPosition(PVector.add(m.getBodyPosition(), new PVector(0, m.uiBits.get(0).size.y+16)));
   }
   
   void registerPorts(Module m){
@@ -218,7 +218,7 @@ class Window implements Interactable{
     }   
   }
   
-  //sets to spawn below the argument module
+  //used after addModule to set default spawn pos
   void updateSpawnPosition(PVector p){
     spawnCursor = p.copy();
   }
@@ -318,12 +318,12 @@ class Window implements Interactable{
         //key commands
         if (sm.inputMan.getState().isDown(CONTROL)){
           if(sm.inputMan.getState().justPressed('S'))saveSketch();
-          if(sm.inputMan.getState().justPressed('C'))selectionMan.copyModules(selectionMan.modules);    
-          if(sm.inputMan.getState().justPressed('V'))selectionMan.pasteModules(selectionMan.clipboard, this, new PVector(e.xMouse, e.yMouse));    
+          if(sm.inputMan.getState().justPressed('C'))sm.selectionMan.copyModules(sm.selectionMan.modules);    
+          if(sm.inputMan.getState().justPressed('V'))sm.selectionMan.pasteModules(sm.selectionMan.clipboard, this, new PVector(e.xMouse, e.yMouse));    
         }
    
         if (e.input.theKey == 'r')windowMan.stateMan.cam.resetCam();
-        if (e.input.theKeyCode == BACKSPACE)selectionMan.onBackSpace();
+        if (e.input.theKeyCode == BACKSPACE)sm.selectionMan.onBackSpace();
           
         //right mouse  
         if (sm.inputMan.getState().isMouseDown(RIGHT)){
@@ -342,12 +342,15 @@ class Window implements Interactable{
         //left mouse  
         if (sm.inputMan.getState().isMouseDown(LEFT)){
           if (sm.isMouseDoing(Action.MOUSE_DRAGGED, LEFT)){
+            PVector panAmount = new PVector(e.input.xMouse - e.input.pxMouse, e.input.yMouse - e.input.pyMouse);
+            panAmount.div(windowMan.stateMan.cam.scl);
+            windowMan.stateMan.cam.pan(panAmount);
             return new StateChange(StateAction.ADD, InteractionState.PANNING, this);
           }
         }   
         //left mouse
         if (sm.isMouseDoing(Action.MOUSE_RELEASED, LEFT)){
-          selectionMan.clearSelection();
+          sm.selectionMan.clearSelection();
         }     
         
         if (sm.isMouseDoing(Action.MOUSE_WHEEL)){
@@ -358,15 +361,16 @@ class Window implements Interactable{
     
     
     //if panning, we can pan or end pan
-    if (sm.isInteractionState(InteractionState.PANNING, this)){
+    if (sm.isInteractionState(InteractionState.PANNING)){      
         if (e.input.action == Action.MOUSE_DRAGGED){
-          windowMan.stateMan.cam.pan(new PVector(e.xMouse - e.pxMouse, e.yMouse - e.pyMouse));
+          PVector panAmount = new PVector(e.input.xMouse - e.input.pxMouse, e.input.yMouse - e.input.pyMouse);
+          panAmount.div(windowMan.stateMan.cam.scl);
+          windowMan.stateMan.cam.pan(panAmount);
         }
         if (e.input.action == Action.MOUSE_RELEASED) {
           return new StateChange(StateAction.REMOVE, InteractionState.PANNING, this);
         }
     }
-    
     
     //if menu open, we can exit menu
     if (sm.isInteractionState(InteractionState.MENU_OPEN)){
@@ -380,8 +384,7 @@ class Window implements Interactable{
     //if are selecting modules, we can finalze selection
     if (sm.isInteractionState(InteractionState.SELECTING_MODULES)){
         if (e.input.action == Action.MOUSE_RELEASED){
-          q();
-          selectionMan.modules = getModulesInside(new PVector(windowMan.stateMan.storedX, windowMan.stateMan.storedY), new PVector(e.xMouse, e.yMouse));
+          sm.selectionMan.modules = getModulesInside(new PVector(windowMan.stateMan.storedX, windowMan.stateMan.storedY), new PVector(e.xMouse, e.yMouse));
           removeSelectionRectangle();
           return new StateChange(StateAction.REMOVE, InteractionState.SELECTING_MODULES, this);
         }

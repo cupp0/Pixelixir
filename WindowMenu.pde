@@ -1,34 +1,35 @@
 //WindowMenu
 class WindowMenu extends Menu<Window>{
   
-  WindowMenu(MenuListener ml, Window w, PVector p){
-    super(ml, w, p);
-    build(); // subclass defines options
+  WindowMenu(MenuListener ml, Window w){
+    super(ml, w);
+    addOptions();
   }
 
-  void build() {
+  void addOptions() {
     
     options.add(new MenuOption(this, "add modules", 0) {
       void execute() {
-        listener.switchMenu(new ModuleTypeMenu(listener, (Window)target, parent.pos), parent.pos);
+        listener.switchMenu(new ModuleTypeMenu(listener, (Window)target), parent.targetPos);
       }
     });
     
     int count = 1; 
-    if (selectionMan.modules.size() > 0){
+    SelectionMan sm = ((WindowMan)listener).stateMan.selectionMan;
+    if (sm.modules.size() > 0){
       options.add(new MenuOption(this, "copy", count) {
         void execute() {
-          selectionMan.copyModules(selectionMan.modules);
+          sm.copyModules(sm.modules);
           listener.exitMenu();
         }
       });
       count++;
     }
     
-    if (selectionMan.clipboard != null){
+    if (sm.clipboard != null){
       options.add(new MenuOption(this, "paste", count) {
         void execute() {
-          selectionMan.pasteModules(selectionMan.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.pos.copy()));
+          sm.pasteModules(sm.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.targetPos.copy()));
           listener.exitMenu();
         }
       });
@@ -36,7 +37,7 @@ class WindowMenu extends Menu<Window>{
       
       options.add(new MenuOption(this, "paste with new id", count) {
         void execute() {
-          HashMap<String, Module> newMods = selectionMan.pasteModules(selectionMan.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.pos.copy()));       
+          HashMap<String, Module> newMods = sm.pasteModules(sm.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.targetPos.copy()));       
           HashMap<String, String> newIds = new HashMap<String, String>();
           
           for (Module m : newMods.values()){

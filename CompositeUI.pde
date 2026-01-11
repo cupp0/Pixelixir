@@ -10,7 +10,8 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
   } 
   
   boolean isHovered(){
-    return (vecDistance(currentWindow.windowMan.stateMan.cam.wMouse, getAbsolutePosition().copy().add(size.x/2, size.y/2)) < irisR);
+    PVector wMouse = new PVector(parent.getWindow().windowMan.stateMan.currentEvent.xMouse, parent.getWindow().windowMan.stateMan.currentEvent.yMouse);
+    return (vecDistance(wMouse, getAbsolutePosition().copy().add(size.x/2, size.y/2)) < irisR);
   }
   
   void display(){   
@@ -18,10 +19,10 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
     noStroke();
     fill(255);
     ellipse(getAbsolutePosition().x+size.x/2, getAbsolutePosition().y+size.y/2, size.x*2, size.y*2);
-  
+    PVector wMouse = new PVector(parent.getWindow().windowMan.stateMan.currentEvent.xMouse, parent.getWindow().windowMan.stateMan.currentEvent.yMouse);
     // --- Iris and pupil follow the mouse ---
-    float dx = (currentWindow.windowMan.stateMan.cam.wMouse.x - getAbsolutePosition().x-size.x/2);
-    float dy = (currentWindow.windowMan.stateMan.cam.wMouse.y - getAbsolutePosition().y-size.y/2);
+    float dx = (wMouse.x - getAbsolutePosition().x-size.x/2);
+    float dy = (wMouse.y - getAbsolutePosition().y-size.y/2);
     float angle = atan2(dy, dx);
     float distMax = size.x*1.1; // how far iris can move inside sclera
     float d = min(dist(dx, dy, 0, 0), distMax);

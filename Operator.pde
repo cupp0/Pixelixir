@@ -158,9 +158,12 @@ public abstract class Operator{
     return executionSemantics;
   }
   
+  //only set cold if hot. if bad, leave bad
   void setPortsCold(){
     for (OutPork o : outs){
-      o.setDataStatus(DataStatus.COLD); 
+      if (o.getDataStatus() == DataStatus.HOT){
+        o.setDataStatus(DataStatus.COLD); 
+      }
     }
   }
   
@@ -259,7 +262,7 @@ public abstract class Operator{
     }
     return;
   }
-  
+
   //when we remove a connection, check if our type requirement can
   //get reset. I think this requires a more robust system
   

@@ -5,7 +5,7 @@
     if (projectDir != null) {
   
       // Save the input to a file
-      String[] data = {gson.toJson(selectionMan.copyModules(bigbang.modules))};
+      String[] data = {gson.toJson(bigbang.windowMan.stateMan.selectionMan.copyModules(bigbang.modules))};
       saveStrings(projectDir, data);
     } 
   }

@@ -23,9 +23,9 @@ class InteractionMan{
     scope = scope_;
   }
   
-  void update(InputMan i, HoverMan h, HumanEvent e){
+  void update(HoverMan h, HumanEvent e){
     
-    resolveTarget(i, h, e);
+    resolveTarget(h, e);
     
     if(target != null){
       StateChange newInfo = target.onInteraction(e);
@@ -37,7 +37,7 @@ class InteractionMan{
   //if we are not in an interaction, target should be what we are hovering
   //exceptions: MENU_OPEN (can interact with menu options or window
   //            MOUSE_WHEEL (interact with window no matter the hover)
-  void resolveTarget(InputMan i, HoverMan h, HumanEvent e){
+  void resolveTarget(HoverMan h, HumanEvent e){
     
     if (state == InteractionState.MENU_OPEN) { 
       target = h.currentHover.ui;

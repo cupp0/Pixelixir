@@ -1,4 +1,9 @@
 //~WindowMan
+enum MenuType {
+  MODULE,
+  MODULE_UI,
+  WINDOW
+}
 
 class WindowMan implements MenuListener, GlobalEventListener{
   
@@ -6,6 +11,7 @@ class WindowMan implements MenuListener, GlobalEventListener{
   StateMan stateMan;
   StyleResolver styleResolver;
   Menu activeMenu;
+  Module lastSpawned;
     
   WindowMan(Window scope_){
     scope = scope_;
@@ -20,21 +26,24 @@ class WindowMan implements MenuListener, GlobalEventListener{
   
   void switchMenu(Menu m, PVector p){
     activeMenu = m;
-    activeMenu.setPosition(p);
+    activeMenu.setTargetPosition(p);
   }
   
   Menu addModuleMenu(Module m, PVector p){
-    activeMenu = new ModuleMenu(this, m, p); 
+    activeMenu = new ModuleMenu(this, m); 
+    activeMenu.setTargetPosition(p);
     return activeMenu;
   }
   
   Menu addModuleUIMenu(ModuleUI m, PVector p){
-    activeMenu = new ModuleUIMenu(this, m, p);
+    activeMenu = new ModuleUIMenu(this, m);
+    activeMenu.setTargetPosition(p);
     return activeMenu;
   }
   
   Menu addWindowMenu(PVector p){
-    activeMenu = new WindowMenu(this, scope, p);
+    activeMenu = new WindowMenu(this, scope);
+    activeMenu.setTargetPosition(p);
     return activeMenu;
   }
   

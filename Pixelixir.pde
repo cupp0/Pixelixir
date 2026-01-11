@@ -18,7 +18,7 @@ String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "
 String[] unary = {"UNARY", "sin", "cos", "tan", "acos", "asin", "atan", "abs", "sqrt", "floor", "round", "random"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
 String[] list = {"LIST", "list", "append", "remove", "set", "get", "concat", "split", "size"};
-String[] utility = {"UTILITY", "print", "iterator", "toFloat", "read", "write", "copy", "valve", "send", "receive", "delay"};
+String[] utility = {"UTILITY", "print", "iterator", "while", "toFloat", "read", "write", "copy", "valve", "send", "receive", "delay"};
 String[] meta = {"META", "time", "mouseX", "mouseY", "moduleWidth", "moduleHeight", "leftMouse", "rightMouse", "mouseWheel", "key", "drag", "moduleX", "moduleY", "window", "moduleList", "getModule", "inList", "outList", "connect", "addModule"};
 
 String[][] UIText = {UI, binary, unary, logic, list, utility, meta};
@@ -37,7 +37,6 @@ Window currentWindow;
 Graph graph = new Graph();
 
 GlobalInputMan globalInputMan = new GlobalInputMan();
-SelectionMan selectionMan = new SelectionMan();
 IdentityMan identityMan = new IdentityMan();
 PartsFactory partsFactory = new PartsFactory();        
 FlowRegistry flowRegistry = new FlowRegistry(); 
@@ -88,10 +87,8 @@ void setup() {
 }
   
 void draw(){
-  //println(graph.allOps.size()+" operators, " + graph.edges.size() + " edges");
   graph.primerContinousUpdaters();         // locate and create notifications at any continuous port
   graph.generateEvaluationSequence();      // generate a global evaluation sequence based on who has new data
   currentWindow.display();                 // display UI before evaluating cause we use info about who is evaluating
   graph.evaluate();                        // evaluate the graph
-  
 }
