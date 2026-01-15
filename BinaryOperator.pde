@@ -47,3 +47,11 @@ class ModulusOperator extends BinaryOp{
 class PowerOperator extends BinaryOp{
   PowerOperator(){super((x, y) -> (float)Math.pow(x.doubleValue(), y.doubleValue())); name = "power";label = "^";}
 }
+
+class MinOperator extends BinaryOp{
+  MinOperator(){super((x, y) -> min(x, y)); name = "min";label = "min";}
+}
+
+class MaxOperator extends BinaryOp{
+  MaxOperator(){super((x, y) -> max(x, y)); name = "max";label = "max";}
+}

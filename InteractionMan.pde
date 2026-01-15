@@ -11,6 +11,8 @@ enum InteractionState{
   SELECTING_UI,
   TYPING,
   MENU_OPEN,
+  WINDOW_TRANSITION_IN,
+  WINDOW_TRANSITION_OUT
 }
 
 class InteractionMan{
@@ -39,9 +41,8 @@ class InteractionMan{
   //            MOUSE_WHEEL (interact with window no matter the hover)
   void resolveTarget(HoverMan h, HumanEvent e){
     
-    if (state == InteractionState.MENU_OPEN) { 
-      target = h.currentHover.ui;
-      return; 
+    if (state == InteractionState.MENU_OPEN){
+      target = h.currentHover.ui; 
     }
     
     if (state == InteractionState.NONE && e.input.action == Action.MOUSE_WHEEL){

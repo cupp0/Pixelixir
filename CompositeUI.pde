@@ -10,7 +10,7 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
   } 
   
   boolean isHovered(){
-    PVector wMouse = new PVector(parent.getWindow().windowMan.stateMan.currentEvent.xMouse, parent.getWindow().windowMan.stateMan.currentEvent.yMouse);
+    PVector wMouse = parent.getWindow().windowMan.stateMan.cam.toWorld(new PVector(mouseX, mouseY));
     return (vecDistance(wMouse, getAbsolutePosition().copy().add(size.x/2, size.y/2)) < irisR);
   }
   
@@ -19,7 +19,7 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
     noStroke();
     fill(255);
     ellipse(getAbsolutePosition().x+size.x/2, getAbsolutePosition().y+size.y/2, size.x*2, size.y*2);
-    PVector wMouse = new PVector(parent.getWindow().windowMan.stateMan.currentEvent.xMouse, parent.getWindow().windowMan.stateMan.currentEvent.yMouse);
+    PVector wMouse = parent.getWindow().windowMan.stateMan.cam.toWorld(new PVector(mouseX, mouseY));
     // --- Iris and pupil follow the mouse ---
     float dx = (wMouse.x - getAbsolutePosition().x-size.x/2);
     float dy = (wMouse.y - getAbsolutePosition().y-size.y/2);
@@ -46,10 +46,6 @@ class CompositeUI extends ModuleUI<CompositeUIState>{
     // --- Pupil ---
     fill(style.fill);
     ellipse(getAbsolutePosition().x+pupilX+size.x/2, getAbsolutePosition().y+pupilY+size.y/2, pupilR*2, pupilR*2);
-  }
-  
-  StateChange onInteraction(HumanEvent e){
-    return new StateChange(StateAction.DO_NOTHING);
   }
 
 }

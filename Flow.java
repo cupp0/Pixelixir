@@ -192,7 +192,7 @@ public class Flow {
     if (i >= 0 && i < this.listValue.size()){
       this.listValue.set(i, f);
     } else {
-      System.out.println("setListAtIndex, out of bounds");
+      System.out.println("index " + i + " out of bounds");
     }
   }
 
@@ -202,9 +202,8 @@ public class Flow {
   
   //remove from list by index
   public void removeFromList(int i){
-    System.out.println(listValue.size());
     if (i >= 0 && i < listValue.size()) {listValue.remove(i);}
-    else { System.out.println("remove index out of bounds"); }
+    else { System.out.println("remove index " + i + " out of bounds"); }
   }
   
   public void clearList(){

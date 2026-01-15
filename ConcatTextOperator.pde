@@ -1,14 +1,13 @@
-class ConcatOperator extends PrimeOperator implements DynamicPorks{  
+class ConcatTextOperator extends PrimeOperator implements DynamicPorks{  
   
-  ConcatOperator(){
+  ConcatTextOperator(){
     super();
-    name = "concat";
+    name = "concatText";
   }
   
   void initialize(){
-    addInPork(DataType.UNDETERMINED); addOutPork(DataType.LIST).setTargetFlow(new Flow(DataType.LIST));
+    addInPork(DataType.TEXT); addOutPork(DataType.TEXT).setTargetFlow(new Flow(DataType.TEXT));
     
-    initializeTypeBinder(ins.get(0));
   }
   
   @Override
@@ -17,12 +16,12 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
   }
   
   void execute(){
-    outs.get(0).targetFlow.clearList();
+    outs.get(0).targetFlow.setTextValue("");
     
     for (int i = 0; i< ins.size(); i++){ 
       if (ins.get(i).targetFlow != null){
-        Flow in = ins.get(i).targetFlow.copyFlow();
-        outs.get(0).targetFlow.addToList(in);
+        String s = outs.get(0).targetFlow.getTextValue();
+        outs.get(0).targetFlow.setTextValue(s+ins.get(i).targetFlow.getTextValue());
       }    
     }
   }
@@ -40,10 +39,9 @@ class ConcatOperator extends PrimeOperator implements DynamicPorks{
   
   void addCanonicalPork(){
     EnumSet<DataAccess> readOnly = EnumSet.of(DataAccess.READONLY);
-    InPork i = addInPork(DataType.UNDETERMINED);
+    InPork i = addInPork(DataType.TEXT);
     i.setAllowedAccess(readOnly);
     i.setCurrentAccess(DataAccess.NONE);
-    initializeTypeBinder(i);
     ((Module)listener).getWindow().registerPorts((Module)listener);
   }
   

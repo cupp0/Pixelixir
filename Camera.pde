@@ -7,9 +7,9 @@ class Camera {
   float targetXOff, targetYOff, targetScl;        //for easing zoom
 
   float zoomSpeed = .25;  // how fast we ease toward targets
-  float zoomFactor = 1.5;
+  float zoomFactor = 2;
 
-  float maxScl = 200;
+  float maxScl = 175;
   float minScl = .05;
     
   Camera(Window view_) {
@@ -85,6 +85,14 @@ class Camera {
   
   public void setZoom(float where){
     targetScl = where;
+  }
+  
+  public void setZoomSpeed(float s){
+    zoomSpeed = s;
+  }
+  
+  public void setZoomFactor(float s){
+    zoomFactor = s;
   }
   
   public void resetCam(){

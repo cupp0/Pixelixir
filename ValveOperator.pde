@@ -15,21 +15,30 @@ class ValveOperator extends PrimeOperator{
   }
   
   void execute(){    
-    if (ins.get(0).targetFlow == null) return;
     Flow.copyData(ins.get(0).targetFlow, outs.get(0).targetFlow);
   }
 
-  @Override
+
   void confirmExecutionStatus(){
-    if (ins.get(1).targetFlow.getBoolValue()){
-      setExecutionStatus(ExecutionStatus.GO); 
-    } else {
-      setExecutionStatus(ExecutionStatus.NOGO); 
+    //sliders, time, 
+    if (isSpeaker()){
+      setExecutionStatus(ExecutionStatus.GO);
+      return;
     }
+    
+    //if any data is hot, we should execute
+    for (InPork i : ins){
+      if (i.getSource() == null) continue;      
+      if (i.getSource().getDataStatus() == DataStatus.HOT){
+        if (ins.get(1).targetFlow.getBoolValue()){
+          setExecutionStatus(ExecutionStatus.GO);
+          return;
+        }
+      }
+    }
+    
+    //if we are here, all inputs are valid but the data is cold (ie valve is closed)
+    setExecutionStatus(ExecutionStatus.NOGO);
   }
-  
-  boolean isSpeaker(){ return true; }
-  
-  boolean isContinuous(){ return true; }
   
 }

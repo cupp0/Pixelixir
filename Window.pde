@@ -319,7 +319,7 @@ class Window implements Interactable{
         if (sm.inputMan.getState().isDown(CONTROL)){
           if(sm.inputMan.getState().justPressed('S'))saveSketch();
           if(sm.inputMan.getState().justPressed('C'))sm.selectionMan.copyModules(sm.selectionMan.modules);    
-          if(sm.inputMan.getState().justPressed('V'))sm.selectionMan.pasteModules(sm.selectionMan.clipboard, this, new PVector(e.xMouse, e.yMouse));    
+          if(sm.inputMan.getState().justPressed('V'))sm.selectionMan.pasteModules(clipboard, this, new PVector(e.xMouse, e.yMouse));    
         }
    
         if (e.input.theKey == 'r')windowMan.stateMan.cam.resetCam();
@@ -354,7 +354,12 @@ class Window implements Interactable{
         }     
         
         if (sm.isMouseDoing(Action.MOUSE_WHEEL)){
-          windowMan.stateMan.cam.zoom(e.input.wheelDelta);
+          if(sm.inputMan.getState().isDown(CONTROL)){
+            sm.cam.setZoomFactor(1.1);
+          } else {
+            sm.cam.setZoomFactor(2);
+          }
+          sm.cam.zoom(e.input.wheelDelta);
           checkWindowTransition(e);
         }
     }

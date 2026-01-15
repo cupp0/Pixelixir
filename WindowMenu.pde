@@ -26,10 +26,10 @@ class WindowMenu extends Menu<Window>{
       count++;
     }
     
-    if (sm.clipboard != null){
+    if (clipboard != null){
       options.add(new MenuOption(this, "paste", count) {
         void execute() {
-          sm.pasteModules(sm.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.targetPos.copy()));
+          sm.pasteModules(clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.targetPos.copy()));
           listener.exitMenu();
         }
       });
@@ -37,7 +37,7 @@ class WindowMenu extends Menu<Window>{
       
       options.add(new MenuOption(this, "paste with new id", count) {
         void execute() {
-          HashMap<String, Module> newMods = sm.pasteModules(sm.clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.targetPos.copy()));       
+          HashMap<String, Module> newMods = sm.pasteModules(clipboard, (Window)target, currentWindow.windowMan.stateMan.cam.toWorld(parent.targetPos.copy()));       
           HashMap<String, String> newIds = new HashMap<String, String>();
           
           for (Module m : newMods.values()){

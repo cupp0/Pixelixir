@@ -14,11 +14,11 @@ import com.google.gson.*;
 //extends PrimeOperator and it will show up in add module options
 
 String[] UI = {"UI", "slider",  "button", "switch", "textfield", "display", "composite"};
-String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus"};
+String[] binary = {"BINARY", "add", "subtract", "multiply", "divide", "power", "modulus", "min", "max"};
 String[] unary = {"UNARY", "sin", "cos", "tan", "acos", "asin", "atan", "abs", "sqrt", "floor", "round", "random"};
 String[] logic = {"LOGIC", "and", "or", "xOr", "not", "lessThan", "greaterThan", "equals"};
 String[] list = {"LIST", "list", "append", "remove", "set", "get", "concat", "split", "size"};
-String[] utility = {"UTILITY", "print", "iterator", "while", "toFloat", "read", "write", "copy", "valve", "send", "receive", "delay"};
+String[] utility = {"UTILITY", "print", "iterator", "while", "selecter", "toFloat", "toText", "read", "write", "copy", "valve", "pump", "send", "receive", "delay", "constrain", "concatText"};
 String[] meta = {"META", "time", "mouseX", "mouseY", "moduleWidth", "moduleHeight", "leftMouse", "rightMouse", "mouseWheel", "key", "drag", "moduleX", "moduleY", "window", "moduleList", "getModule", "inList", "outList", "connect", "addModule"};
 
 String[][] UIText = {UI, binary, unary, logic, list, utility, meta};
@@ -42,6 +42,7 @@ PartsFactory partsFactory = new PartsFactory();
 FlowRegistry flowRegistry = new FlowRegistry(); 
 NoiseGenerator noiseGen = new NoiseGenerator();
 Gson gson; 
+String clipboard;
 
 HashMap<Module, Window> windows = new HashMap<Module, Window>(); //composite module, window that ops kids display in
 HashMap<String, Window> windowByBoundaryID = new HashMap<String, Window>(); //t ops kids display in
@@ -51,7 +52,7 @@ int portGap = 12;
 int roundOver = 10;
 
 public void settings(){
-  size(800, 800, P3D);
+  size(900, 900, P3D);
 }  
 
 void setup() {

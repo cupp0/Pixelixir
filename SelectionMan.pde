@@ -4,7 +4,6 @@ class SelectionMan{
   Window scope;
   ArrayList<Module> modules = new ArrayList<Module>();            //what is selected
   ArrayList<Module> copiedModules = new ArrayList<Module>();      //stored for copy/paste and what not
-  String clipboard;
   
   SelectionMan(Window scope_){
     scope = scope_;  
@@ -41,7 +40,7 @@ class SelectionMan{
       if (mdata.name.equals("composite")) {
         Window subWin = windows.get(m); 
         if (subWin != null){
-          mdata.subwindow = copyModules(subWin.modules);
+          mdata.subwindow = subWin.windowMan.stateMan.selectionMan.copyModules(subWin.modules);
         }
       }
       wdata.modules.add(mdata);
@@ -198,7 +197,6 @@ class SelectionMan{
       }  
     }
 
-    println(wdata.connections.size());
     // Rebuild connections
     for (ConnectionData cdata : wdata.connections) {
       Window where = windows.get(newMods.get(cdata.fromModule).parent);
@@ -207,6 +205,7 @@ class SelectionMan{
       Module srcMod  = newMods.get(cdata.fromModule);
       Module destMod  = newMods.get(cdata.toModule);
       
+      //println(newMods.get(cdata.fromModule).name, newMods.get(cdata.toModule).name);
       //build the connection
       OutPortUI src = newMods.get(cdata.fromModule).outs.get(cdata.fromPortIndex);
       InPortUI dest = newMods.get(cdata.toModule).ins.get(cdata.toPortIndex);

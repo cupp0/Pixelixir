@@ -83,7 +83,11 @@ public abstract class Operator{
   
   //stuff like concat overrides this
   boolean validInputConnections(){
-    return inPorksFull();
+    if (!inPorksFull())return false;
+    for (InPork i : ins){
+      if (i.targetFlow == null) return false;
+    }
+    return true;
   }
 
   abstract void execute();

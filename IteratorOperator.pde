@@ -21,7 +21,6 @@ class IteratorOperator extends PrimeOperator implements GraphListener{
     int loops = constrain((int)ins.get(0).targetFlow.getFloatValue(), 1, 1000000);
     subgraph.addUpdater(outs.get(0));
     subgraph.generateEvaluationSequence();
-    println(subgraph.evaluationSequence);
         
     for (int i = 0; i < loops-1; i++){
       outs.get(0).targetFlow.setFloatValue((float)i); 
