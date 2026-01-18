@@ -19,7 +19,7 @@ class Window implements Interactable{
   Window(Module from){
     boundary = from;
     windowMan = new WindowMan(this);
-    style = new Style(color (25+random(100), 75 + random(100), 125 + random(100)));
+    style = new Style(color (random(150), 50 + random(150), 100 + random(150)));
   } 
   
   public Style getStyle(){

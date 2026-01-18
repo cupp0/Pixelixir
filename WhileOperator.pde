@@ -38,8 +38,8 @@ class WhileOperator extends PrimeOperator implements GraphListener{
       
       //reread input condition
       f = flowRegistry.readFlow(ins.get(0).targetFlow.getTextValue());
-      if (f == null) return;
-      if (f.getType() != DataType.BOOL) return;
+      if (f == null) break;
+      if (f.getType() != DataType.BOOL) break;
     }
     
     outs.get(0).targetFlow.setBoolValue(false);

@@ -4,13 +4,16 @@ class IteratorOperator extends PrimeOperator implements GraphListener{
   
   IteratorOperator(){
     super();
-    name = "iterator";
+    name = "iterator"; setExecutionSemantics(ExecutionSemantics.MUTATES);
   }
   
   void initialize(){
-    addInPork(DataType.NUMERIC); 
+    addInPork(DataType.UNDETERMINED); addInPork(DataType.NUMERIC);
+    addOutPork(DataType.UNDETERMINED).setTargetFlow(new Flow(DataType.UNDETERMINED));
     addOutPork(DataType.NUMERIC).setTargetFlow(new Flow(DataType.NUMERIC)); 
-    graph.addListener(this);
+    initializeTypeBinder(ins.get(0), outs.get(0));
+    
+    graph.addListener(this);    
   }
   
   void onGraphChange(){
@@ -18,17 +21,19 @@ class IteratorOperator extends PrimeOperator implements GraphListener{
   }
   
   void execute(){    
-    int loops = constrain((int)ins.get(0).targetFlow.getFloatValue(), 1, 1000000);
+    int loops = constrain((int)ins.get(1).targetFlow.getFloatValue(), 0, 1000000);
     subgraph.addUpdater(outs.get(0));
+    subgraph.addUpdater(outs.get(1));
     subgraph.generateEvaluationSequence();
         
-    for (int i = 0; i < loops-1; i++){
-      outs.get(0).targetFlow.setFloatValue((float)i); 
+    for (int i = 0; i < loops; i++){
+      outs.get(1).targetFlow.setFloatValue((float)i); 
       outs.get(0).setDataStatus(DataStatus.HOT);
+      outs.get(1).setDataStatus(DataStatus.HOT);
       subgraph.evaluate();     
     }
     
-    outs.get(0).targetFlow.setFloatValue(loops-1);
+    outs.get(1).targetFlow.setFloatValue(loops);
   }
   
 }

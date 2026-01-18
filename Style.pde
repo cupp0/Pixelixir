@@ -126,8 +126,8 @@ class StyleResolver {
       c = getDataTypeColor(p.getCurrentDataType());
     }
     int framesSinceEval = frameCount - ((OutPork)p).lastEval;
-    if (framesSinceEval < 10){
-      c = addColor(c, color((10-framesSinceEval) * 12));
+    if (framesSinceEval < 15){
+      c = addColor(c, color((15-framesSinceEval) * 4));
     }
     return c;
   }
@@ -141,19 +141,22 @@ class StyleResolver {
     else {
       c = getDataTypeColor(p.getCurrentDataType());
     }
-    int framesSinceEval = frameCount - ((OutPork)p).lastEval;
-    if (framesSinceEval < 10){
-      c = addColor(c, color((10-framesSinceEval) * 12));
+    if (p instanceof OutPork){
+      int framesSinceEval = frameCount - ((OutPork)p).lastEval;
+      if (framesSinceEval < 15){
+        c = addColor(c, color((15-framesSinceEval) * 4));
+      }
     }
     return c;
   }
   
   color getColorByPork(Pork p){
-    if (badPork(p)){return color(255, 0, 0);}
-    switch (p.getCurrentDataType()) {
-      case BOOL : return getBoolFill(p);
-      default : return getDataTypeColor(p.getCurrentDataType());
-    } 
+    return getConnectionColorByPork(p);
+    //if (badPork(p)){return color(255, 0, 0);}
+    //switch (p.getCurrentDataType()) {
+    //  case BOOL : return getBoolFill(p);
+    //  default : return getDataTypeColor(p.getCurrentDataType());
+    //} 
   }
   
   color getDataTypeColor(DataType dt){
@@ -176,9 +179,9 @@ class StyleResolver {
   }
   
   color getStrokeByPork(Pork p){
-    if (p.getCurrentAccess() == null) return color(0);
+    if (!p.isConnected()) return color(0);
     if (badPork(p)){return color(255, 0, 0);}
-    return getDataTypeColor(p.getCurrentDataType()); 
+    return getConnectionColorByPork(p); 
   }
   
   boolean badPork(Pork p){

@@ -9,7 +9,7 @@ class WriteOperator extends PrimeOperator{
   
   void initialize(){
     addInPork(DataType.TEXT); addInPork(DataType.UNDETERMINED);
-    
+    addOutPork(DataType.TEXT).setTargetFlow(new Flow(DataType.TEXT));
     initializeTypeBinder(ins.get(1));
   }
   
@@ -18,6 +18,7 @@ class WriteOperator extends PrimeOperator{
       address = ins.get(0).targetFlow.getTextValue(); 
       flowRegistry.writeFlow(address, ins.get(1).targetFlow.copyFlow());  //add new flow to registry
     }
+    outs.get(0).targetFlow.setTextValue(ins.get(0).targetFlow.getTextValue());
   }
   
 }

@@ -27,19 +27,22 @@ class Connection implements Interactable, Renderable{
     if (ds == DataAccess.READWRITE){ connectionStyle = ConnectionStyle.CABLE; }
     if (ds == DataAccess.READONLY){ connectionStyle = ConnectionStyle.DOTS; }
 
-    PVector sPos = source.getAbsolutePosition().copy().add(4, 8);
-    PVector dPos = destination.getAbsolutePosition().copy().add(4, 0);
-    stiffness = 0.5+random(100)/1000;                
-    damping = 0.75+random(100)/1000;                 
-    gravity = new PVector(0, 0.8+random(100)/1000);
-    // Initialize rope straight across
-    for (int i = 0; i < 4; i++) {
-      pos[i] = sPos.copy().lerp(dPos, i/3);
-      prev[i] = pos[i].copy();
-      acc[i] = new PVector();
+    if (connectionStyle == ConnectionStyle.CABLE){
+      PVector sPos = source.getAbsolutePosition().copy().add(4, 8);
+      PVector dPos = destination.getAbsolutePosition().copy().add(4, 0);
+      stiffness = 0.5+random(100)/1000;                
+      damping = 0.75+random(100)/1000;                 
+      gravity = new PVector(0, 0.8+random(100)/1000);
+      // Initialize rope straight across
+      for (int i = 0; i < 4; i++) {
+        pos[i] = sPos.copy().lerp(dPos, i/3);
+        prev[i] = pos[i].copy();
+        acc[i] = new PVector();
+      }
+      restLength = vecDistance(pos[0], pos[3])/10; // each segment natural length
+      computeAnchorPoints();
     }
-    restLength = vecDistance(pos[0], pos[3])/10; // each segment natural length
-    computeAnchorPoints();
+    
     setStyle(source.getStyle());
   }
   
@@ -57,8 +60,6 @@ class Connection implements Interactable, Renderable{
   }
   
   void display(){
-    
-    applyStyle(source.parent.getWindow().windowMan.styleResolver.resolve(this));
 
     if (connectionStyle == ConnectionStyle.CABLE){
       displayCable();
@@ -71,7 +72,8 @@ class Connection implements Interactable, Renderable{
   }
   
   void displayCable(){
-
+    applyStyle(source.parent.getWindow().windowMan.styleResolver.resolve(this));
+    
     //update pos if we are jiggly
     if (!source.getAbsolutePosition().equals(pos[0]) || 
         !destination.getAbsolutePosition().equals(pos[3]) ||
@@ -83,19 +85,26 @@ class Connection implements Interactable, Renderable{
   }
   
   void displayDots(){
+    Style s = source.parent.getWindow().windowMan.styleResolver.resolve(this);
+    
     PVector start = source.getAbsolutePosition().copy().add(4, 8);
     PVector finish = destination.getAbsolutePosition().copy().add(4, 0);
     PVector dir = PVector.sub(finish, start);
     float dist = dir.mag();
     dir.normalize();
-    PVector offsetVector = dir.copy().mult(5);
+    PVector offsetVector = dir.copy().mult(3);
     
-    float framesSinceEval = min(10, frameCount - ((OutPork)source.getPorkPair()).lastEval);
-    float spacing = 10;   // distance between dots
-    float speed = 1-(framesSinceEval*.06);      // animation speed
+    float framesSinceEval = min(15, frameCount - ((OutPork)source.getPorkPair()).lastEval);
+    float spacing = 20;   // distance between dots
+    float speed = 2-(framesSinceEval*.1);      // animation speed
     dotOffset = (dotOffset+speed)%spacing;
-
-    for (float d = dotOffset; d < dist-spacing/2; d += spacing) {
+    
+    applyStyle(s);
+    line(start.x, start.y, finish.x, finish.y);
+    
+    s.stroke = source.parent.getWindow().windowMan.styleResolver.addColor(s.stroke, color(50));
+    applyStyle(s);
+    for (float d = dotOffset; d < dist; d += spacing) {
       PVector pos = PVector.add(start, PVector.mult(dir, d));
       PVector pos2 = PVector.add(pos, offsetVector);
       line(pos.x, pos.y, pos2.x, pos2.y);
@@ -178,8 +187,8 @@ class Connection implements Interactable, Renderable{
     }
     
     if (connectionStyle == ConnectionStyle.DOTS){
-      PVector p1 = source.getAbsolutePosition().copy();
-      PVector p2 = destination.getAbsolutePosition().copy();
+      PVector p1 = source.getAbsolutePosition().copy().add(4, 8);
+      PVector p2 = destination.getAbsolutePosition().copy().add(4, 0);
       if (isInside(new PVector(x, y), p1, p2)){
         if (distToSegment(x, y, p1.x, p1.y, p2.x, p2.y) < 4) {
           return true;

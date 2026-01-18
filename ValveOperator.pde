@@ -2,7 +2,7 @@ class ValveOperator extends PrimeOperator{
   
   ValveOperator(){
     super();
-    name = "valve";
+    name = "valve"; setExecutionSemantics(ExecutionSemantics.MUTATES);
   }
   
   void initialize(){

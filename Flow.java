@@ -192,7 +192,7 @@ public class Flow {
     if (i >= 0 && i < this.listValue.size()){
       this.listValue.set(i, f);
     } else {
-      System.out.println("index " + i + " out of bounds");
+      System.out.println("set index " + i + " out of bounds");
     }
   }
 

@@ -1,6 +1,6 @@
 class ListOperator extends PrimeOperator{
     
-  int currentSize;
+  int currentSize = 0;
   DataType currentDataType;
   
   ListOperator(){
@@ -14,11 +14,11 @@ class ListOperator extends PrimeOperator{
   }
   
   void execute(){
-    
-    if ((int)ins.get(0).targetFlow.getFloatValue() != currentSize || ins.get(1).getCurrentDataType() != currentDataType){
-      instantiateList((int)ins.get(0).targetFlow.getFloatValue(), ins.get(1).getCurrentDataType());
+    ArrayList<Flow> newList = new ArrayList<Flow>();
+    for (int i = 0; i < ins.get(0).targetFlow.getFloatValue(); i++){
+      newList.add(new Flow(ins.get(1).targetFlow.getType()));
     }
-        
+    outs.get(0).targetFlow.setListValue(newList);
   }
   
   ArrayList<Flow> instantiateList(int listSize, DataType listType){
@@ -41,7 +41,7 @@ class ListOperator extends PrimeOperator{
       }
       newList.add(new Flow(listType));
     }
-   outs.get(0).targetFlow.setListValue(newList);
+    outs.get(0).targetFlow.setListValue(newList);
     return newList;
   }
         
