@@ -255,7 +255,7 @@ public abstract class Operator{
     
     for (DataTypeBinder dtb : typeBindings){
       if (!dtb.getBoundPorks().contains(where)) continue;        
-      dtb.setDataType(dt);
+      dtb.setCurrentType(dt);
     }    
   }
   

@@ -5,7 +5,7 @@ class DisplayUIState extends DBUIState{
   
   DisplayUIState() {
     super(); 
-    setData(new UIPayload(new PImage()));
+    setData(new UIPayload(img));
   }
   
   PImage getImg(){

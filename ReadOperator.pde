@@ -20,7 +20,7 @@ class ReadOperator extends PrimeOperator{
     
     //if nothing found at this address do nothing
     if (readData == null){ println("nothing to read"); return; }    
-    if (readData.getType() != outs.get(0).getCurrentDataType()){
+    if (outs.get(0).getCurrentDataType() != DataType.UNDETERMINED && readData.getType() != outs.get(0).getCurrentDataType()){
       println("read " + readData.getType() + ", expected " + outs.get(0).getCurrentDataType());
       setExecutionStatus(ExecutionStatus.BADDATA);
       return;

@@ -7,6 +7,7 @@ class DataTypeBinder {
 
   DataTypeBinder(Pork p){
     addPork(p);  
+    setCurrentType(p.getCurrentDataType());
   }
   
   void addPork(Pork p){ boundPorks.add(p); }
@@ -14,7 +15,7 @@ class DataTypeBinder {
   ArrayList<Pork> getBoundPorks(){ return boundPorks; }
   
   //propagates type to anyting connected as well
-  void setDataType(DataType dt){ 
+  void setCurrentType(DataType dt){ 
     currentType = dt;
     for (Pork p : boundPorks){
       p.setCurrentDataType(currentType);

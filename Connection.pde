@@ -100,8 +100,10 @@ class Connection implements Interactable, Renderable{
     dotOffset = (dotOffset+speed)%spacing;
     
     applyStyle(s);
+    strokeWeight(1);
     line(start.x, start.y, finish.x, finish.y);
     
+    s = source.parent.getWindow().windowMan.styleResolver.resolve(this);
     s.stroke = source.parent.getWindow().windowMan.styleResolver.addColor(s.stroke, color(50));
     applyStyle(s);
     for (float d = dotOffset; d < dist; d += spacing) {

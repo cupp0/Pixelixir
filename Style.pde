@@ -120,10 +120,10 @@ class StyleResolver {
   color getColorByLastEval(OutPork p){
     color c = 0;
     if (p.targetFlow != null){
-      c = getDataTypeColor(p.targetFlow.getType());
+      c = getDataTypeColor(p);
     }
     else {
-      c = getDataTypeColor(p.getCurrentDataType());
+      c = getDataTypeColor(p);
     }
     int framesSinceEval = frameCount - ((OutPork)p).lastEval;
     if (framesSinceEval < 15){
@@ -136,10 +136,11 @@ class StyleResolver {
     color c = 0;
     if (badPork(p)){return color(255, 0, 0);}
     if (p.targetFlow != null){
-      c = getDataTypeColor(p.targetFlow.getType());
+      c = getDataTypeColor(p);
     }
     else {
-      c = getDataTypeColor(p.getCurrentDataType());
+      c = getDataTypeColor(p);
+      
     }
     if (p instanceof OutPork){
       int framesSinceEval = frameCount - ((OutPork)p).lastEval;
@@ -151,18 +152,22 @@ class StyleResolver {
   }
   
   color getColorByPork(Pork p){
-    return getConnectionColorByPork(p);
-    //if (badPork(p)){return color(255, 0, 0);}
-    //switch (p.getCurrentDataType()) {
-    //  case BOOL : return getBoolFill(p);
-    //  default : return getDataTypeColor(p.getCurrentDataType());
-    //} 
+    if (badPork(p)){return color(255, 0, 0);}
+    if (p instanceof InPork && p.targetFlow == null) return getDataTypeColor(p);
+    return getConnectionColorByPork(p);    
   }
   
-  color getDataTypeColor(DataType dt){
+  color getDataTypeColor(Pork p ){
+    DataType dt = DataType.UNDETERMINED;
+    
+    if (p.targetFlow == null){ dt = p.getCurrentDataType();} else {
+      dt = p.targetFlow.getType();
+    }
+    
     switch (dt) {
       case NUMERIC : return color(175, 125, 75);
       case TEXT : return color(75, 175, 125);
+      case BOOL : return getBoolFill(p);
       case LIST : return color(75, 125, 175);
       case MODULE : return color(175, 75, 125);
       case WINDOW : return color(50, 75, 150);
@@ -175,7 +180,7 @@ class StyleResolver {
   color getColorByInputData(Operator op){
     if (op.ins.size() == 0) return color(0);
     if (!op.ins.get(0).isConnected()) return color(0);
-    return getDataTypeColor(op.ins.get(0).getCurrentDataType());
+    return getDataTypeColor(op.ins.get(0));
   }
   
   color getStrokeByPork(Pork p){

@@ -11,6 +11,7 @@ class DisplayUI extends DBUI{
   void display(){ 
     if (state.getData() != null){
       PImage img = state.getData().getImgValue();
+      
       if (img != null){
         if (img.width != this.size.x || img.height != this.size.y){
           setSize(new PVector(img.width, img.height));
@@ -18,10 +19,12 @@ class DisplayUI extends DBUI{
         }
   
         strokeWeight(2);
-        rect(getAbsolutePosition().x, getAbsolutePosition().y, size.x, size.y, 4);
+        rect(getAbsolutePosition().x, getAbsolutePosition().y, img.width, img.height, 4);
+        //println(getAbsolutePosition(), img.width);
         image(img, getAbsolutePosition().x, getAbsolutePosition().y);    
   
-      }
+      } 
+      
       
       displayIdentity();
     }
