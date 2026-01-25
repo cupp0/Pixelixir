@@ -16,7 +16,7 @@ abstract class Pork {
   DataType defaultDataType;
   DataType currentDataType;
   EnumSet<DataAccess> allowedAccess;
-  DataAccess currentAccess;
+  DataAccess currentAccess = DataAccess.NONE;
   DataStatus dataStatus;
   boolean hidden; 
   
@@ -191,6 +191,7 @@ class OutPork extends Pork {
     
     if (currentAccess == DataAccess.NONE) return true;
     
+    if (currentAccess == null){println("null access");}
     return false;
   }
   

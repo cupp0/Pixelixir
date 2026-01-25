@@ -119,6 +119,8 @@ class OutPortUI extends PortUI{
           sm.selectionMan.clearSelection();
           parent.getWindow().addConnectionLine(this);
           return new StateChange(StateAction.ADD, InteractionState.DRAGGING_OPEN_CONNECTION, this);  
+        } else {
+          println("outpork inelligible");
         }
       }
     }

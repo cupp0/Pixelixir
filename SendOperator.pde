@@ -33,7 +33,9 @@ class SendOperator extends IOOperator{
     if (inPorksFull()){
       addCanonicalPork();
     }    
-    tryExposingHiddenPorts();  
+    if (((Module)listener).parent.outs.size() <= where.index){
+      exposeHiddenPork(outs.get(where.index));
+    }
   }
   
   boolean isInputDynamic(){ return true; }

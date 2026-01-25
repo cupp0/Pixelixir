@@ -85,6 +85,12 @@ class Window implements Interactable{
     OutPork srcPork = ((OutPork)portMap.getPork(src));
     InPork destPork = ((InPork)portMap.getPork(dest));
     
+    if (srcPork == null){
+      return;//println(src.parent.name +" has unpaired output");return;
+    }
+    if (destPork == null){
+      return;//println(dest.parent.name + " has unpaired input");return;
+    }
     //determine if the ports have compatible access requirements (a read only out can't be plugged into an in that wants to write)
     //access resolution could be static
     DataAccess accessRequirement = srcPork.resolveDataAccess(destPork, da);
@@ -187,9 +193,6 @@ class Window implements Interactable{
     modules.add(m);
     m.setParent(this.boundary);
     registerPorts(m);
-    if (m.owner instanceof IOOperator){
-      m.owner.tryExposingHiddenPorts();
-    }
     windowMan.lastSpawned = m;
     updateSpawnPosition(PVector.add(m.getBodyPosition(), new PVector(0, m.uiBits.get(0).size.y+16)));
   }
@@ -355,9 +358,9 @@ class Window implements Interactable{
         
         if (sm.isMouseDoing(Action.MOUSE_WHEEL)){
           if(sm.inputMan.getState().isDown(CONTROL)){
-            sm.cam.setZoomFactor(1.1);
+            sm.cam.setZoomFactor(1.01);
           } else {
-            sm.cam.setZoomFactor(2);
+            sm.cam.setZoomFactor(1.1);
           }
           sm.cam.zoom(e.input.wheelDelta);
           checkWindowTransition(e);

@@ -33,8 +33,11 @@ class ReceiveOperator extends IOOperator{
     //if all outs are full, add a new one
     if (outPorksFull()){
       addCanonicalPork();
-    }    
-    tryExposingHiddenPorts();
+    }   
+    
+    if (((Module)listener).parent.ins.size() <= where.index){
+      exposeHiddenPork(ins.get(where.index));
+    }
   }
   
 }

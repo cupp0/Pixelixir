@@ -93,7 +93,8 @@ class Connection implements Interactable, Renderable{
     float dist = dir.mag();
     dir.normalize();
     PVector offsetVector = dir.copy().mult(3);
-    
+    if (source == null)println("no source");
+    if (source.getPorkPair() == null)println("no pair");
     float framesSinceEval = min(15, frameCount - ((OutPork)source.getPorkPair()).lastEval);
     float spacing = 20;   // distance between dots
     float speed = 2-(framesSinceEval*.1);      // animation speed
@@ -229,6 +230,10 @@ class Connection implements Interactable, Renderable{
     }
     
     return new StateChange(StateAction.DO_NOTHING);
+  }
+  
+  DataAccess getDataAccess(){
+    return connectionStyle == ConnectionStyle.CABLE ? DataAccess.READWRITE : DataAccess.READONLY;
   }
 
 }

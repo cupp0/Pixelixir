@@ -334,32 +334,37 @@ public abstract class Operator{
   
   //send and receive hide porks in their UI. use this method to expose
   //any hidden porks in the enclosing module
-  void tryExposingHiddenPorts(){
+  void tryExposingHiddenPorks(){
     
     Module encloser = ((Module)listener).parent;
     if (encloser == mama) return; //make sure we are in a composite
     
     for (InPork i : ins){
-      if (i.hidden){
-        if (!encloser.isExposing(i)){
-          i.owner.setDefaultDataAccess();
-          encloser.addInPort(i);
-          encloser.getWindow().registerPorts(encloser);
-          encloser.organizeUI();
-        }
-      }
+      if (!i.hidden) continue;
+      if (encloser.isExposing(i)) continue;
+      if (!i.isConnected()) continue;
+      exposeHiddenPork(i);
     }
     
     for (OutPork o : outs){
-      if (o.hidden){
-        if (!encloser.isExposing(o)){
-          o.owner.setDefaultDataAccess();
-          encloser.addOutPort(o);
-          encloser.getWindow().registerPorts(encloser);
-          encloser.organizeUI();
-        }
-      }
+      if (!o.hidden) continue;
+      if (encloser.isExposing(o)) continue;
+      if (!o.isConnected()) continue;
+      exposeHiddenPork(o);
     }
+  }
+  
+  void exposeHiddenPork(Pork p){
+    
+    Module encloser = ((Module)listener).parent;
+    if (encloser == mama) return; //make sure we are in a composite
+    String what = p instanceof InPork ? "in" : "out";
+    
+    //println("exposing " + what + " of " + p.owner.name + " inside mama? " + (encloser == mama));
+    encloser.addPort(p);    
+    encloser.getWindow().registerPorts(encloser);
+    encloser.organizeUI();
+
   }
   
   //void addUpdater(UpdateObject uo){}

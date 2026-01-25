@@ -140,7 +140,8 @@ class SelectionMan{
         
       //create UI on composites
       if (newMods.get(mdata.id).isComposite()){
-        for (UIState uis : mdata.uiElements){           
+        for (UIState uis : mdata.uiElements){   
+          if (!(uis instanceof DBUIState))continue;
           ModuleUI newUI = (ModuleUI)partsFactory.createUI(uis.getType());
           ((DBUIState)newUI.state).copyData((DBUIState)uis);
           newMods.get(mdata.id).addUI(newUI);
@@ -193,7 +194,11 @@ class SelectionMan{
     //recurse through composites first, as send receive connections build ports outside
     for (ModuleData mdata : wdata.modules){
       if (newMods.get(mdata.id).isComposite()){
+        println(newMods.get(mdata.id).ins.size() + " b4 composite ins");
+        println(newMods.get(mdata.id).outs.size() + " b4 composite outs");
         rebuildConnections(mdata.subwindow, newMods);
+        println(newMods.get(mdata.id).ins.size() + " aftr composite ins");
+        println(newMods.get(mdata.id).outs.size() + " aftr composite outs");
       }  
     }
 
@@ -237,7 +242,7 @@ class SelectionMan{
     ArrayList<Connection> cons = new ArrayList<Connection>();
     for (Connection c : origin.connections){
       
-      //if source and destination ar in mods, cue connection for the move
+      //if source and destination are in mods, cue connection for the move
       if (mods.contains(c.source.parent) && mods.contains(c.destination.parent)){
         cons.add(c);
       }  else {   
@@ -260,7 +265,7 @@ class SelectionMan{
     }
     for (int i = origin.connections.size()-1; i >= 0; i--){
       if (cons.contains(origin.connections.get(i))){
-        origin.connections.remove(origin.connections.get(i)); 
+        origin.removeConnection(origin.connections.get(i)); 
       }
     }
     
@@ -269,7 +274,7 @@ class SelectionMan{
       destination.registerModule(m);  
     }
     for (Connection c : cons){
-      destination.connections.add(c);  
+      destination.attemptConnection((OutPortUI)c.source, (InPortUI)c.destination, c.getDataAccess());  
     }
   }
 

@@ -135,6 +135,7 @@ class StyleResolver {
   color getConnectionColorByPork(Pork p){
     color c = 0;
     if (badPork(p)){return color(255, 0, 0);}
+    if (p == null) return color(0);
     if (p.targetFlow != null){
       c = getDataTypeColor(p);
     }
@@ -184,6 +185,7 @@ class StyleResolver {
   }
   
   color getStrokeByPork(Pork p){
+    if (p == null) return color(0);
     if (!p.isConnected()) return color(0);
     if (badPork(p)){return color(255, 0, 0);}
     return getConnectionColorByPork(p); 
